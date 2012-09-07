@@ -5,7 +5,7 @@ Created on Nov 29, 2011
 '''
 from SimPy.Simulation import *
 import nodes
-from strateval.results import G
+from netuse.results import G
 
 class Stats(Process):
     

@@ -12,8 +12,8 @@ from FuXi.Rete.RuleStore import SetupRuleStore
 from FuXi.Rete.Util import generateTokenSet
 from FuXi.DLP.DLNormalization import NormalFormReduction
 
-from strateval.triplespace.gossiping.gossiped import Gossiped
-from strateval.main.simulate import loadGraphsJustOnce
+from netuse.triplespace.gossiping.gossiped import Gossiped
+from netuse.main.simulate import loadGraphsJustOnce
 
 
 semanticPath = '../../../files/semantic'

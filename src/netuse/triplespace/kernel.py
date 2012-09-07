@@ -9,12 +9,12 @@ from rdflib import URIRef
 from rdflib.Literal import Literal
 
 from SimPy.Simulation import *
-from strateval.triplespace.dataaccess.store import DataAccess
-from strateval.triplespace.network.httpelements import HttpRequest
-from strateval.triplespace.network.handlers import CustomSimulationHandler
-from strateval.results import G
-from strateval.triplespace.gossiping.gossiping_mechanism import GossipingBase
-from strateval.nodes import NodeGenerator
+from netuse.triplespace.dataaccess.store import DataAccess
+from netuse.triplespace.network.httpelements import HttpRequest
+from netuse.triplespace.network.handlers import CustomSimulationHandler
+from netuse.results import G
+from netuse.triplespace.gossiping.gossiping_mechanism import GossipingBase
+from netuse.nodes import NodeGenerator
 
 class TripleSpace(object):
     

@@ -5,8 +5,8 @@ Created on Dec 31, 2011
 '''
 import os
 from rdflib import URIRef
-from strateval.database.execution import ExecutionSet, Execution
-from strateval.database.parametrization import Parametrization
+from netuse.database.execution import ExecutionSet, Execution
+from netuse.database.parametrization import Parametrization
 
 # TODO delete from calculateExpectedResults
 def getStationNames(semanticPath):

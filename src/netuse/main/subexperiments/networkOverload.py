@@ -6,13 +6,13 @@ Created on Jan 30, 2012
 import random
 from rdflib import URIRef
 from rdflib import RDF
-from strateval.main.parametrize import getStationNames
-from strateval.database.execution import ExecutionSet
-from strateval.database.execution import Execution
-from strateval.database.parametrization import Parametrization
-from strateval.main.showResults import RequestsResults
-from strateval.main.showResults import PlotStats
-from strateval.main.showResults import AveragedAttributeGetter
+from netuse.main.parametrize import getStationNames
+from netuse.database.execution import ExecutionSet
+from netuse.database.execution import Execution
+from netuse.database.parametrization import Parametrization
+from netuse.main.showResults import RequestsResults
+from netuse.main.showResults import PlotStats
+from netuse.main.showResults import AveragedAttributeGetter
 
 # Assess network overload
 

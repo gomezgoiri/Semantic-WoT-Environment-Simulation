@@ -7,11 +7,11 @@ Created on Nov 28, 2011
 import unittest
 from rdflib import URIRef
 from SimPy.SimulationTrace import *
-from strateval.activity import ActivityGenerator
-from strateval.nodes import NodeGenerator
-from strateval.database.parametrization import Parametrization
-from strateval.results import G
-from strateval.main.simulate import loadGraphsJustOnce
+from netuse.activity import ActivityGenerator
+from netuse.nodes import NodeGenerator
+from netuse.database.parametrization import Parametrization
+from netuse.results import G
+from netuse.main.simulate import loadGraphsJustOnce
 
 PREFIXES = {
             'om-owl': 'http://knoesis.wright.edu/ssw/ont/sensor-observation.owl#',

@@ -2,7 +2,7 @@ import unittest
 import urllib
 from rdflib import URIRef
 from rdflib.Literal import Literal, _XSD_NS
-from strateval.triplespace.kernel import TripleSpace
+from netuse.triplespace.kernel import TripleSpace
 
 ANY = None
 SUBJECT = URIRef("http://subject")

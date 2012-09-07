@@ -7,10 +7,10 @@ import copy
 import StringIO
 from rdflib import Graph
 from SimPy.Simulation import random
-from strateval.nodes import NodeGenerator
-from strateval.triplespace.kernel import NegativeBroadcasting, Centralized, Gossiping
-from strateval.database.parametrization import Parametrization
-from strateval.results import G
+from netuse.nodes import NodeGenerator
+from netuse.triplespace.kernel import NegativeBroadcasting, Centralized, Gossiping
+from netuse.database.parametrization import Parametrization
+from netuse.results import G
 
 class ActivityGenerator():
     

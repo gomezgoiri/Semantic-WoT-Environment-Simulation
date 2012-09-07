@@ -5,9 +5,9 @@ from copy import deepcopy
 import rdflib
 from rdflib.Graph import Graph
 
-from strateval.triplespace.dataaccess.util import locked
-from strateval.results import G
-from strateval.triplespace.gossiping.gossiped import Gossiped
+from netuse.triplespace.dataaccess.util import locked
+from netuse.results import G
+from netuse.triplespace.gossiping.gossiped import Gossiped
 
 
 class DataAccess(object):

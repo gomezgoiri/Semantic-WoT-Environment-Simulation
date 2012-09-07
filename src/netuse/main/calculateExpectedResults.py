@@ -5,8 +5,8 @@ Created on Nov 26, 2011
 '''
 import os
 from rdflib import Graph, URIRef
-from strateval.database.expected import RequestsResults
-from strateval.database.parametrization import Parametrization
+from netuse.database.expected import RequestsResults
+from netuse.database.parametrization import Parametrization
 
 def getAllTemplates():
     ret = []

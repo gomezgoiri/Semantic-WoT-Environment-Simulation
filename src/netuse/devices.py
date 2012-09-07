@@ -4,7 +4,7 @@ Created on Nov 28, 2011
 @author: tulvur
 '''
 from SimPy.Simulation import Resource
-from strateval.results import G
+from netuse.results import G
 
 # In the future other Device dependent methods can be implemented such as: reasoning
 # That's why I've created a Hierarchy instead of just having some variables with the 2D arrays which represent each node

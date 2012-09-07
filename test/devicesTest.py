@@ -6,7 +6,7 @@ Created on Nov 28, 2011
 
 import unittest
 from mock import Mock, patch
-from strateval.devices import XBee
+from netuse.devices import XBee
 
 def side_effect(*args):
     return args[0] + args[1]/2 # just to check how to configure different returns

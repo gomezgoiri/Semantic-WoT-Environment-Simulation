@@ -5,9 +5,9 @@ Created on Jan 4, 2012
 '''
 
 import unittest
-from strateval.database.execution import Execution, ExecutionSet
-from strateval.database.parametrization import Parametrization
-from strateval.database.results import RequestsResults, Results
+from netuse.database.execution import Execution, ExecutionSet
+from netuse.database.parametrization import Parametrization
+from netuse.database.results import RequestsResults, Results
 
 Execution.meta = {'collection': 'executionsTest'}
 ExecutionSet.meta = {'collection': 'executionSetTest'}

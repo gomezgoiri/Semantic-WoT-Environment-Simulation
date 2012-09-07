@@ -7,7 +7,7 @@ import StringIO
 import unittest
 from rdflib import Graph
 from rdflib import URIRef
-from strateval.triplespace.gossiping.gossiping_mechanism import GossipingBase
+from netuse.triplespace.gossiping.gossiping_mechanism import GossipingBase
 
 tbox_data = """
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.

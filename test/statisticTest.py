@@ -5,7 +5,7 @@ Created on Nov 30, 2011
 '''
 import unittest
 from SimPy.Simulation import Monitor
-from strateval.statistic import Stats
+from netuse.statistic import Stats
 from mock import Mock
 
 class TestStats(unittest.TestCase):

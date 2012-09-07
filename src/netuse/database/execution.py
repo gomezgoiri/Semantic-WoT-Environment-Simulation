@@ -5,8 +5,8 @@ Created on Nov 27, 2011
 '''
 import datetime
 from mongoengine import Document, DateTimeField, ListField, StringField, ReferenceField, queryset_manager
-from strateval.database.parametrization import Parametrization
-from strateval.database.results import Results, RequestsResults
+from netuse.database.parametrization import Parametrization
+from netuse.database.results import Results, RequestsResults
 
 class Execution(Document):
     meta = {'collection': 'executions'}

@@ -4,7 +4,7 @@ Created on Jan 7, 2012
 @author: tulvur
 '''
 from pymongo.objectid import ObjectId
-from strateval.database.execution import ExecutionSet
+from netuse.database.execution import ExecutionSet
 
 def delete(executionSets):
     for es in executionSets:

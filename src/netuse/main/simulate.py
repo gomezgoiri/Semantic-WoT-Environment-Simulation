@@ -16,16 +16,16 @@ from FuXi.Rete.RuleStore import SetupRuleStore
 from FuXi.Rete.Util import generateTokenSet
 from FuXi.DLP.DLNormalization import NormalFormReduction
 
-from strateval.main.parametrize import getStationNames
-from strateval.devices import XBee
-from strateval.devices import FoxG20, RegularComputer
-from strateval.activity import ActivityGenerator
-from strateval.nodes import NodeGenerator
-from strateval.database.execution import ExecutionSet
-from strateval.database.results import Results, RequestsResults
-from strateval.results import G
-from strateval.statistic import Stats
-from strateval.database.parametrization import Parametrization
+from netuse.main.parametrize import getStationNames
+from netuse.devices import XBee
+from netuse.devices import FoxG20, RegularComputer
+from netuse.activity import ActivityGenerator
+from netuse.nodes import NodeGenerator
+from netuse.database.execution import ExecutionSet
+from netuse.database.results import Results, RequestsResults
+from netuse.results import G
+from netuse.statistic import Stats
+from netuse.database.parametrization import Parametrization
 
 
 

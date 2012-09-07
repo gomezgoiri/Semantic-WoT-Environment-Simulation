@@ -10,7 +10,7 @@ from rdflib import Graph
 from rdflib import Literal, URIRef
 from rdflib.Literal import _XSD_NS
 
-from strateval.triplespace.network.httpelements import HttpResponse
+from netuse.triplespace.network.httpelements import HttpResponse
 
 class SpacesHandler(object):
     def __init__(self, stores):

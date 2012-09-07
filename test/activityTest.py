@@ -5,11 +5,11 @@ Created on Nov 30, 2011
 '''
 import unittest
 from SimPy.SimulationTrace import *
-from strateval.activity import ActivityGenerator
-from strateval.nodes import NodeGenerator
-from strateval.database.parametrization import Parametrization
-from strateval.results import G
-from strateval.statistic import Stats
+from netuse.activity import ActivityGenerator
+from netuse.nodes import NodeGenerator
+from netuse.database.parametrization import Parametrization
+from netuse.results import G
+from netuse.statistic import Stats
 
 semanticPath = '../files/semantic/dataset'
 

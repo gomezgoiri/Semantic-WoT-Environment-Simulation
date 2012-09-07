@@ -7,9 +7,9 @@ Created on Nov 26, 2011
 import numpy
 from itertools import cycle
 from matplotlib.pyplot import figure, show, xlabel, ylabel, title
-from strateval.database.expected import RequestsResults
-from strateval.database.execution import ExecutionSet
-from strateval.database.parametrization import Parametrization
+from netuse.database.expected import RequestsResults
+from netuse.database.execution import ExecutionSet
+from netuse.database.parametrization import Parametrization
 
 class PlotStats(object):
     # http://www.thetechrepo.com/main-articles/469

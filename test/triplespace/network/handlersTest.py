@@ -6,9 +6,9 @@ from rdflib.Literal import Literal
 from rdflib.Literal import _XSD_NS
 from rdflib.URIRef import URIRef
 from rdflib.Graph import Graph
-import strateval.triplespace.network.handlers as handlers
-from strateval.triplespace.network.httpelements import HttpRequest
-from strateval.triplespace.dataaccess.store import DataAccess
+import netuse.triplespace.network.handlers as handlers
+from netuse.triplespace.network.httpelements import HttpRequest
+from netuse.triplespace.dataaccess.store import DataAccess
 
 TRIPLES = Graph()
 TRIPLES.add((URIRef('http://python'), URIRef('http://is'), URIRef('http://good'),))
