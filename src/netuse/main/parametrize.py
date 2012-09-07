@@ -70,8 +70,8 @@ if __name__ == '__main__':
     semanticPath = args.dataset_path
     
     if args.subexperiment=='networkOverload':    
-        from strateval.main.subexperiments.networkOverload import parametrize
+        from netuse.main.subexperiments.networkOverload import parametrize
     if args.subexperiment=='responseTime':
-        from strateval.main.subexperiments.responseTime import parametrize
+        from netuse.main.subexperiments.responseTime import parametrize
         
     parametrize(semanticPath)

@@ -166,9 +166,9 @@ def main():
     args = parser.parse_args()
     
     if args.subexperiment=='networkOverload':    
-        from strateval.main.subexperiments.networkOverload import show
+        from netuse.main.subexperiments.networkOverload import show
     if args.subexperiment=='responseTime':
-        from strateval.main.subexperiments.responseTime import show
+        from netuse.main.subexperiments.responseTime import show
     
     showTotal()
 

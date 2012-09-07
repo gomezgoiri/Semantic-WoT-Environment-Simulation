@@ -26,7 +26,7 @@ class TestDeviceType(unittest.TestCase):
         device._DeviceType__resources = resources
         return device
     
-    @patch('strateval.results.G.Rnd', rndMock)
+    @patch('netuse.results.G.Rnd', rndMock) # new global unrandomized variable 
     def test_getTimeNeededToAnswer(self):        
         dev = self.getMockedDevice(XBee())
         

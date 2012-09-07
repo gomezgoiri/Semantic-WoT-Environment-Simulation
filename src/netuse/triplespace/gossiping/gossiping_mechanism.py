@@ -12,7 +12,7 @@ from FuXi.Rete.Util import generateTokenSet
 from FuXi.DLP.DLNormalization import NormalFormReduction
 from FuXi.Horn.HornRules import HornFromN3
 
-from strateval.triplespace.gossiping.gossiped import Gossiped
+from netuse.triplespace.gossiping.gossiped import Gossiped
 
 # module where the gossiped info is stored
 class GossipingBase:
