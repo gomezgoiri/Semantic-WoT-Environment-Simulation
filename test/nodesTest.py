@@ -31,6 +31,12 @@ class TestNodes(unittest.TestCase):
     def setUp(self):
         G.Rnd = random.Random(12346)
     
+    '''
+        @param parameters
+            Parameters for the simulation.
+        @param extraActivityGenerator
+            Method to be called which will generate extra activity.
+    '''
     def performSimulation(self, parameters, extraActivityGenerator):
         trace.tchange(outfile=open(r"/tmp/simulation.log","w"))
         trace.ttext("New simulation!")
@@ -70,7 +76,16 @@ class TestNodes(unittest.TestCase):
         self._testReceivedResponses(2, ((200, 1),(404, 1)))
         self._testReceivedResponses(3, ((404, 2),))
         
-        
+    '''
+        @param reqNum
+            The request number whose responses will be checked.
+            
+        @param codes
+            Tuple with the different type or responses received in this form (code, amount)
+            Examples:
+                ((200), 2) => Two HTTP 200 reponses received.
+                ((200, 1),(404, 1)) => One 404 response and another 200 reponse received.
+    '''
     def _testReceivedResponses(self, reqNum, codes):
         actionNode = NodeGenerator.getNodes()[0]
         for c in codes:
