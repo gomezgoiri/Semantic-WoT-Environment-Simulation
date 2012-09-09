@@ -58,7 +58,7 @@ class SpacesHandler(object):
             if method=='GET':
                 return (200, """Graph list (not implemented)""", 'text/html')
             elif method=='POST':
-                actual_graph = Graph().parse(StringIO.StringIO(request.get_data()), format='n3')
+                actual_graph = request.get_data() # Graph().parse(StringIO.StringIO(request.get_data()), format='n3')
                 store.write(actual_graph)
                 return (200, """The graph was successfully written""", 'text/html')
             # cannot be another method, urllib2 does not use them
