@@ -3,10 +3,8 @@ Created on Dec 13, 2011
 
 @author: tulvur
 '''
-import StringIO
 import traceback
 import urllib
-from rdflib import Graph
 from rdflib import Literal, URIRef
 from rdflib.Literal import _XSD_NS
 
