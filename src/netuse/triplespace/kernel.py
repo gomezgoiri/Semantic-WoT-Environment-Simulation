@@ -10,8 +10,8 @@ from rdflib.Literal import Literal
 
 from SimPy.Simulation import *
 from netuse.triplespace.dataaccess.store import DataAccess
-from netuse.triplespace.network.server_side import CustomSimulationHandler
-from netuse.triplespace.network.client_side import RequestInstance
+from netuse.triplespace.network.server import CustomSimulationHandler
+from netuse.triplespace.network.client import RequestInstance
 from netuse.results import G
 from netuse.triplespace.gossiping.gossiping_mechanism import GossipingBase
 from netuse.nodes import NodeGenerator
