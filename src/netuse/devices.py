@@ -10,7 +10,7 @@ from netuse.results import G
 # That's why I've created a Hierarchy instead of just having some variables with the 2D arrays which represent each node
 class DeviceType():
     # Waiting time measure in FoxG20
-    # Concurrent request, Mean, Std dev    
+    # Concurrent request, Mean, Std dev
     def __init__(self, waitingTime=None, canQueue=True, canReason=True):
         self.__wait = waitingTime
         if waitingTime!=None:

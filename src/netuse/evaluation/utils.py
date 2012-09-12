@@ -19,13 +19,21 @@ class ParametrizationUtils():
         self.repetitions = repetitions
         
     def createDefaultParametrization(self, strategy, amountOfQueries, writeFrequency, simulateUntil, queries, numNodes, nodeTypes=None):
-        nodes = random.sample(self.possibleNodes, numNodes)
+        if len(self.possibleNodes)<=numNodes:
+            nodes = random.sample(self.possibleNodes, numNodes)
+        else:
+            nodes = list(self.possibleNodes) # copies the list (or more cryptic: self.possibleNodes[:])
+            for i in range(numNodes-len(self.possibleNodes)):
+                nodes.append('DOE_'+i) #TODO mecanismo para meter nodos sin contenido (o contenido de pega)
+        
+        if nodeTypes==None:
+            nodeTypes = (RegularComputer.TYPE_ID,)*numNodes
         
         params = Parametrization(strategy = strategy,
                         amountOfQueries = amountOfQueries,
                         writeFrequency = writeFrequency,
                         nodes = nodes,
-                        nodeTypes = nodeTypes if nodeTypes!=None else (RegularComputer.TYPE_ID,)*numNodes,
+                        nodeTypes = nodeTypes,
                         simulateUntil = simulateUntil,
                         queries = ((None, RDF.type, URIRef('http://knoesis.wright.edu/ssw/ont/weather.owl#RainfallObservation')),
                                     (URIRef('http://dev.morelab.deusto.es/bizkaisense/resource/station/ABANTO'), None, None)

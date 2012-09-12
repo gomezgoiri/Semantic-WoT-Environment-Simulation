@@ -50,14 +50,16 @@ if __name__ == '__main__':
     p = ParametrizationUtils('network_usage', '/home/tulvur/dev/workspaces/doctorado/files/semantic')
     
     # important: this for before the strategy for, to have the same nodes in both simulations
-    for numNodes in (2, 5, 10, 50, 100, 150):        
-        for strategy in (Parametrization.negative_broadcasting, Parametrization.centralized, Parametrization.gossiping):
-            p.createDefaultParametrization(strategy,
-                                           amountOfQueries = 100,
-                                           writeFrequency = 1000,
-                                           simulateUntil = 60000,
-                                           queries = ((None, RDF.type, URIRef('http://knoesis.wright.edu/ssw/ont/weather.owl#RainfallObservation')),
-                                                      (URIRef('http://dev.morelab.deusto.es/bizkaisense/resource/station/ABANTO'), None, None)
-                                                      ,),
-                                           numNodes = numNodes
-                                           )
+    for numNodes in (2, 5, 10, 50, 100, 150):
+        for numConsumers in (1, 10, 100):
+            for strategy in (Parametrization.negative_broadcasting, Parametrization.gossiping):
+                p.createDefaultParametrization(strategy,
+                                               amountOfQueries = 100,
+                                               writeFrequency = 1000,
+                                               simulateUntil = 60000,
+                                               queries = ((None, RDF.type, URIRef('http://knoesis.wright.edu/ssw/ont/weather.owl#RainfallObservation')),
+                                                          (URIRef('http://dev.morelab.deusto.es/bizkaisense/resource/station/ABANTO'), None, None)
+                                                          ,),
+                                               numNodes = numNodes,
+                                               numConsumers = numConsumers
+                                               )
