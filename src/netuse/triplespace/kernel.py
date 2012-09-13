@@ -152,7 +152,7 @@ class Gossiping(NegativeBroadcasting):
         # store gossips
         for response in requestInstance.responses:
             if response.getstatus()==200:
-                dest_node_name = requestInstance.extractDestinationNode(response.getid())
+                dest_node_name = requestInstance.get_destination_node_name(response.getid())
                 self.gossiping_base.addGossip(dest_node_name, response.get_data(), expand=False) #TODO put it again self.reasoningCapacity)
         
         # extract template for pending query

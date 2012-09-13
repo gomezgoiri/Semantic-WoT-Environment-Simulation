@@ -31,7 +31,7 @@ class RequestInstance(Process):
         self.__observers = []
         
     def startup(self):
-        init = now()
+        t_init = now()
         
         for node in self.__destinationNodes:
             # already removed from the list prior to calling to this method, but just in case...
@@ -44,8 +44,8 @@ class RequestInstance(Process):
                 
                 self.requestInit[reqId] = now()
                 node.queueRequest(self, request)
-                if self.__data!=None:
-                    G.executionData.requests['data-exchanged'] += len(self.__data)
+                #if self.__data!=None:
+                #    G.executionData.requests['data-exchanged'] += len(self.__data)
             else:
                 raise Exception("A request to the same node is impossible!")
         
@@ -54,38 +54,64 @@ class RequestInstance(Process):
         while not self.allReceived() or self.timer.ended:
             yield waitevent, self, (self.__timeout, self.__newResponseReceived,)
         
-        if self.allReceived():
-            #print "All the responses get by node %s: %s"%(self.__actionNode,self.responses)
-            self.__actionNode.addClientRequestActivityObservation(now()-init, now())
-            G.executionData.requests['success'].append(self)
-        else: # timeout reached
+        
+        if not self.allReceived(): # timeout reached
             #print "Response not received!"
-            self.__actionNode.addClientRequestActivityObservation(now()-init, now())
-            G.executionData.requests['failure'].append(self)
-            G.executionData.requests['timeout'].append(self.getWaitingFor())
+            response_time = now() - t_init
+            
+            for node_name in self.get_unanswered_nodes():
+                G.traceRequest(t_init,
+                           self.__actionNode.name,
+                           node_name,
+                           408, # TIMEOUT. See http://www.restlet.org/documentation/2.0/jse/api/org/restlet/data/Status.html#CLIENT_ERROR_REQUEST_TIMEOUT
+                           response_time )
+            
+            # self.__actionNode.addClientRequestActivityObservation(now()-init, now())
+            
+            # this information can be extracted from the traces
+            # G.executionData.requests['failure'].append(self)
             
         for o in self.__observers:
             o.notifyRequestFinished(self)
-    
-    def allReceived(self):
-        return self.getWaitingFor()==0
+            
+    def get_unanswered_nodes(self):
+        unanswered_reqids = self.requestInit.keys()
+        for response in self.responses:
+            unanswered_reqids.remove(response.getid())
+        
+        unanswered = []
+        for reqId in unanswered_reqids:
+            unanswered.append(self.get_destination_node_name(reqId))
+            
+        return unanswered
     
     def getWaitingFor(self):
         return len(self.requestInit)
     
+    def allReceived(self):
+        return self.getWaitingFor()==0
+    
     def addResponse(self, response): # TODO associate with a node
         #if response.getstatus()==404:
-        #    dest_node_name = self.extractDestinationNode(response.getid())
+        #    dest_node_name = self.get_destination_node_name(response.getid())
         #    print dest_node_name
         
         # timeouts have been already taken into account in the 'timeout' counter
         if not self.timer.ended:
             t_init = self.requestInit[response.getid()]
-            G.executionData.response_time_monitor.observe( now() - t_init ) # request time
+            response_time = now() - t_init
+            G.traceRequest(t_init,
+                           self.__actionNode.name,
+                           self.get_destination_node_name(response.getid()),
+                           response.getstatus(),
+                           response_time )
+            
+            #G.executionData.response_time_monitor.observe( now() - t_init ) # request time
             del self.requestInit[response.getid()]
             
             self.responses.append(response) #dest_node_name
-            G.executionData.requests['data-exchanged'] += len(response.get_data())
+            
+            #G.executionData.requests['data-exchanged'] += len(response.get_data())
             
             #fileHandle = open ( 'test.txt', 'a' )
             #fileHandle.write ( response.get_data() )
@@ -93,17 +119,8 @@ class RequestInstance(Process):
             
             self.__newResponseReceived.signal()
             
-    def extractDestinationNode(self, responseId):
-        ret = self.nodeNamesByReqId[responseId]
-        del self.nodeNamesByReqId[responseId]
-        return ret
-         
-    def rejectConnection(self, requestId):
-        # timeouts have been already taken into account in the 'timeout' counter
-        if not self.timer.ended:
-            del self.requestInit[requestId]
-            G.executionData.requests['server-error'] += 1
-            self.__newResponseReceived.signal()
+    def get_destination_node_name(self, responseId):
+        return self.nodeNamesByReqId[responseId]
     
     def toString(self):
         for resp in self.responses:

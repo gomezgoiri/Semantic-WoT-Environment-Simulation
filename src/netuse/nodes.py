@@ -51,7 +51,7 @@ class ConcurrentThread(Process):
     
     def executeTask(self, handler, req):
         if self.__device.isOverloaded():
-            self.__node.rejectRequest(req.getid())
+            self.__node.addResponse(handler.handle(req))
         else:
             yield request,self,self.__device.getResources()
             
@@ -93,39 +93,24 @@ class Node(Process):
         self.__reqIdGenerator = 0
         self.__waitingRequesters_and_InitTime = {} # TODO the "InitTime" is not longer used in this class
         
-        self.__inactivityMonitor = Monitor()
-        # to monitor the time needed by the node as request client
-        self.__requestActivityMonitor = Monitor()
         self.__requestsCounter = 0
     
     def processRequests(self):
         while 1:
             if not self.__httpIn: # if it's empty...
-                inactive = now()
                 yield passivate, self
-                self.__inactivityMonitor.observe(now()-inactive)
             else:
                 # reqIdGenerator was not intended to be used to generate a name for CurrentThread, but I've reused :-P
                 thMngr = ConcurrentThread(self, self.__device, name=self.name+"_th"+str(self.__reqIdGenerator))               
                 activate(thMngr, thMngr.executeTask(self.ts.handler, self.__httpIn.pop()))
-    
-    def getInactivityPeriod(self):
-        return self.__inactivityMonitor.total()
-    
+        
     def addResponse(self, response):
         self.__httpOut[response.getid()] = response
         
         requester, _ = self.__waitingRequesters_and_InitTime[response.getid()]
         del self.__waitingRequesters_and_InitTime[response.getid()]
         
-        #G.executionData.response_time_monitor.observe(now()-t_init)
         requester.addResponse(response)
-    
-    def rejectRequest(self, requestId):        
-        requester, _ = self.__waitingRequesters_and_InitTime[requestId]
-        del self.__waitingRequesters_and_InitTime[requestId]
-        
-        requester.rejectConnection(requestId) # implement this method!
     
     def queueRequest(self, requester, req):
         self.__requestsCounter += 1
@@ -133,15 +118,6 @@ class Node(Process):
         self.__httpIn.append(req)
         self.__waitingRequesters_and_InitTime[req.getid()] = (requester, now())
         reactivate(self) # starts answering
-        
-    def addClientRequestActivityObservation(self, y, t=now()):
-        self.__requestActivityMonitor.observe(y, t)
-        
-    def getInactivityMonitor(self):
-        return self.__inactivityMonitor
-    
-    def getActivityMonitor(self):
-        return self.__requestActivityMonitor
     
     def getReceivedRequests(self):
         return self.__requestsCounter

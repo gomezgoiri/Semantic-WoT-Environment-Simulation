@@ -3,7 +3,22 @@ Created on Nov 27, 2011
 
 @author: tulvur
 '''
-from mongoengine import Document, FloatField, IntField, ReferenceField
+from mongoengine import Document, StringField, FloatField, IntField, ReferenceField
+
+class NetworkTrace(Document):
+    meta = {'collection': 'net_trace'}
+    
+    timestamp = FloatField(default=0.0)
+    client = StringField()
+    server = StringField()
+    status = IntField(default=0)
+    response_time = FloatField(default=0.0)
+    
+    # Possible extensions
+    #  + bandwidth (or data exchanged)
+    #  + path = StringField()
+    
+    
 
 class RequestsResults(Document):
     meta = {'collection': 'results'}

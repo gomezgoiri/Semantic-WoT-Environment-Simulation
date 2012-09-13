@@ -6,14 +6,15 @@ Created on Nov 27, 2011
 import datetime
 from mongoengine import Document, DateTimeField, ListField, StringField, ReferenceField, queryset_manager
 from netuse.database.parametrization import Parametrization
-from netuse.database.results import Results, RequestsResults
+from netuse.database.results import NetworkTrace
 
 class Execution(Document):
     meta = {'collection': 'executions'}
     
     # executions are repeated if they have exactly the same "parameters" attribute
     parameters = ReferenceField(Parametrization) 
-    results = ReferenceField(Results)
+    #results = ReferenceField(Results)
+    requests = ListField(ReferenceField(NetworkTrace))
     
     def save(self, *args, **kwargs):
         """Apart from saving the object, the execution time of its ExecutionSet is modified and updated in the database."""

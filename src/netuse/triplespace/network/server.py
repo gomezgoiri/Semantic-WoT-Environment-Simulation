@@ -172,8 +172,11 @@ class CustomSimulationHandler(object):
 
         return (404, "Not found", 'text/plain')
     
-    def handle(self, request):
-        status, response, content_type = self.handleSpaces(request)
+    def not_handle(self):
+        return (503, "Service Unavailable: server overload.", 'text/plain')
+    
+    def handle(self, request, overload=False):
+        status, response, content_type = self.not_handle() if overload else self.handleSpaces(request)
         return HttpResponse(request.getid(), response, status=status, headers="Content-Type: %s;"%content_type)
         #self.send_response(code)
         #self.send_header("Content-type", content_type)

@@ -19,7 +19,10 @@ class ParametrizationUtils():
         self.repetitions = repetitions
         
     def createDefaultParametrization(self, strategy, amountOfQueries, writeFrequency, simulateUntil, queries, numNodes, numConsumers, nodeTypes=None):
-        if len(self.possibleNodes)<=numNodes:
+        if numNodes<numConsumers:
+            raise Exception('Parametrization error: nore consumers than nodes in the simulation.')
+        
+        if numNodes<=len(self.possibleNodes):
             nodes = random.sample(self.possibleNodes, numNodes)
         else:
             nodes = list(self.possibleNodes) # copies the list (or more cryptic: self.possibleNodes[:])

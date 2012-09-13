@@ -28,7 +28,7 @@ class ActivityGenerator():
             self.configureCentralizedActivity()
         
         self.generateSimulationWritings()
-        self.generateSimulationQueries()
+        self.generateSimulationQueries(self.__params.numConsumers)
     
     def configureNegativeBroadcasting(self):
         for n in NodeGenerator.getNodes():
@@ -54,7 +54,6 @@ class ActivityGenerator():
         if 0 < self.__params.writeFrequency:
             # writings
             for i in range(0,self.__params.numberOfNodes):
-                #print len(NodeGenerator.getNodes()), i
                 actionNode = NodeGenerator.getNodes()[i]
                 graphsToWrite = copy.deepcopy(self.__baseGraphs[actionNode.name])
                 
@@ -68,8 +67,8 @@ class ActivityGenerator():
                     actionNode.ts.write(last, startAt=startsWriting+writesAt)
         
     
-    def generateSimulationQueries(self):
-        consumerNodes = cycle(G.Rnd.sample(NodeGenerator.getNodes()))
+    def generateSimulationQueries(self, numConsumers):
+        consumerNodes = cycle(G.Rnd.sample(NodeGenerator.getNodes(), numConsumers))
         
         # queries to central node
         if self.__params.numberOfNodes>1: # otherwise it does not make sense!
