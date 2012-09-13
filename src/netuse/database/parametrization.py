@@ -21,6 +21,7 @@ class Parametrization(Document):
     nodes = ListField(StringField(), required=True, default=[])
     nodeTypes = ListField(StringField(), required=True, default=[])
     amountOfQueries = IntField(required=True, default=0)
+    numConsumers = IntField(required=True, default=0)
     writeFrequency = IntField(required=True, default=100)
     
     _queries = StringField(required=True, default=pickle.dumps([('*', '*', '*'),]))

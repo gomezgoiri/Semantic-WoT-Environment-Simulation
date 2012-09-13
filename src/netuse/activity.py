@@ -4,6 +4,7 @@ Created on Nov 26, 2011
 @author: tulvur
 '''
 import copy
+from itertools import cycle
 import StringIO
 from rdflib import Graph
 from SimPy.Simulation import random
@@ -66,8 +67,9 @@ class ActivityGenerator():
                     #    last = Graph().parse(StringIO.StringIO("<http://s> <http://p> <http://o> .\n"), format="nt")
                     actionNode.ts.write(last, startAt=startsWriting+writesAt)
         
+    
     def generateSimulationQueries(self):
-        actionNode = NodeGenerator.getNodes()[G.Rnd.randint(1,self.__params.numberOfNodes-1)]
+        consumerNodes = cycle(G.Rnd.sample(NodeGenerator.getNodes()))
         
         # queries to central node
         if self.__params.numberOfNodes>1: # otherwise it does not make sense!
@@ -76,4 +78,4 @@ class ActivityGenerator():
                 template = G.Rnd.choice(self.__params.queries)
                 
                 #print "%s requests at %s"%(actionNode,startAt)
-                actionNode.ts.query(template, startAt=startAt)
+                consumerNodes.next().ts.query(template, startAt=startAt)

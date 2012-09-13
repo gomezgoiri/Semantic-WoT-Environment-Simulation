@@ -18,7 +18,7 @@ class ParametrizationUtils():
         self.es = ExecutionSet(experiment_id=experiment_id) # 'network_use'
         self.repetitions = repetitions
         
-    def createDefaultParametrization(self, strategy, amountOfQueries, writeFrequency, simulateUntil, queries, numNodes, nodeTypes=None):
+    def createDefaultParametrization(self, strategy, amountOfQueries, writeFrequency, simulateUntil, queries, numNodes, numConsumers, nodeTypes=None):
         if len(self.possibleNodes)<=numNodes:
             nodes = random.sample(self.possibleNodes, numNodes)
         else:
@@ -31,6 +31,7 @@ class ParametrizationUtils():
         
         params = Parametrization(strategy = strategy,
                         amountOfQueries = amountOfQueries,
+                        numConsumers=numConsumers,
                         writeFrequency = writeFrequency,
                         nodes = nodes,
                         nodeTypes = nodeTypes,
