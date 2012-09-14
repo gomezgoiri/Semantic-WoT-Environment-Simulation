@@ -152,12 +152,33 @@ class SpacesHandler(object):
         return (200, ntriples, 'text/n3') # text/n-triples, text/n3
 
 
+class WhitepageHandler(object):
+    def __init__(self, whitepage):
+        self.whitepage = whitepage
+        
+    def process_whitepage(self, wp_path, request=None):
+        if self.tskernel.whitepage==None:
+            return (501, "Not Implemented", 'text/plain')
+        
+        if wp_path.startswith('clues'):
+            # clue_path = wp_path[len('clues/'):] #to offer individual access to the clues?
+            # Not the best API in the world, but this can be changed in advance
+            
+            method = request.get_method()
+            if method=='GET':
+                return (200, """TODO JSON""", 'application/json')
+            elif method=='POST':
+                clues_json = request.get_data()
+                # TODO do something with it
+                return (200, """The clue was successfully updated""", 'text/html')
+
+
 class CustomSimulationHandler(object):
     
     def __init__(self, tskernel):
         self.tskernel = tskernel
     
-    def handleSpaces(self, request):
+    def _handleRequest(self, request):
         path = request.get_full_url()
         if path.startswith('/spaces'):
             spaces_path = path[len('/spaces/'):]
@@ -169,14 +190,19 @@ class CustomSimulationHandler(object):
                 return (500, "Error: %s" % e, 'text/html')
         elif path.startswith('/prefixes'):
             print "prefixes..."
-
+        elif path.startswith('/whitepage'):
+            if hasattr(self.tskernel, 'whitepage'):
+                whitepage_path = path[len('/whitepage/'):]
+                whitepage_handler = WhitepageHandler(self.tskernel.dataaccess.stores)
+                return whitepage_handler.process_whitepage(whitepage_path)
+            
         return (404, "Not found", 'text/plain')
     
-    def not_handle(self):
+    def _not_handle(self):
         return (503, "Service Unavailable: server overload.", 'text/plain')
     
     def handle(self, request, overload=False):
-        status, response, content_type = self.not_handle() if overload else self.handleSpaces(request)
+        status, response, content_type = self._not_handle() if overload else self._handleRequest(request)
         return HttpResponse(request.getid(), response, status=status, headers="Content-Type: %s;"%content_type)
         #self.send_response(code)
         #self.send_header("Content-type", content_type)

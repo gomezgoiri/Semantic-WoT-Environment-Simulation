@@ -121,6 +121,7 @@ class Gossiping(NegativeBroadcasting):
         NegativeBroadcasting.__init__(self, me)
         self.gossiping_base = GossipingBase(ontologyGraph)
         self.templateToQueryAfterGossiping = {}
+        self.whitepage = None
     
     def write(self, triples, startAt=now()):
         self.dataaccess.write(triples)
