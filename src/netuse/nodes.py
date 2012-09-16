@@ -25,13 +25,6 @@ class NodeGenerator:
                 NodeGenerator.Nodes[nodeName] = node
                 activate(node,node.processRequests())
     
-    def getTotalRequests(self):
-        if self.__totalRequests==-1 :
-            self.__totalRequests = 0
-            for n in NodeGenerator.getNodes():
-                self.__totalRequests += n.getReceivedRequests()  
-        return self.__totalRequests
-    
     @staticmethod
     def getNodes():
         return NodeGenerator.Nodes.values()
@@ -92,8 +85,6 @@ class Node(Process):
         self.__httpIn = []
         self.__reqIdGenerator = 0
         self.__waitingRequesters_and_InitTime = {} # TODO the "InitTime" is not longer used in this class
-        
-        self.__requestsCounter = 0
     
     def processRequests(self):
         while 1:
@@ -112,15 +103,11 @@ class Node(Process):
         
         requester.addResponse(response)
     
-    def queueRequest(self, requester, req):
-        self.__requestsCounter += 1
-        
+    def queueRequest(self, requester, req):        
         self.__httpIn.append(req)
         self.__waitingRequesters_and_InitTime[req.getid()] = (requester, now())
         reactivate(self) # starts answering
-    
-    def getReceivedRequests(self):
-        return self.__requestsCounter
+
         
     def __str__(self):
         return self.name

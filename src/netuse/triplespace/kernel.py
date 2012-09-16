@@ -21,11 +21,11 @@ class TripleSpace(object):
     
     __metaclass__ = ABCMeta
     
-    def __init__(self, me):
+    def __init__(self, discovery):
         self.handler = CustomSimulationHandler(self)
         self.dataaccess = DataAccess() # join not implemented yet
         self.network = None
-        self.me = me
+        self.discovery = discovery
         self.__logRequests = False
         self.reasoningCapacity = False # TODO refactor (it should be get from Device
     
@@ -74,8 +74,8 @@ class TripleSpace(object):
         return 'spaces/' + urllib.quote_plus(space) + '/'
 
 class NegativeBroadcasting(TripleSpace):
-    def __init__(self, me):
-        TripleSpace.__init__(self, me)
+    def __init__(self, discovery):
+        TripleSpace.__init__(self, discovery)
     
     def write(self, triples, startAt=now()):
         self.dataaccess.write(triples)
@@ -84,15 +84,12 @@ class NegativeBroadcasting(TripleSpace):
         # local query
         
         # remote queries
-        req = RequestInstance(self.me, self.destNodes,
+        req = RequestInstance(self.discovery.me,
+                              self.discovery.rest,
                               '/' + self.fromSpaceToURL() + "query/" + self.fromTemplateToURL(template),
                               name="queryAt"+str(startAt))
         activate(req, req.startup(), at=startAt)
         self.logRequest(req)
-    
-    def setNodes(self, listNodes):
-        self.destNodes = list(listNodes)
-        self.destNodes.remove(self.me) # just in case
         
 
 class Centralized(TripleSpace):
@@ -117,8 +114,8 @@ class Centralized(TripleSpace):
 
 
 class Gossiping(NegativeBroadcasting):
-    def __init__(self, me, ontologyGraph): # ontologyGraph, which may be already expanded or not
-        NegativeBroadcasting.__init__(self, me)
+    def __init__(self, discovery, ontologyGraph): # ontologyGraph, which may be already expanded or not
+        NegativeBroadcasting.__init__(self, discovery)
         self.gossiping_base = GossipingBase(ontologyGraph)
         self.templateToQueryAfterGossiping = {}
         self.whitepage = None
@@ -134,9 +131,9 @@ class Gossiping(NegativeBroadcasting):
         # local query
         
         # remote queries
-        ungossiped_nodes = self.gossiping_base.getUngossiped(self.destNodes)
+        ungossiped_nodes = self.gossiping_base.getUngossiped(self.discovery.rest)
         if ungossiped_nodes:
-            req = RequestInstance(self.me, ungossiped_nodes,
+            req = RequestInstance(self.discovery.me, ungossiped_nodes,
                                   '/' + self.fromSpaceToURL() + "gossip/",
                                   name="gossipAt"+str(now()))
             
@@ -169,7 +166,7 @@ class Gossiping(NegativeBroadcasting):
         for node_name in selected_nodes:
             destNodes.append(NodeGenerator.getNodeByName(node_name))
         
-        req = RequestInstance(self.me, destNodes,
+        req = RequestInstance(self.discovery.me, destNodes,
                               '/' + self.fromSpaceToURL() + "query/" + self.fromTemplateToURL(template),
                               name="queryAt"+str(startAt))
         activate(req, req.startup(), at=startAt)

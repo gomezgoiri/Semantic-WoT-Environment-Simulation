@@ -10,6 +10,7 @@ from rdflib import Graph
 from SimPy.Simulation import random
 from netuse.nodes import NodeGenerator
 from netuse.triplespace.kernel import NegativeBroadcasting, Centralized, Gossiping
+from netuse.triplespace.kernel.network.discovery import DiscoveryFactory
 from netuse.database.parametrization import Parametrization
 from netuse.results import G
 
@@ -18,6 +19,7 @@ class ActivityGenerator():
     def __init__(self, params, baseGraphs):
         self.__params = params
         self.__baseGraphs = baseGraphs
+        self.__discovery_factory = DiscoveryFactory(NodeGenerator.getNodes())
     
     def generateActivity(self):
         if self.__params.strategy==Parametrization.negative_broadcasting :
@@ -32,14 +34,14 @@ class ActivityGenerator():
     
     def configureNegativeBroadcasting(self):
         for n in NodeGenerator.getNodes():
-            n.ts = NegativeBroadcasting(n)
-            n.ts.setNodes(NodeGenerator.getNodes())
+            discov = self.__discovery_factory.create_simple_discovery(n)
+            n.ts = NegativeBroadcasting(discov)
             
     def configureGossiping(self):
         for n in NodeGenerator.getNodes():
-            n.ts = Gossiping(n, self.__baseGraphs['ontology'])
+            discov = self.__discovery_factory.create_simple_discovery(n)
+            n.ts = Gossiping(discov, self.__baseGraphs['ontology'])
             n.ts.reasoningCapacity = n.canReason
-            n.ts.setNodes(NodeGenerator.getNodes())
     
     def configureCentralizedActivity(self):
         centralNode = NodeGenerator.getNodes()[0] # for instance
