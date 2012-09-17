@@ -88,7 +88,7 @@ class RemoteConnector(AbstractConnector, RequestObserver):
             pc = ProcessCanceler(self.scheduled_request)
             activate(pc, pc.cancel())
             
-            # schedule future update
+            # schedule the next update
             self._schedule_future_update()
     
     def get_query_candidates(self, template):
