@@ -76,9 +76,10 @@ class RemoteConnector(AbstractConnector, RequestObserver):
         return req
     
     def notifyRequestFinished(self, request_instance):
-        for unique_req in request_instance.responses:
-            # update(self.clues, unique_req) # somehow
-            pass # TODO
+        for unique_response in request_instance.responses:
+            if unique_response.getstatus()==200:
+                # update(self.clues, unique_req) # somehow
+                pass # TODO
     
     def _check_if_next_update_changes(self):
         possible_next = now() + self.updateTimeManager.get_updatetime()
