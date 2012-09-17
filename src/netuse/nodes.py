@@ -5,6 +5,7 @@ Created on Nov 26, 2011
 '''
 from SimPy.Simulation import *
 from devices import DeviceType, RegularComputer
+from netuse.triplespace.network.discovery import DiscoveryRecord
 
 class NodeGenerator:
     
@@ -34,7 +35,6 @@ class NodeGenerator:
         return NodeGenerator.Nodes[node_name]
 
 
-
 class ConcurrentThread(Process):
         
     def __init__(self, node, deviceType=None, name="thread" ):
@@ -55,6 +55,7 @@ class ConcurrentThread(Process):
             yield release,self,self.__device.getResources()
             self.__node.addResponse(handler.handle(req))
 
+
 class Node(Process):
     
     @property
@@ -74,12 +75,16 @@ class Node(Process):
     def canReason(self):
         return self.__device.canReason
     
-    
-    # numThreads = number of requests per node should be specified in each Node type
-    def __init__(self, name="node", device=None):
+    def __init__(self, name="node", device=None, joined_since=1, sac=False, batery_lifetime='1d'):
         Process.__init__(self, name=name)
         self._ts = None
         self.__device = device if device!=None else RegularComputer() # device type 
+        
+        self.discovery_record = DiscoveryRecord(memory = device.ram_memory,
+                                                storage = device.storage_capacity,
+                                                joined_since = joined_since,
+                                                sac = sac,
+                                                batery_lifetime = batery_lifetime)
         
         self.__httpOut = {}
         self.__httpIn = []
@@ -108,6 +113,5 @@ class Node(Process):
         self.__waitingRequesters_and_InitTime[req.getid()] = (requester, now())
         reactivate(self) # starts answering
 
-        
     def __str__(self):
         return self.name

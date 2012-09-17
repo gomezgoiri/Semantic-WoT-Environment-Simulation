@@ -9,9 +9,14 @@ from netuse.results import G
 # In the future other Device dependent methods can be implemented such as: reasoning
 # That's why I've created a Hierarchy instead of just having some variables with the 2D arrays which represent each node
 class DeviceType():
+    
     # Waiting time measure in FoxG20
     # Concurrent request, Mean, Std dev
-    def __init__(self, waitingTime=None, canQueue=True, canReason=True):
+    def __init__(self,
+                 ram_memory='1MB',
+                 storage_capacity='1MB',
+                 waitingTime=None,
+                 canQueue=True, canReason=True, hasBatery=True):
         self.__wait = waitingTime
         if waitingTime!=None:
             last = len(self.__wait)-1
@@ -69,26 +74,54 @@ class XBee(DeviceType):
     TYPE_ID = 'xbee'
     
     def __init__(self):
-        DeviceType.__init__(self, [[1,77,1],
-                                 [5,392,8],
-                                 [10,775,8]],
+        DeviceType.__init__(self,
+                            ram_memory='8MB',
+                            storage_capacity='1MB',
+                            [[1,77,1],
+                             [5,392,8],
+                             [10,775,8]],
                             canQueue=False,
-                            canReason=False)
+                            canReason=False,
+                            hasBatery=False)
 
 class FoxG20(DeviceType):
     TYPE_ID = 'foxg20'
     
     def __init__(self):
-        DeviceType.__init__(self, [[1,17,0],
-                                 [5,97,16],
-                                 [10,174,28],
-                                 [15,282,43],
-                                 [20,375,30],
-                                 [25,460,30],
-                                 [30,540,35],
-                                 [35,632,29]],
+        DeviceType.__init__(self,
+                            ram_memory='64MB',
+                            storage_capacity='1GB',
+                            [[1,17,0],
+                             [5,97,16],
+                             [10,174,28],
+                             [15,282,43],
+                             [20,375,30],
+                             [25,460,30],
+                             [30,540,35],
+                             [35,632,29]],
                             canQueue=False,
-                            canReason=True)
+                            canReason=True,
+                            hasBatery=True)
+
+ 
+class SamsungGalaxyTab(DeviceType):
+    TYPE_ID = 'galaxy_tab'
+
+    def __init__(self):
+        DeviceType.__init__(self,
+                            ram_memory='512MB',
+                            storage_capacity='8GB',
+                            [[1,223,349],
+                             [5,256,76],
+                             [10,372,171],
+                             [15,497,191],
+                             [20,661,444],
+                             [25,748,288],
+                             [30,929,805],
+                             [35,1029,672]],
+                            canQueue=True,
+                            canReason=True,
+                            hasBatery=True)
         
 # I don't remember which example did we use in senami2012,
 # but from 50 to 500 new measures in a new benchmarking have been noted down.
@@ -98,20 +131,45 @@ class RegularComputer(DeviceType):
     TYPE_ID = 'computer'
     
     def __init__(self):
-        DeviceType.__init__(self, [[1,13,0],
-                                 [5,7,3],
-                                 [10,8,4],
-                                 [15,5,2],
-                                 [20,5,3],
-                                 [25,5,4],
-                                 [30,6,4],
-                                 [35,5,2],
-                                 [50,42,62],
-                                 [100,39,75],
-                                 [150,120,156],
-                                 [200,169,160],
-                                 [250,291,252],
-                                 [300,431,373],
-                                 [500,769,621]],
+        DeviceType.__init__(self,
+                            ram_memory='4GB',
+                            storage_capacity='32GB',
+                            [[1,13,0],
+                             [5,7,3],
+                             [10,8,4],
+                             [15,5,2],
+                             [20,5,3],
+                             [25,5,4],
+                             [30,6,4],
+                             [35,5,2],
+                             [50,42,62],
+                             [100,39,75],
+                             [150,120,156],
+                             [200,169,160],
+                             [250,291,252],
+                             [300,431,373],
+                             [500,769,621]],
                             canQueue=True,
-                            canReason=True)
+                            canReason=True,
+                            hasBatery=False)
+
+
+class Server(DeviceType): # TODO fill with real data
+    TYPE_ID = 'server'
+    
+    def __init__(self):
+        DeviceType.__init__(self,
+                            ram_memory='32GB',
+                            storage_capacity='4TB',
+                            [[1,13,0],
+                             [5,7,3],
+                             [10,8,4],
+                             [15,5,2],
+                             [20,5,3],
+                             [25,5,4],
+                             [30,6,4],
+                             [35,5,2],
+                             [500,769,621]],
+                            canQueue=True,
+                            canReason=True,
+                            hasBatery=False)
