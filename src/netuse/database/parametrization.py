@@ -11,12 +11,12 @@ class Parametrization(Document):
     
     negative_broadcasting = "negative broadcasting"
     centralized = "centralized"
-    gossiping = "gossiping"
+    our_solution = "our"
     
     strategy = StringField(required=True,
                            default=negative_broadcasting)
                            #don't know why stopped working :-S
-                           #choices=(negative_broadcasting, centralized, gossiping,))
+                           #choices=(negative_broadcasting, centralized, our_solution,))
     simulateUntil = FloatField(required=True, default=60000.0)
     nodes = ListField(StringField(), required=True, default=[])
     nodeTypes = ListField(StringField(), required=True, default=[])
@@ -54,4 +54,4 @@ class Parametrization(Document):
 #    como medir push???
 #    tipo de cacharros?
 #    escala de la red y/o frecuencia de consulta y frecuencia de escritura?
-#    centralizado vs NB vs gossiping sencillo (comparten esquema cada X)
+#    centralizado vs NB vs our_solution sencillo (comparten esquema cada X)

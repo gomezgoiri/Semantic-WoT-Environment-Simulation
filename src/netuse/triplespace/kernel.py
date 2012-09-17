@@ -11,7 +11,8 @@ from rdflib.Literal import Literal
 from SimPy.Simulation import *
 from netuse.triplespace.dataaccess.store import DataAccess
 from netuse.triplespace.network.server import CustomSimulationHandler
-from netuse.triplespace.network.client import RequestInstance
+from netuse.triplespace.network.client import RequestInstance, RequestObserver
+from netuse.triplespace.our_solution.wp_selection import WhitepageSelector
 from netuse.results import G
 from netuse.triplespace.gossiping.gossiping_mechanism import GossipingBase
 from netuse.nodes import NodeGenerator
@@ -113,17 +114,25 @@ class Centralized(TripleSpace):
         self.logRequest(req)
 
 
-class Gossiping(NegativeBroadcasting):
-    def __init__(self, discovery, ontologyGraph): # ontologyGraph, which may be already expanded or not
+class OurSolution(TripleSpace, RequestObserver):
+    def __init__(self, discovery): # ontologyGraph, which may be already expanded or not
         NegativeBroadcasting.__init__(self, discovery)
         self.gossiping_base = GossipingBase(ontologyGraph)
-        self.templateToQueryAfterGossiping = {}
-        self.whitepage = None
+        self.templateToQueryAfterGossiping = None
+        self.aggregated_clue = None
     
     def write(self, triples, startAt=now()):
         self.dataaccess.write(triples)
     
     def query(self, template, startAt=now()):
+        if self.clues_manager==None:
+            wp = self.get_whitepage()
+            if wp==None:
+                wp = WhitepageSelector.selectWhitePage(self.discovery)
+            
+            self.clues_manager = None # a algo
+            self.clues_manager.digestClues()
+        
         qs = GossipingQueryStarter(template, self)
         activate(qs, qs.startup(), at=startAt)
         
@@ -173,7 +182,7 @@ class Gossiping(NegativeBroadcasting):
         self.logRequest(req)
 
 class GossipingQueryStarter(Process):
-    """ This class performs a delayed query in a Gossiping kernel """    
+    """ This class performs a delayed query in a OurSolution kernel """    
     
     def __init__(self, template, kernel):
         Process.__init__(self)

@@ -22,13 +22,14 @@ class DiscoveryRecord(object):
     INFINITE_BATERY = 'inf' # plugged in to the plug
     
     def __init__(self, memory='1MB', storage='1MB',
-                 joined_since=1, sac=False, batery_lifetime=INFINITE_BATERY):
+                 joined_since=1, sac=False, batery_lifetime=INFINITE_BATERY, is_whitepage=False):
         self.change_observers = []
         self.memory = memory # does not change
         self.storage = storage # does not change
         self.__joined_since = joined_since
         self.__sac = sac
         self.__batery_lifetime = batery_lifetime
+        self.__is_whitepage = is_whitepage
         
     def add_change_observer(self, observer):
         self.change_observers.append(observer)
@@ -67,6 +68,16 @@ class DiscoveryRecord(object):
     def joined_since(self, batery_lifetime):
         self.__batery_lifetime = batery_lifetime
         self.__record_updated()
+        
+    @property
+    def is_whitepage(self):
+        return self.__is_whitepage
+    
+    @is_whitepage.setter
+    def is_whitepage(self, is_whitepage):
+        self.__is_whitepage = is_whitepage
+        self.__record_updated()
+    
 
 
 class DiscoveryRecordObserver(object):
@@ -86,3 +97,13 @@ class SimpleDiscoveryMechanism(object, DiscoveryRecordObserver):
     
     def notify_changes(self):
         pass
+    
+    def get_whitepage(self):
+        '''Returns the node currently acting as whitepage. None if no whitepage exists in the space.'''
+        if self.me.discovery_record.is_whitepage:
+            return self.me
+        else:
+            for node in self.rest:
+                if node.discovery_record.is_whitepage:
+                    return node
+        return None

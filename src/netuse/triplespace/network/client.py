@@ -5,8 +5,28 @@ Created on Sep 10, 2012
 '''
 
 from SimPy.Simulation import *
+from abc import ABCMeta, abstractmethod
 from netuse.triplespace.network.httpelements import HttpRequest
 from netuse.results import G
+
+
+class ScheduledRequest(Process):    
+    def __init__(self, request, wait_for):
+        Process.__init__(self)
+        self.wait_for = wait_for
+        self.request = request
+    
+    def waitAndRequest(self):
+        yield hold, self, self.wait_for
+        activate(self.request, self.request.startup())
+
+
+class RequestObserver(Process):    
+    __metaclass__ = ABCMeta
+    
+    @abstractmethod
+    def notifyRequestFinished(self, request_instance):
+        pass
 
 
 class RequestInstance(Process):
