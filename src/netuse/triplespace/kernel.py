@@ -14,7 +14,7 @@ from netuse.nodes import NodeGenerator
 from netuse.triplespace.our_solution.consumer.consumer import Consumer
 from netuse.triplespace.dataaccess.store import DataAccess
 from netuse.triplespace.network.server import CustomSimulationHandler
-from netuse.triplespace.network.client import RequestInstance, RequestObserver
+from netuse.triplespace.network.client import RequestManager, RequestInstance, RequestObserver
 
 
 class TripleSpace(object):
@@ -80,7 +80,7 @@ class NegativeBroadcasting(TripleSpace):
                               self.discovery.rest,
                               '/' + self.fromSpaceToURL() + "query/" + self.fromTemplateToURL(template),
                               name="queryAt"+str(startAt))
-        activate(req, req.startup(), at=startAt)
+        RequestManager.launchScheduledRequest(req, at=startAt)
         
 
 class Centralized(TripleSpace):
@@ -93,14 +93,14 @@ class Centralized(TripleSpace):
             req = RequestInstance(self.me, (self.server,),
                                   '/' + self.fromSpaceToURL() + "graphs/",
                                   data=triples.serialize(format='n3'), name="writeAt"+str(startAt))
-            activate(req, req.startup(), at=startAt)
-            self.logRequest(req)
+            RequestManager.launchScheduledRequest(req, at=startAt)
     
     def query(self, template, startAt=now()):
         req = RequestInstance(self.me, (self.server,),
                               '/' + self.fromSpaceToURL() + "query/" + self.fromTemplateToURL(template),
                               name="queryAt"+str(startAt))
-        activate(req, req.startup(), at=startAt)
+        
+        RequestManager.launchScheduledRequest(req, at=startAt)
 
 
 class OurSolution(TripleSpace, RequestObserver):
@@ -127,4 +127,4 @@ class OurSolution(TripleSpace, RequestObserver):
         req = RequestInstance(self.discovery.me, destNodes,
                               '/' + self.fromSpaceToURL() + "query/" + self.fromTemplateToURL(template),
                               name="queryAt"+str(startAt))
-        activate(req, req.startup(), at=startAt)
+        RequestManager.launchScheduledRequest(req, at=startAt)

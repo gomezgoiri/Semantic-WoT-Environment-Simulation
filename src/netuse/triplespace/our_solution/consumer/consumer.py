@@ -8,7 +8,7 @@ from abc import ABCMeta, abstractmethod
 from SimPy.Simulation import *
 from netuse.triplespace.our_solution.clue_management import ClueStore
 from netuse.triplespace.our_solution.consumer.time_update import UpdateTimesManager
-from netuse.triplespace.network.client import RequestInstance, ScheduledRequest, RequestObserver
+from netuse.triplespace.network.client import RequestInstance, RequestManager, ScheduledRequest, RequestObserver
 
 class Consumer(object):
     
@@ -67,8 +67,7 @@ class RemoteConnector(AbstractConnector, RequestObserver):
         
     def _schedule_future_update(self):
         up_time = self.updateTimeManager.get_updatetime()
-        self.scheduled_request_time = now() + up_time
-        self.scheduled_request = ScheduledRequest(self._get_update_request(), up_time)
+        self.scheduled_request = RequestManager.launchScheduledRequest(self._get_update_request(), now()+up_time)
     
     def _get_update_request(self):
         req = RequestInstance(self.me_as_node, [self.whitepage_node], '/whitepage/clues')
@@ -84,10 +83,9 @@ class RemoteConnector(AbstractConnector, RequestObserver):
     def _check_if_next_update_changes(self):
         possible_next = now() + self.updateTimeManager.get_updatetime()
         # if we don't have a scheduled update or we have a candidate to update our next update with an earlier update...
-        if possible_next < self.scheduled_request_time:
+        if possible_next < self.scheduled_request.at:
             # stop any previously scheduled request, start a new request
-            pc = ProcessCanceler(self.scheduled_request)
-            activate(pc, pc.cancel())
+            RequestManager.cancelRequest(self.scheduled_request)
             
             # schedule the next update
             self._schedule_future_update()
@@ -96,13 +94,3 @@ class RemoteConnector(AbstractConnector, RequestObserver):
         self.updateTimeManager.add_updatetime(now()) # add a timestamp of now to get the update frequency
         self._check_if_next_update_changes()
         return self.clues.get_query_candidates(template)
-
-
-class ProcessCanceler(Process):
-    def __init__(self, victimProcess):
-        Process.__init__(self)
-        self.victimProcess = victimProcess
-        
-    def cancel(self):
-        yield hold, self, 0 # the activator function of a Process should be a generator (contain a yield)
-        self.cancel(self.victimProcess)
