@@ -113,6 +113,7 @@ class OurSolution(TripleSpace, RequestObserver):
     def __init__(self, discovery): # ontologyGraph, which may be already expanded or not
         TripleSpace.__init__(self, discovery)
         self.consumer = None
+        self.whitepage = None # just the whitepage will have this attribute to !=None
     
     @schedule
     def write(self, triples):

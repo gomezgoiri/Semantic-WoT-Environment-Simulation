@@ -23,6 +23,8 @@ setup(name="netuse",
                           'rdflib<3a',
                           'mongoengine',
                           'mock', # http://www.voidspace.org.uk/python/mock/
+                          'numpy',
+                          'scipy',
                           #'matplotlib',
                           ],
       #license = "Apache",
