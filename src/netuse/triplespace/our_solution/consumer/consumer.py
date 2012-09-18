@@ -5,10 +5,11 @@ Created on Sep 17, 2012
 '''
 
 from abc import ABCMeta, abstractmethod
-from SimPy.Simulation import *
+from SimPy.Simulation import now
 from netuse.triplespace.our_solution.clue_management import ClueStore
 from netuse.triplespace.our_solution.consumer.time_update import UpdateTimesManager
-from netuse.triplespace.network.client import RequestInstance, RequestManager, ScheduledRequest, RequestObserver
+from netuse.triplespace.our_solution.whitepage.selection import WhitepageSelector
+from netuse.triplespace.network.client import RequestInstance, RequestManager, RequestObserver
 
 class Consumer(object):
     
@@ -23,12 +24,15 @@ class Consumer(object):
     
     def __update_connector_if_needed(self):
         wp = self.discovery.get_whitepage()
-        if self.wp_node_name==None or self.wp_node_name!=wp.name:
-            self.wp_node_name = wp.name
-            if wp==self.discovery.me:
-                self.connector = LocalConnector()
-            else:
-                self.connector = RemoteConnector(self.discovery.me, wp)
+        if wp==None:
+            WhitepageSelector.selectWhitePage()
+        else:
+            if self.wp_node_name==None or self.wp_node_name!=wp.name:
+                self.wp_node_name = wp.name
+                if wp==self.discovery.me:
+                    self.connector = LocalConnector()
+                else:
+                    self.connector = RemoteConnector(self.discovery.me, wp)
 
 
 class AbstractConnector(object):
@@ -62,8 +66,7 @@ class RemoteConnector(AbstractConnector, RequestObserver):
     
     def _initialize_clues(self):
         # request to whitepage
-        req = self._get_update_request()
-        activate(req, req.startup())
+        RequestManager.launchNormalRequest(self._get_update_request())
         
     def _schedule_future_update(self):
         up_time = self.updateTimeManager.get_updatetime()
