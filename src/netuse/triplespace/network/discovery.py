@@ -18,18 +18,30 @@ class DiscoveryFactory(object):
         return SimpleDiscoveryMechanism(localNode, restOfTheNodes)
 
 
+
 class DiscoveryRecord(object):
     INFINITE_BATERY = 'inf' # plugged in to the plug
     
     def __init__(self, memory='1MB', storage='1MB',
                  joined_since=1, sac=False, batery_lifetime=INFINITE_BATERY, is_whitepage=False):
         self.change_observers = []
-        self.memory = memory # does not change
-        self.storage = storage # does not change
+        self.memory = self._separate_units_from_values(memory) # does not change
+        self.storage = self._separate_units_from_values(storage) # does not change
         self.__joined_since = joined_since
         self.__sac = sac
         self.__batery_lifetime = batery_lifetime
         self.__is_whitepage = is_whitepage
+        
+    def _separate_units_from_values(self, unstandardized):
+        s = '1 MB'
+        i = 0
+        for c in s:
+            if not c.isdigit():
+                break
+            else:
+                i += 1
+        standardized = (int(unstandardized[:i]), unstandardized[i:].replace(' ', ''))
+        return standardized
         
     def add_change_observer(self, observer):
         self.change_observers.append(observer)
