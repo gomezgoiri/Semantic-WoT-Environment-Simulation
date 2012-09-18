@@ -79,12 +79,11 @@ class NegativeBroadcasting(TripleSpace):
         # local query
         
         # remote queries
-        start_at = now()
         req = RequestInstance(self.discovery.me,
                               self.discovery.rest,
                               '/' + self.fromSpaceToURL() + "query/" + self.fromTemplateToURL(template),
-                              name="queryAt"+str(start_at))
-        RequestManager.launchScheduledRequest(req, at=start_at)
+                              name="queryAt"+str(now()))
+        RequestManager.launchNormalRequest(req)
         
 
 class Centralized(TripleSpace):
@@ -95,20 +94,19 @@ class Centralized(TripleSpace):
     @schedule
     def write(self, triples):
         if self.server is not None:
-            start_at = now()
             req = RequestInstance(self.me, (self.server,),
                                   '/' + self.fromSpaceToURL() + "graphs/",
-                                  data=triples.serialize(format='n3'), name="writeAt"+str(start_at))
-            RequestManager.launchScheduledRequest(req, at=start_at)
+                                  data=triples.serialize(format='n3'),
+                                  name="writeAt"+str(now()))
+            RequestManager.launchNormalRequest(req)
     
     @schedule
     def query(self, template):
-        start_at = now()
         req = RequestInstance(self.me, (self.server,),
                               '/' + self.fromSpaceToURL() + "query/" + self.fromTemplateToURL(template),
-                              name="queryAt"+str(start_at))
+                              name="queryAt"+str(now()))
         
-        RequestManager.launchScheduledRequest(req, at=start_at)
+        RequestManager.launchNormalRequest(req)
 
 
 class OurSolution(TripleSpace, RequestObserver):
