@@ -10,15 +10,87 @@ from netuse.triplespace.network.httpelements import HttpRequest
 from netuse.results import G
 
 
-class ScheduledRequest(Process):    
-    def __init__(self, request, wait_for):
+class ProcessCanceler(Process):
+    def __init__(self, victimProcess):
+        Process.__init__(self)
+        self.victimProcess = victimProcess
+        
+    def cancel_process(self):
+        yield hold, self, 0 # the activator function of a Process should be a generator (contain a yield)
+        self.cancel(self.victimProcess) # cancel is Process object's method, that's why we need to create this class
+
+
+class RequestManager(object):
+    
+    @staticmethod
+    def launchNormalRequest(request):
+        r = ScheduledRequest(request, at=now())
+        r.start() # observers should have been added to the request itself prior to this call
+        return r
+    
+    @staticmethod
+    def launchDelayedRequest(request, wait_for):
+        r = DelayedRequest(request, wait_for)
+        r.start() # observers should have been added to the request itself prior to this call
+        return r
+    
+    @staticmethod
+    def launchScheduledRequest(request, at):
+        r = ScheduledRequest(request, at)
+        r.start() # observers should have been added to the request itself prior to this call
+        return r
+        
+    @staticmethod
+    def cancelRequest(request): # should be a delayed or scheduled request
+        pc = ProcessCanceler(request.getProcess())
+        activate(pc, pc.cancel_process())
+
+
+class AbstractRequest(object):
+    __metaclass__ = ABCMeta
+    
+    @abstractmethod
+    def getProcess(self):
+        pass
+    
+    @abstractmethod
+    def start(self):
+        pass
+
+
+class DelayedRequestLauncher(Process):    
+    def __init__(self, request, wait_for=0):
         Process.__init__(self)
         self.wait_for = wait_for
         self.request = request
     
-    def waitAndRequest(self):
+    def start(self):
         yield hold, self, self.wait_for
         activate(self.request, self.request.startup())
+
+class DelayedRequest(AbstractRequest):
+    def __init__(self, request, wait_for):
+        AbstractRequest.__init__(self)
+        self.launcher = DelayedRequestLauncher(request, wait_for=wait_for)
+    
+    def getProcess(self):
+        return self.launcher
+    
+    def start(self):
+        activate(self.launcher, self.launcher.start())
+
+
+class ScheduledRequest(AbstractRequest):    
+    def __init__(self, request, at):
+        AbstractRequest.__init__(self)
+        self.at = at
+        self.request = request
+    
+    def getProcess(self):
+        return self.request
+    
+    def start(self):
+        activate(self.request, self.request.startup(), at=self.at)
 
 
 class RequestObserver(Process):    
@@ -50,7 +122,7 @@ class RequestInstance(Process):
         self.__newResponseReceived = SimEvent()
         self.__observers = []
         
-    def startup(self):
+    def __startup(self):
         t_init = now()
         
         for node in self.__destinationNodes:
