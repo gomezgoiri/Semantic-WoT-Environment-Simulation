@@ -4,11 +4,12 @@ Created on Dec 12, 2011
 @author: tulvur
 '''
 from abc import abstractmethod, ABCMeta
+from netuse.sim_utils import schedule
 import urllib
 from rdflib import URIRef
 from rdflib.Literal import Literal
 
-from SimPy.Simulation import *
+from SimPy.Simulation import now
 from netuse.results import G
 from netuse.nodes import NodeGenerator
 from netuse.triplespace.our_solution.consumer.consumer import Consumer
@@ -30,11 +31,11 @@ class TripleSpace(object):
         self.reasoningCapacity = False # TODO refactor (it should be get from Device
         
     @abstractmethod
-    def write(self, startAt=now()):
+    def write(self, triples):
         pass
     
     @abstractmethod
-    def query(self, template, startAt=now()):
+    def query(self, template):
         pass
     
     def fromTemplateToURL(self, template):
@@ -69,18 +70,21 @@ class NegativeBroadcasting(TripleSpace):
     def __init__(self, discovery):
         TripleSpace.__init__(self, discovery)
     
-    def write(self, triples, startAt=now()):
+    @schedule
+    def write(self, triples):
         self.dataaccess.write(triples)
     
-    def query(self, template, startAt=now()):
+    @schedule
+    def query(self, template):
         # local query
         
         # remote queries
+        start_at = now()
         req = RequestInstance(self.discovery.me,
                               self.discovery.rest,
                               '/' + self.fromSpaceToURL() + "query/" + self.fromTemplateToURL(template),
-                              name="queryAt"+str(startAt))
-        RequestManager.launchScheduledRequest(req, at=startAt)
+                              name="queryAt"+str(start_at))
+        RequestManager.launchScheduledRequest(req, at=start_at)
         
 
 class Centralized(TripleSpace):
@@ -88,19 +92,23 @@ class Centralized(TripleSpace):
         TripleSpace.__init__(self, me)
         self.server = server
     
-    def write(self, triples, startAt=now()):
+    @schedule
+    def write(self, triples):
         if self.server is not None:
+            start_at = now()
             req = RequestInstance(self.me, (self.server,),
                                   '/' + self.fromSpaceToURL() + "graphs/",
-                                  data=triples.serialize(format='n3'), name="writeAt"+str(startAt))
-            RequestManager.launchScheduledRequest(req, at=startAt)
+                                  data=triples.serialize(format='n3'), name="writeAt"+str(start_at))
+            RequestManager.launchScheduledRequest(req, at=start_at)
     
-    def query(self, template, startAt=now()):
+    @schedule
+    def query(self, template):
+        start_at = now()
         req = RequestInstance(self.me, (self.server,),
                               '/' + self.fromSpaceToURL() + "query/" + self.fromTemplateToURL(template),
-                              name="queryAt"+str(startAt))
+                              name="queryAt"+str(start_at))
         
-        RequestManager.launchScheduledRequest(req, at=startAt)
+        RequestManager.launchScheduledRequest(req, at=start_at)
 
 
 class OurSolution(TripleSpace, RequestObserver):
@@ -108,11 +116,12 @@ class OurSolution(TripleSpace, RequestObserver):
         TripleSpace.__init__(self, discovery)
         self.consumer = None
     
-    def write(self, triples, startAt=now()):
+    @schedule
+    def write(self, triples):
         self.dataaccess.write(triples)
     
-    # TODO start ALL the method at "startAt", not just the request !!!
-    def query(self, template, startAt=now()):
+    @schedule
+    def query(self, template):
         if self.consumer==None:
             self.consumer = Consumer(self.discovery)
         
@@ -126,5 +135,5 @@ class OurSolution(TripleSpace, RequestObserver):
         
         req = RequestInstance(self.discovery.me, destNodes,
                               '/' + self.fromSpaceToURL() + "query/" + self.fromTemplateToURL(template),
-                              name="queryAt"+str(startAt))
-        RequestManager.launchScheduledRequest(req, at=startAt)
+                              name="queryAt"+str(now()))
+        RequestManager.launchNormalRequest(req)

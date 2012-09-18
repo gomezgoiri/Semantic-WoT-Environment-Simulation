@@ -66,7 +66,7 @@ class ActivityGenerator():
                         last = graphsToWrite.pop()
                     #else: # if there is nothing else to send, we create a mock request
                     #    last = Graph().parse(StringIO.StringIO("<http://s> <http://p> <http://o> .\n"), format="nt")
-                    actionNode.ts.write(last, startAt=startsWriting+writesAt)
+                    actionNode.ts.write(starts_at=startsWriting+writesAt, triples=last)
         
     
     def generateSimulationQueries(self, numConsumers):
@@ -79,4 +79,4 @@ class ActivityGenerator():
                 template = G.Rnd.choice(self.__params.queries)
                 
                 #print "%s requests at %s"%(actionNode,startAt)
-                consumerNodes.next().ts.query(template, startAt=startAt)
+                consumerNodes.next().ts.query(starts_at=startAt, template)
