@@ -8,10 +8,10 @@ from abc import ABCMeta, abstractmethod
 from SimPy.Simulation import now
 from netuse.triplespace.our_solution.clue_management import ClueStore
 from netuse.triplespace.our_solution.consumer.time_update import UpdateTimesManager
-from netuse.triplespace.our_solution.whitepage.selection import WhitepageSelectionManager
+from netuse.triplespace.our_solution.whitepage.selection import WhitepageSelectionManager, SelectionProcessObserver
 from netuse.triplespace.network.client import RequestInstance, RequestManager, RequestObserver
 
-class Consumer(object):
+class Consumer(object, SelectionProcessObserver):
     
     def __init__(self, discovery):
         self.discovery = discovery
@@ -26,8 +26,8 @@ class Consumer(object):
         wp = self.discovery.get_whitepage()
         if wp==None:
             wsm = WhitepageSelectionManager(self.discovery)
+            wsm.set_observer(self)
             wsm.choose_whitepage()
-            # TODO update the connector with the new selected white page
         else:
             if self.wp_node_name==None or self.wp_node_name!=wp.name:
                 self.wp_node_name = wp.name
@@ -35,6 +35,11 @@ class Consumer(object):
                     self.connector = LocalConnector()
                 else:
                     self.connector = RemoteConnector(self.discovery.me, wp)
+                    
+    def wp_selection_finished(self, wp_node):
+        pass
+        # TODO update the connector with the new selected white page
+        # TODO finish get_query_candidates
 
 
 class AbstractConnector(object):

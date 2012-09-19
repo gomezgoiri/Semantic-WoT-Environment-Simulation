@@ -93,7 +93,7 @@ class ScheduledRequest(AbstractRequest):
         activate(self.request, self.request.startup(), at=self.at)
 
 
-class RequestObserver(Process):    
+class RequestObserver(object):    
     __metaclass__ = ABCMeta
     
     @abstractmethod

@@ -1,6 +1,7 @@
 from numpy import mean, std
+from abc import ABCMeta, abstractmethod
 from netuse.triplespace.network.discovery import DiscoveryRecord
-        
+from netuse.triplespace.network.client import RequestInstance, RequestManager, RequestObserver       
 
 class WhitepageSelector(object):
     
@@ -143,13 +144,39 @@ class WhitepageSelector(object):
             return WhitepageSelector._choose_the_one_with_most_memory(candidates)
 
 
-class WhitepageSelectionManager(object):
+class SelectionProcessObserver(object):    
+    __metaclass__ = ABCMeta
+    
+    @abstractmethod
+    def wp_selection_finished(self, wp_node):
+        pass
+
+
+class WhitepageSelectionManager(object, RequestObserver):
     
     def __init__(self, discovery):
         self.discovery = discovery
+        self.refused = []
+        self.observer = None
+        self.last_choosen = None
+        
+    def set_observer(self, observer):
+        self.observer = observer
     
     def choose_whitepage(self):
-        candidates = list(self.discovery.rest)
-        wp_candidate = WhitepageSelector.select_whitepage(candidates)
-        # TODO ask him
+        candidates = [item for item in self.discovery.rest if item not in self.refused]
+        self.last_choosen = WhitepageSelector.select_whitepage(candidates)
+        RequestManager.launchNormalRequest(self._get_choose_request())
     
+    def _get_choose_request(self):
+        req = RequestInstance(self.me_as_node, [self.whitepage_node], '/whitepage/choose', data='') # it has data => POST
+        req.addObserver(self)
+        return req
+    
+    def notifyRequestFinished(self, request_instance):
+        for unique_response in request_instance.responses:
+            if unique_response.getstatus()==200:
+                self.refused.append(self.last_choosen)
+                self.choose_whitepage()
+            else: # has refused being whitepage!
+                self.observer.wp_selection_finished(self.last_choosen)
