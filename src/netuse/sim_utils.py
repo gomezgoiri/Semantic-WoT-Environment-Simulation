@@ -4,7 +4,7 @@ Created on Sep 18, 2011
 @author: tulvur
 '''
 from functools import wraps
-from SimPy.Simulation import *
+from SimPy.Simulation import Process, activate, hold, now
 
 # def funcion(*args, **kwargs):
 #    print args
