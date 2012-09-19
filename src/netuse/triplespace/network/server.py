@@ -213,7 +213,7 @@ class CustomSimulationHandler(object):
     
     def handle(self, request, overload=False):
         status, response, content_type = self._not_handle() if overload else self._handleRequest(request)
-        return HttpResponse(request.getid(), response, status=status, headers="Content-Type: %s;"%content_type)
+        return HttpResponse(request.getid(), response, url=request.get_full_url(), status=status, headers="Content-Type: %s;"%content_type)
         #self.send_response(code)
         #self.send_header("Content-type", content_type)
         #self.send_header("Content-length", str(len(response)))

@@ -16,8 +16,8 @@ class FileTracer:
     def stop(self):
         self.f.close()
     
-    def trace(self, timestamp, client, server, status, response_time):
-        self.f.write("%0.2f\t%s\t%s\t%d\n"%(timestamp,client,server,status))
+    def trace(self, timestamp, client, server, path, status, response_time):
+        self.f.write("%0.2f\t%s\t%s\t%s\t%d\n"%(timestamp,client,server,path,status))
         
 class MongoDBTracer:
     
@@ -32,7 +32,8 @@ class MongoDBTracer:
         # Apparently, calling to self.execution.save() each time an element
         # is appended to the list introduces a huge latency
     
-    def trace(self, timestamp, client, server, status, response_time):
+    # TODO store path!
+    def trace(self, timestamp, client, server, path, status, response_time):
         from netuse.database.results import NetworkTrace
         n = NetworkTrace(
             timestamp=timestamp,
@@ -58,9 +59,9 @@ class G:  # global variables
         G._tracer.start()
         
     @staticmethod
-    def traceRequest(timestamp, client, server, status, response_time):
+    def traceRequest(timestamp, client, server, path, status, response_time):
         #t1 = time.time()
-        G._tracer.trace(timestamp, client, server, status, response_time)
+        G._tracer.trace(timestamp, client, server, path, status, response_time)
         #print time.time()-t1
     
     @staticmethod

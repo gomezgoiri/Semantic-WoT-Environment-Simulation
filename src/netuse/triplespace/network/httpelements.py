@@ -21,8 +21,9 @@ class HttpRequest(Request):
 # http://docs.python.org/release/3.0.1/library/http.client.html
 class HttpResponse(object):
     """ Inspired in http.client.HTTPResponse objects, which cannot be instantiated """
-    def __init__(self, reqId, data, headers=None, status=200, reason="OK", version=11):
+    def __init__(self, reqId, data, headers=None, status=200, url="",reason="OK", version=11):
         self.__reqId = reqId
+        self.__url = url
         self.__status = status
         self.__reason = reason
         self.__headers = headers
@@ -53,7 +54,11 @@ class HttpResponse(object):
     def getversion(self):
         """HTTP protocol version used by server. 10 for HTTP/1.0, 11 for HTTP/1.1."""
         return self.__version
-        
+    
+    def geturl(self):
+        """Added to ease the trace."""
+        return self.__url    
+    
     def getstatus(self):
         """Status code returned by server."""
         return self.__status

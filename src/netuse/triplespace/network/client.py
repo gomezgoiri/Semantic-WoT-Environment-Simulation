@@ -195,6 +195,7 @@ class RequestInstance(Process):
             G.traceRequest(t_init,
                            self.__actionNode.name,
                            self.get_destination_node_name(response.getid()),
+                           response.geturl(),
                            response.getstatus(),
                            response_time )
             
