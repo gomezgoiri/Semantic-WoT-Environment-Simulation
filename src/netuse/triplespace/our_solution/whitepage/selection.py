@@ -65,6 +65,19 @@ class WhitepageSelector(object):
         return WhitepageSelector._choose_the_one_with_most_memory(candidates, additional_filter)    
     
     @staticmethod
+    def _choose_the_one_with_most_memory(candidates, additionalFilter=lambda n: True):
+        best_memory_node = None
+            
+        for node in candidates:
+            if additionalFilter(node):
+                if best_memory_node==None:
+                    best_memory_node = node
+                elif best_memory_node.discovery_record.memory < node.discovery_record.memory:
+                    best_memory_node = node
+                    
+        return best_memory_node
+    
+    @staticmethod
     def _filter_unsteady_nodes(candidates):
         # c2) filtra a aquellos que han demostrado inestabilidad (no se puede confiar en ellos)
         #    Si la media es mayor de 1h, (asi si inicias la red de 0, te evitas este filtro)
@@ -74,7 +87,7 @@ class WhitepageSelector(object):
             #  Eliges a todos aquellos que tengan un z-score mayor que 1.
             new_candidates = list(candidates)
             zsco = WhitepageSelector._zscores( joins )
-            for node, zsco in zip(new_candidates, zsco):
+            for node, zsco in zip(candidates, zsco):
                 if zsco<1:
                     new_candidates.remove(node)
             
@@ -89,7 +102,6 @@ class WhitepageSelector(object):
         
         return candidates
     
-    
     @staticmethod
     def _filter_nodes_with_more_battery(candidates):
         # d2) De entre aquellos con z-score de bateria de 1 o mas: el que tenga mas memoria.
@@ -97,7 +109,7 @@ class WhitepageSelector(object):
 
         new_candidates = list(candidates)
         zsco = WhitepageSelector._zscores( battery )
-        for node, zsco in zip(new_candidates, zsco):
+        for node, zsco in zip(candidates, zsco):
             if zsco<1:
                 new_candidates.remove(node)
         
@@ -108,22 +120,7 @@ class WhitepageSelector(object):
             for node in candidates:
                 if node.discovery_record.battery_lifetime >= battery_mean:
                     new_candidates.append(node)
-        return new_candidates        
-    
-    
-    @staticmethod
-    def _choose_the_one_with_most_memory(candidates, additionalFilter=lambda n: True):
-        best_memory_node = None
-            
-        for node in candidates:
-            if additionalFilter(node):
-                if best_memory_node==None:
-                    best_memory_node = node
-                elif best_memory_node.discovery_record.memory < node.discovery_record.memory:
-                    best_memory_node = node
-                    
-        return best_memory_node
-                
+        return new_candidates                
     
     @staticmethod
     def select_whitepage(candidate_nodes):

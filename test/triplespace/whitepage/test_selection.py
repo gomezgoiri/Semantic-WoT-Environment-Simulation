@@ -23,10 +23,10 @@ class WhitepageSelectorTestCase(unittest.TestCase):
     
     def setUp(self):
         self.nodes = []
-        self.nodes.append(FakeNode('3MB', '22MB', 2))
+        self.nodes.append(FakeNode('3MB', '22MB', 3))
         self.nodes.append(FakeNode('8MB', '32MB', 2, '1d'))
         self.nodes.append(FakeNode('32MB', '32MB', 2))
-        self.nodes.append(FakeNode('34MB', '32MB', 2, '1d'))
+        self.nodes.append(FakeNode('34MB', '32MB', 3, '1d'))
         self.nodes.append(FakeNode('16MB', '50MB', 1)) # best, but unstable
         self.nodes.append(FakeNode('3MB', '1GB', 2))
     
@@ -55,6 +55,11 @@ class WhitepageSelectorTestCase(unittest.TestCase):
     def test_choose_the_one_with_most_memory(self):
         selected_node = WhitepageSelector._choose_the_one_with_most_memory(self.nodes)
         self.assertEquals(self.nodes[3], selected_node)
+        
+    def test_filter_unsteady_nodes(self):
+        filtered_nodes = WhitepageSelector._filter_unsteady_nodes(list(self.nodes)) # 500 nodes * (1KB * 1024) = at least 42MBs
+        expected = (self.nodes[0], self.nodes[1], self.nodes[2], self.nodes[3], self.nodes[5])
+        self.assertItemsEqual(filtered_nodes, expected)
 
     def test_select_whitepage_with_infinite_battery_candidates(self):        
         selected_node = WhitepageSelector.select_whitepage(self.nodes)
