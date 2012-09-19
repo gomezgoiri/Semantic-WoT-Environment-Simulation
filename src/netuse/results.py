@@ -3,9 +3,7 @@ Created on Jan 2, 2012
 
 @author: tulvur
 '''
-import time
-from SimPy.Simulation import random, Monitor
-from netuse.database.results import NetworkTrace
+from SimPy.Simulation import random
 
 class FileTracer:
     
@@ -35,6 +33,7 @@ class MongoDBTracer:
         # is appended to the list introduces a huge latency
     
     def trace(self, timestamp, client, server, status, response_time):
+        from netuse.database.results import NetworkTrace
         n = NetworkTrace(
             timestamp=timestamp,
             client=client,
@@ -53,9 +52,9 @@ class G:  # global variables
     
     
     @staticmethod
-    def setNewExecution(execution):
+    def setNewExecution(execution, tracer=None):
         # G._tracer = FileTracer('/tmp/workfile')
-        G._tracer = MongoDBTracer(execution)
+        G._tracer = MongoDBTracer(execution) if tracer==None else tracer
         G._tracer.start()
         
     @staticmethod

@@ -152,7 +152,7 @@ class SelectionProcessObserver(object):
         pass
 
 
-class WhitepageSelectionManager(object, RequestObserver):
+class WhitepageSelectionManager(RequestObserver):
     
     def __init__(self, discovery):
         self.discovery = discovery
@@ -166,17 +166,21 @@ class WhitepageSelectionManager(object, RequestObserver):
     def choose_whitepage(self):
         candidates = [item for item in self.discovery.rest if item not in self.refused]
         self.last_choosen = WhitepageSelector.select_whitepage(candidates)
-        RequestManager.launchNormalRequest(self._get_choose_request())
+        if self.last_choosen==None:
+            # somehow, transmit that no node could have been chosen
+            pass
+        else:
+            RequestManager.launchNormalRequest(self._get_choose_request())
     
     def _get_choose_request(self):
-        req = RequestInstance(self.me_as_node, [self.whitepage_node], '/whitepage/choose', data='') # it has data => POST
+        req = RequestInstance(self.discovery.me, [self.last_choosen], '/whitepage/choose', data='') # it has data => POST
         req.addObserver(self)
         return req
     
     def notifyRequestFinished(self, request_instance):
         for unique_response in request_instance.responses:
             if unique_response.getstatus()==200:
+                self.observer.wp_selection_finished(self.last_choosen)
+            else: # has refused being whitepage!
                 self.refused.append(self.last_choosen)
                 self.choose_whitepage()
-            else: # has refused being whitepage!
-                self.observer.wp_selection_finished(self.last_choosen)

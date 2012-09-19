@@ -17,8 +17,8 @@ class ParametrizationUtils():
         self.possibleNodes = ParametrizationUtils.getStationNames(semanticPath)
         self.es = ExecutionSet(experiment_id=experiment_id) # 'network_use'
         self.repetitions = repetitions
-        
-    def createDefaultParametrization(self, strategy, amountOfQueries, writeFrequency, simulateUntil, queries, numNodes, numConsumers, nodeTypes=None):
+    
+    def getDefaultParametrization(self, strategy, amountOfQueries, writeFrequency, simulateUntil, queries, numNodes, numConsumers, nodeTypes=None):
         if numNodes<numConsumers:
             raise Exception('Parametrization error: nore consumers than nodes in the simulation.')
         
@@ -43,9 +43,13 @@ class ParametrizationUtils():
                                     (URIRef('http://dev.morelab.deusto.es/bizkaisense/resource/station/ABANTO'), None, None)
                                     ,)
                         )
+        return params
+    
+    def createDefaultParametrization(self, strategy, amountOfQueries, writeFrequency, simulateUntil, queries, numNodes, numConsumers, nodeTypes=None):
+        params = self.getDefaultParametrization(strategy, amountOfQueries, writeFrequency, simulateUntil, queries, numNodes, numConsumers, nodeTypes)
         params.save()
         self._repeatExperiment(params)
-        
+    
     def _repeatExperiment(self, params):
         '''Repeating each experiment's execution, we increase the accuracy of the obtained data.'''
         for _ in range(self.repetitions):

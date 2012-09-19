@@ -11,23 +11,28 @@ from netuse.triplespace.our_solution.consumer.time_update import UpdateTimesMana
 from netuse.triplespace.our_solution.whitepage.selection import WhitepageSelectionManager, SelectionProcessObserver
 from netuse.triplespace.network.client import RequestInstance, RequestManager, RequestObserver
 
-class Consumer(object, SelectionProcessObserver):
+class Consumer(SelectionProcessObserver):
     
     def __init__(self, discovery):
         self.discovery = discovery
         self.connector = None
         self.wp_node_name = None
+        self.ongoing_selection = False
     
     def get_query_candidates(self, template):
         self.__update_connector_if_needed()
+        if self.connector==None:
+            raise Exception("Try again a little bit latter.")
         return self.connector.get_query_candidates(template)
     
     def __update_connector_if_needed(self):
         wp = self.discovery.get_whitepage()
         if wp==None:
-            wsm = WhitepageSelectionManager(self.discovery)
-            wsm.set_observer(self)
-            wsm.choose_whitepage()
+            if not self.ongoing_selection:
+                self.ongoing_selection = True
+                wsm = WhitepageSelectionManager(self.discovery)
+                wsm.set_observer(self)
+                wsm.choose_whitepage()
         else:
             if self.wp_node_name==None or self.wp_node_name!=wp.name:
                 self.wp_node_name = wp.name
@@ -37,9 +42,9 @@ class Consumer(object, SelectionProcessObserver):
                     self.connector = RemoteConnector(self.discovery.me, wp)
                     
     def wp_selection_finished(self, wp_node):
+        self.ongoing_selection = False
         pass
         # TODO update the connector with the new selected white page
-        # TODO finish get_query_candidates
 
 
 class AbstractConnector(object):

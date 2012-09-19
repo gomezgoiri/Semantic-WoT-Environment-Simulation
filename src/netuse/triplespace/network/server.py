@@ -153,14 +153,22 @@ class SpacesHandler(object):
 
 
 class WhitepageHandler(object):
-    def __init__(self, whitepage):
-        self.whitepage = whitepage
+    def __init__(self, tskernel):
+        self.tskernel = tskernel
         
     def process_whitepage(self, wp_path, request=None):
-        if self.tskernel.whitepage==None:
-            return (501, "Not Implemented", 'text/plain')
-        
-        if wp_path.startswith('clues'):
+        if wp_path.startswith('choose'):
+            method = request.get_method()
+            if method=='POST':
+                # set as whitepage
+                self.tskernel.be_whitepage()
+                return (200, """TODO JSON""", 'application/json')
+            
+        elif wp_path.startswith('clues'):
+            
+            if self.tskernel.whitepage==None:
+                return (501, "Not Implemented", 'text/plain')
+            
             # clue_path = wp_path[len('clues/'):] #to offer individual access to the clues?
             # Not the best API in the world, but this can be changed in advance
             
@@ -171,6 +179,8 @@ class WhitepageHandler(object):
                 clues_json = request.get_data()
                 # TODO do something with it
                 return (200, """The clue was successfully updated""", 'text/html')
+            
+        return (404, """Not found.""", 'text/html')
 
 
 class CustomSimulationHandler(object):
@@ -193,8 +203,8 @@ class CustomSimulationHandler(object):
         elif path.startswith('/whitepage'):
             if hasattr(self.tskernel, 'whitepage'):
                 whitepage_path = path[len('/whitepage/'):]
-                whitepage_handler = WhitepageHandler(self.tskernel.dataaccess.stores)
-                return whitepage_handler.process_whitepage(whitepage_path)
+                whitepage_handler = WhitepageHandler(self.tskernel)
+                return whitepage_handler.process_whitepage(whitepage_path, request)
             
         return (404, "Not found", 'text/plain')
     

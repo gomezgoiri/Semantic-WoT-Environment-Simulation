@@ -94,9 +94,6 @@ class DiscoveryRecord(object):
 class DiscoveryRecordObserver(object):
     __metaclass__ = ABCMeta
     
-    def __init__(self):
-        pass
-    
     @abstractmethod
     def notify_changes(self):
         pass
@@ -104,7 +101,6 @@ class DiscoveryRecordObserver(object):
 
 class SimpleDiscoveryMechanism(DiscoveryRecordObserver):
     def __init__(self, me, rest):
-        DiscoveryRecordObserver.__init__()
         self.me = me
         self.rest = rest
         for node in self.rest:

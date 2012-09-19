@@ -122,7 +122,7 @@ class RequestInstance(Process):
         self.__newResponseReceived = SimEvent()
         self.__observers = []
         
-    def __startup(self):
+    def startup(self):
         t_init = now()
         
         for node in self.__destinationNodes:

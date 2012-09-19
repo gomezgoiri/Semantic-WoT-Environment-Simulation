@@ -16,17 +16,22 @@ class DeviceType():
                  ram_memory='1MB',
                  storage_capacity='1MB',
                  waitingTime=None,
-                 canQueue=True, canReason=True, hasBatery=True):
+                 canQueue=True, canReason=True, hasBattery=True):
         self.__wait = waitingTime
         if waitingTime!=None:
             last = len(self.__wait)-1
             self.__resources = Resource(self.__wait[last][0], name="Concurrent requests this node can answer")
-            
+        
+        # physical characteristics
+        self.ram_memory = ram_memory
+        self.storage_capacity = storage_capacity
+        self.hasBattery = hasBattery
+        
         # a device can or cannot queue requests
         # we it is able to queue, then no limit is imposed (unbounded queue)
         self.canQueue = canQueue
         self.canReason = canReason
-            
+    
     @classmethod
     def create(cls, device_type):
         device_type = device_type.lower()
@@ -82,7 +87,7 @@ class XBee(DeviceType):
                              [10,775,8]],
                             canQueue=False,
                             canReason=False,
-                            hasBatery=False)
+                            hasBattery=False)
 
 class FoxG20(DeviceType):
     TYPE_ID = 'foxg20'
@@ -101,7 +106,7 @@ class FoxG20(DeviceType):
                              [35,632,29]],
                             canQueue=False,
                             canReason=True,
-                            hasBatery=True)
+                            hasBattery=True)
 
  
 class SamsungGalaxyTab(DeviceType):
@@ -121,7 +126,7 @@ class SamsungGalaxyTab(DeviceType):
                              [35,1029,672]],
                             canQueue=True,
                             canReason=True,
-                            hasBatery=True)
+                            hasBattery=True)
         
 # I don't remember which example did we use in senami2012,
 # but from 50 to 500 new measures in a new benchmarking have been noted down.
@@ -151,7 +156,7 @@ class RegularComputer(DeviceType):
                              [500,769,621]],
                             canQueue=True,
                             canReason=True,
-                            hasBatery=False)
+                            hasBattery=False)
 
 
 class Server(DeviceType): # TODO fill with real data
@@ -172,4 +177,4 @@ class Server(DeviceType): # TODO fill with real data
                              [500,769,621]],
                             canQueue=True,
                             canReason=True,
-                            hasBatery=False)
+                            hasBattery=False)

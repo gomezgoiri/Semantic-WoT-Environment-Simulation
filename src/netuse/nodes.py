@@ -75,7 +75,7 @@ class Node(Process):
     def canReason(self):
         return self.__device.canReason
     
-    def __init__(self, name="node", device=None, joined_since=1, sac=False, batery_lifetime='1d'):
+    def __init__(self, name="node", device=None, joined_since=1, sac=False, battery_lifetime='1d'):
         Process.__init__(self, name=name)
         self._ts = None
         self.__device = device if device!=None else RegularComputer() # device type 
@@ -84,7 +84,7 @@ class Node(Process):
                                                 storage = device.storage_capacity,
                                                 joined_since = joined_since,
                                                 sac = sac,
-                                                batery_lifetime = batery_lifetime)
+                                                battery_lifetime = battery_lifetime if device.hasBattery else DiscoveryRecord.INFINITE_BATTERY)
         
         self.__httpOut = {}
         self.__httpIn = []
