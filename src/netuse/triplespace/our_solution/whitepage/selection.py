@@ -46,11 +46,8 @@ class WhitepageSelector(object):
         # b) Filtra a los que no tengan al menos X almacenamiento.
         #    Se estima en base a las medidas tomadas en la evaluacion de clues y el numero de nodos en ese espacio.
         required = WhitepageSelector._to_bytes(total_num_nodes, 'KB') # supose 1KB per node
-        for node in candidates:
-            sto = WhitepageSelector._to_bytes(*node.discovery_record.storage) # tuple to parameters
-            if sto<required:
-                candidates.remove(node)
-        return candidates
+        greater_than_required = lambda node: WhitepageSelector._to_bytes(*node.discovery_record.storage) >= required
+        return filter(greater_than_required, candidates)
     
     @staticmethod
     def _any_with_full_battery(nodes):
@@ -60,20 +57,12 @@ class WhitepageSelector(object):
         return False
     
     @staticmethod
-    def _choose_within_full_battery_nodes(candidates):
-        # d1) Selecciona al que tenga mejores caracteristicas: Memoria
-        best_memory_node = None
+    def _choose_within_full_battery_nodes(candidates):        
+        # c1) Filtra los que tienen bateria a 1
+        additional_filter = lambda node: node.discovery_record.battery_lifetime==DiscoveryRecord.INFINITE_BATTERY
         
-        for node in candidates:
-            # c1) Filtra los que tienen bateria a 1
-            if node.discovery_record.battery_lifetime==DiscoveryRecord.INFINITE_BATTERY:
-                if best_memory_node==None:
-                    best_memory_node = node
-                elif best_memory_node.discovery_record.memory < node.discovery_record.memory:
-                    best_memory_node = node
-                    
-        return best_memory_node
-    
+        # d1) Selecciona al que tenga mejores caracteristicas: Memoria
+        return WhitepageSelector._choose_the_one_with_most_memory(candidates, additional_filter)    
     
     @staticmethod
     def _filter_unsteady_nodes(candidates):
@@ -123,12 +112,11 @@ class WhitepageSelector(object):
     
     
     @staticmethod
-    def _choose_the_one_with_most_battery(candidates):
+    def _choose_the_one_with_most_memory(candidates, additionalFilter=lambda n: True):
         best_memory_node = None
             
         for node in candidates:
-            # c1) Filtra los que tienen bateria a 1
-            if node.discovery_record.battery_lifetime==DiscoveryRecord.INFINITE_BATTERY:
+            if additionalFilter(node):
                 if best_memory_node==None:
                     best_memory_node = node
                 elif best_memory_node.discovery_record.memory < node.discovery_record.memory:
@@ -155,7 +143,7 @@ class WhitepageSelector(object):
             candidates = WhitepageSelector._filter_nodes_with_more_battery(candidates)
             
             # De esta forma se da prioridad a los que tienen mas bateria y de entre ellos se elige al que tenga mas memoria.
-            return WhitepageSelector._choose_the_one_with_most_battery(candidates)
+            return WhitepageSelector._choose_the_one_with_most_memory(candidates)
 
 
 class WhitepageSelectionManager(object):

@@ -24,17 +24,39 @@ class WhitepageSelectorTestCase(unittest.TestCase):
     def setUp(self):
         self.nodes = []
         self.nodes.append(FakeNode('3MB', '22MB', 2))
-        self.nodes.append(FakeNode('8MB', '32MB', 2))
-        self.nodes.append(FakeNode('16MB', '32MB', 2))
+        self.nodes.append(FakeNode('8MB', '32MB', 2, '1d'))
+        self.nodes.append(FakeNode('32MB', '32MB', 2))
+        self.nodes.append(FakeNode('34MB', '32MB', 2, '1d'))
         self.nodes.append(FakeNode('16MB', '50MB', 1)) # best, but unstable
         self.nodes.append(FakeNode('3MB', '1GB', 2))
     
     def test_filter_less_memory_than(self):
         filtered_nodes = WhitepageSelector._filter_less_memory_than(list(self.nodes), (16,'MB'))
-        expected = (self.nodes[2], self.nodes[3])
+        expected = (self.nodes[2], self.nodes[3], self.nodes[4])
         self.assertItemsEqual(filtered_nodes, expected)
+        
+    def test_filter_less_storage_than(self):
+        filtered_nodes = WhitepageSelector._filter_less_storage_than(list(self.nodes), 1024*42) # 500 nodes * (1KB * 1024) = at least 42MBs
+        expected = (self.nodes[4], self.nodes[5])
+        self.assertItemsEqual(filtered_nodes, expected)
+    
+    def test_any_with_full_battery(self):
+        self.assertTrue(self.nodes)
+        
+        nodes2 = []
+        nodes2.append(FakeNode('3MB', '22MB', 2, '2h'))
+        nodes2.append(FakeNode('8MB', '32MB', 2, '1d'))
+        self.assertFalse(WhitepageSelector._any_with_full_battery(nodes2))
+        
+    def test_choose_within_full_battery_nodes(self):
+        selected_node = WhitepageSelector._choose_within_full_battery_nodes(self.nodes)
+        self.assertEquals(self.nodes[2], selected_node)
+    
+    def test_choose_the_one_with_most_memory(self):
+        selected_node = WhitepageSelector._choose_the_one_with_most_memory(self.nodes)
+        self.assertEquals(self.nodes[3], selected_node)
 
-    def test_select_best_with_infinite_battery(self):        
+    def test_select_whitepage_with_infinite_battery_candidates(self):        
         selected_node = WhitepageSelector.select_whitepage(self.nodes)
         self.assertEquals(self.nodes[2], selected_node)
 
