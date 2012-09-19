@@ -20,22 +20,21 @@ class DiscoveryFactory(object):
 
 
 class DiscoveryRecord(object):
-    INFINITE_BATERY = 'inf' # plugged in to the plug
+    INFINITE_BATTERY = 'inf' # plugged in to the plug
     
     def __init__(self, memory='1MB', storage='1MB',
-                 joined_since=1, sac=False, batery_lifetime=INFINITE_BATERY, is_whitepage=False):
+                 joined_since=1, sac=False, battery_lifetime=INFINITE_BATTERY, is_whitepage=False):
         self.change_observers = []
         self.memory = self._separate_units_from_values(memory) # does not change
         self.storage = self._separate_units_from_values(storage) # does not change
         self.__joined_since = joined_since
         self.__sac = sac
-        self.__batery_lifetime = batery_lifetime
+        self.__battery_lifetime = battery_lifetime
         self.__is_whitepage = is_whitepage
         
     def _separate_units_from_values(self, unstandardized):
-        s = '1 MB'
         i = 0
-        for c in s:
+        for c in unstandardized:
             if not c.isdigit():
                 break
             else:
@@ -73,12 +72,12 @@ class DiscoveryRecord(object):
         self.__record_updated()
     
     @property
-    def batery_lifetime(self):
-        return self.__batery_lifetime
+    def battery_lifetime(self):
+        return self.__battery_lifetime
     
-    @joined_since.setter
-    def joined_since(self, batery_lifetime):
-        self.__batery_lifetime = batery_lifetime
+    @battery_lifetime.setter
+    def battery_lifetime(self, battery_lifetime):
+        self.__battery_lifetime = battery_lifetime
         self.__record_updated()
         
     @property
@@ -95,13 +94,17 @@ class DiscoveryRecord(object):
 class DiscoveryRecordObserver(object):
     __metaclass__ = ABCMeta
     
+    def __init__(self):
+        pass
+    
     @abstractmethod
     def notify_changes(self):
         pass
 
 
-class SimpleDiscoveryMechanism(object, DiscoveryRecordObserver):
+class SimpleDiscoveryMechanism(DiscoveryRecordObserver):
     def __init__(self, me, rest):
+        DiscoveryRecordObserver.__init__()
         self.me = me
         self.rest = rest
         for node in self.rest:
