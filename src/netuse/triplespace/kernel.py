@@ -127,7 +127,8 @@ class OurSolution(TripleSpace, RequestObserver, Process):
             self.provider = Provider(self.dataaccess, self.discovery)
             activate(self.provider, self.provider.update_clues_on_whitepage())
             
-        # TODO if clues have been updated, let the provider module now
+        # if clues have been updated, let the provider module now
+        self.provider.refresh_clue()
     
     @schedule
     def query(self, template):        

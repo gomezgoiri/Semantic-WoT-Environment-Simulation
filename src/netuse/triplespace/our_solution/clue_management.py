@@ -23,3 +23,6 @@ class ClueStore(object):
     # return the nodes which may have relevant data for a given query
     def get_query_candidates(self, template):
         pass
+        
+    def get_aggregated_clues_json(self):
+        pass

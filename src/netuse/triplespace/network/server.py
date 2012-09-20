@@ -155,7 +155,8 @@ class SpacesHandler(object):
 class WhitepageHandler(object):
     def __init__(self, tskernel):
         self.tskernel = tskernel
-        
+    
+    # Not the best API in the world, but this can be changed in advance
     def process_whitepage(self, wp_path, request=None):
         if wp_path.startswith('choose'):
             method = request.get_method()
@@ -169,16 +170,22 @@ class WhitepageHandler(object):
             if self.tskernel.whitepage==None:
                 return (501, "Not Implemented", 'text/plain')
             
-            # clue_path = wp_path[len('clues/'):] #to offer individual access to the clues?
-            # Not the best API in the world, but this can be changed in advance
-            
+            clues_path = wp_path[len('clues/'):]  #to offer individual access to the clues?
             method = request.get_method()
-            if method=='GET':
-                return (200, """TODO JSON""", 'application/json')
-            elif method=='POST':
-                clues_json = request.get_data()
-                # TODO do something with it
-                return (200, """The clue was successfully updated""", 'text/html')
+            
+            if len(clues_path)==0:
+                if method=='GET':
+                    return (200, self.tskernel.whitepage.get_aggregated_clues_json(), 'application/json')
+                else:
+                    return (405, "Method not allowed", 'text/plain')
+            else: #to offer individual access to the clues, to allow their update or creation
+                if method=='POST':
+                    node_id = clues_path[:-1] if clues_path.endswith('/') else clues_path
+                    clues_json = request.get_data()
+                    self.tskernel.whitepage.add_clue(-1, node_id, clues_json)
+                    return (200, "The clue was successfully updated", 'text/html')
+                else:
+                    return (405, "Method not allowed", 'text/plain')
             
         return (404, """Not found.""", 'text/html')
 

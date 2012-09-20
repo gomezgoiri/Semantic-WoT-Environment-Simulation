@@ -11,3 +11,5 @@ class Whitepage(object):
     def add_clue(self, expiry_time, node, clue):
         self.clues.add_clue(expiry_time, node, clue)
         
+    def get_aggregated_clues_json(self):
+        self.clues.get_aggregated_clues_json()
