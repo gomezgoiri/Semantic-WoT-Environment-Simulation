@@ -8,8 +8,8 @@ class Whitepage(object):
     def get_query_candidates(self, template):
         self.clues.get_query_candidates(template)
     
-    def add_clue(self, expiry_time, node, clue):
-        self.clues.add_clue(expiry_time, node, clue)
+    def add_clue(self, node, clue, expiry_time=-1):
+        self.clues.add_clue(node, clue, expiry_time)
         
     def get_aggregated_clues_json(self):
         self.clues.get_aggregated_clues_json()

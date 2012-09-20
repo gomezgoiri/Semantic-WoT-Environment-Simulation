@@ -6,6 +6,7 @@ Created on Sep 17, 2012
 
 from abc import ABCMeta, abstractmethod
 from SimPy.Simulation import now
+from clueseval.clues.aggregated import ClueAggregation
 from netuse.triplespace.our_solution.clue_management import ClueStore
 from netuse.triplespace.our_solution.consumer.time_update import UpdateTimesManager
 from netuse.triplespace.our_solution.whitepage.selection import WhitepageSelectionManager, SelectionProcessObserver
@@ -92,8 +93,9 @@ class RemoteConnector(AbstractConnector, RequestObserver):
     def notifyRequestFinished(self, request_instance):
         for unique_response in request_instance.responses:
             if unique_response.getstatus()==200:
-                # update(self.clues, unique_req) # somehow
-                pass # TODO
+                ca = ClueAggregation()
+                ca.fromJson(unique_response.get_data())
+                self.clues.add_clues(ca)
     
     def _check_if_next_update_changes(self):
         possible_next = now() + self.updateTimeManager.get_updatetime()

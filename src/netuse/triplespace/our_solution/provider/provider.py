@@ -6,9 +6,9 @@ Created on Sep 17, 2012
 
 from abc import ABCMeta, abstractmethod
 from SimPy.Simulation import Process, SimEvent, activate, hold, waitevent
+from clueseval.clues.node_attached import ClueWithNode
 from netuse.triplespace.network.discovery import SimpleDiscoveryObserver
-from netuse.triplespace.our_solution.provider.clue_manager import ClueManager
-from netuse.triplespace.our_solution.whitepage.selection import WhitepageSelectionManager
+from netuse.triplespace.our_solution.provider.simple_clue_management import ClueManager
 from netuse.triplespace.network.client import RequestInstance, RequestManager, RequestObserver
 
 
@@ -83,7 +83,7 @@ class LocalConnector(AbstractConnector):
         self.me = self.discovery.me
         
     def send_clue(self, clue):
-        self.local_whitepage.add_clue(-1, self.me, clue)
+        self.local_whitepage.add_clue(self.me, clue)
 
 
 class RemoteConnector(AbstractConnector, RequestObserver):
@@ -96,7 +96,8 @@ class RemoteConnector(AbstractConnector, RequestObserver):
         RequestManager.launchNormalRequest(self._get_update_request(clue.toJson()))
     
     def _get_update_request(self, clue):
-        req = RequestInstance(self.me_as_node, [self.whitepage_node], '/whitepage/clues/'+self.me_as_node.name, data=clue)
+        c = ClueWithNode(self.me_as_node.name, clue)
+        req = RequestInstance(self.me_as_node, [self.whitepage_node], '/whitepage/clues/'+self.me_as_node.name, data=c.toJson())
         req.addObserver(self)
         return req
     

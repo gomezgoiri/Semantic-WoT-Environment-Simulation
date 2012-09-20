@@ -8,6 +8,7 @@ import urllib
 from rdflib import Literal, URIRef
 from rdflib.Literal import _XSD_NS
 
+from clueseval.clues.node_attached import ClueWithNode
 from netuse.triplespace.network.httpelements import HttpResponse
 
 class SpacesHandler(object):
@@ -181,8 +182,9 @@ class WhitepageHandler(object):
             else: #to offer individual access to the clues, to allow their update or creation
                 if method=='POST':
                     node_id = clues_path[:-1] if clues_path.endswith('/') else clues_path
-                    clues_json = request.get_data()
-                    self.tskernel.whitepage.add_clue(-1, node_id, clues_json)
+                    clueWN = ClueWithNode()
+                    clueWN.fromJson(request.get_data()) # we already know the node_id, but we could get from clueWN also
+                    self.tskernel.whitepage.add_clue(node_id, clueWN.clue)
                     return (200, "The clue was successfully updated", 'text/html')
                 else:
                     return (405, "Method not allowed", 'text/plain')

@@ -159,12 +159,12 @@ class RegularComputer(DeviceType):
                             hasBattery=False)
 
 
-class Server(DeviceType): # TODO fill with real data
+class Server(DeviceType): # real data from helheim.deusto.es
     TYPE_ID = 'server'
     
     def __init__(self):
         DeviceType.__init__(self,
-                            ram_memory='32GB',
+                            ram_memory='16GB',
                             storage_capacity='4TB',
                             waitingTime = [[1,13,0],
                              [5,7,3],
