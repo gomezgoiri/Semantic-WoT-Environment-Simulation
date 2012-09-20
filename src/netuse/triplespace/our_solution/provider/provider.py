@@ -30,12 +30,14 @@ class Provider(Process, SimpleDiscoveryObserver):
     UPDATE_TIME = 3600000 # 1h
     
     def __init__(self, dataaccess, discovery):
-        Process.__init__()
+        Process.__init__(self)
         
         self.discovery = discovery
+        self.discovery.add_changes_observers(self)
         self.clue_manager = ClueManager(dataaccess)
         
         self.stop = False
+        self.wp_node_name = None
         self.connector = None
         
         self.externalCondition = SimEvent()
@@ -44,7 +46,7 @@ class Provider(Process, SimpleDiscoveryObserver):
     def update_clues_on_whitepage(self):
         while not self.stop:
             self.__update_connector_if_needed()
-            if self.connector==None:
+            if self.connector!=None:
                 self.connector.send_clue(self.clue_manager.get_clue())
             self.timer = Timer(Provider.UPDATE_TIME)
             activate(self.timer, self.timer.wait())
@@ -79,8 +81,8 @@ class AbstractConnector(object):
 class LocalConnector(AbstractConnector):
     
     def __init__(self, discovery):
-        self.local_whitepage = self.discovery.me.ts.whitepage
-        self.me = self.discovery.me
+        self.local_whitepage = discovery.me.ts.whitepage
+        self.me = discovery.me
         
     def send_clue(self, clue):
         self.local_whitepage.add_clue(self.me, clue)

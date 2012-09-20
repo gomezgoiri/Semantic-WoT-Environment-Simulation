@@ -48,7 +48,7 @@ class PredicateBasedClue(Clue):
     
     def parseGraph(self, graph):
         self._schemas = set(self._extractNamespaces(graph))
-        self._predicates = set(self._extractPredicates(graph))
+        self._predicates = self._extractPredicates(graph)
     
     def _extractPredicates(self, graph):
         ret = set()

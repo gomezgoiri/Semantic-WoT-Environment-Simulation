@@ -6,10 +6,10 @@ class Whitepage(object):
         self.clues = ClueStore()
         
     def get_query_candidates(self, template):
-        self.clues.get_query_candidates(template)
+        return self.clues.get_query_candidates(template)
     
     def add_clue(self, node, clue, expiry_time=-1):
         self.clues.add_clue(node, clue, expiry_time)
         
     def get_aggregated_clues_json(self):
-        self.clues.get_aggregated_clues_json()
+        return self.clues.get_aggregated_clues_json()

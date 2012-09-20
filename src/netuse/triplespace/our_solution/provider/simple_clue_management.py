@@ -12,7 +12,7 @@ class ClueManager:
         self.refresh()
         
     def refresh(self):
-        g = self.dataaccess.getSpace(None)
+        g = self.dataaccess.getSpace(None).graphs
         clue = PredicateBasedClue()
         clue.parseGraph(g)
         

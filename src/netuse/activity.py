@@ -16,9 +16,9 @@ from netuse.results import G
 
 class ActivityGenerator():
     
-    FAKE_GRAPH = Graph().parse(StringIO("<http://s> <http://p> <http://o> .\n"), format="nt")
-    
     def __init__(self, params, baseGraphs):
+        self.FAKE_GRAPH = Graph().parse(StringIO("<http://www.deusto.es/fakesubject> <http://www.deusto.es/fakepredicate> <http://www.deusto.es/fakeobject> .\n"), format="nt")
+        self.FAKE_GRAPH.bind("deusto", "http://www.deusto.es/", override=True)
         self.__params = params
         self.__baseGraphs = baseGraphs
         self.__discovery_factory = DiscoveryFactory(NodeGenerator.getNodes())
@@ -66,7 +66,7 @@ class ActivityGenerator():
                     if graphsToWrite:
                         last = graphsToWrite.pop()
                     else:
-                        last = ActivityGenerator.FAKE_GRAPH
+                        last = self.FAKE_GRAPH
                     actionNode.ts.write(starts_at=startsWriting+writesAt, triples=last)
         
     

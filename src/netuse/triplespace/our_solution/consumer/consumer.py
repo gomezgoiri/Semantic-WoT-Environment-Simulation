@@ -94,6 +94,7 @@ class RemoteConnector(AbstractConnector, RequestObserver):
         for unique_response in request_instance.responses:
             if unique_response.getstatus()==200:
                 ca = ClueAggregation()
+                print unique_response.get_data()
                 ca.fromJson(unique_response.get_data())
                 self.clues.add_clues(ca)
     

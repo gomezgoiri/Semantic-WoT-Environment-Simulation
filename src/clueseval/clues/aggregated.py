@@ -22,7 +22,7 @@ class ClueAggregation(object):
              Note that all the clues should be of the same type.
          '''
         self.clues = clues
-        self.type = -1 if clues==None else clues[0][ClueAggregation.CLUE_FIELD].ID() # the type of the first element
+        self.type = -1 if clues==None or not clues else clues[0][ClueAggregation.CLUE_FIELD].ID() # the type of the first element
     
     def _create_temporary_dictionaries(self):
         tmpDictios = {}
@@ -96,6 +96,6 @@ class ClueAggregation(object):
     def toJson(self):
         return json.dumps(self._toDictionary())
     
-    def parseJson(self, json_str):
+    def fromJson(self, json_str):
         diction = json.loads(json_str)
         self._fromDictionary(diction)

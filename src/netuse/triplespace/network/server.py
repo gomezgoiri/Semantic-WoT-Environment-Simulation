@@ -176,7 +176,8 @@ class WhitepageHandler(object):
             
             if len(clues_path)==0:
                 if method=='GET':
-                    return (200, self.tskernel.whitepage.get_aggregated_clues_json(), 'application/json')
+                    aggregated_clues = self.tskernel.whitepage.get_aggregated_clues_json()
+                    return (200, aggregated_clues, 'application/json') if aggregated_clues!=None else (404, "No clues in this node.", '')
                 else:
                     return (405, "Method not allowed", 'text/plain')
             else: #to offer individual access to the clues, to allow their update or creation

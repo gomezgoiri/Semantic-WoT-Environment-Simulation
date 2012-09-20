@@ -35,5 +35,8 @@ class ClueStore(object):
         return candidates
         
     def get_aggregated_clues_json(self):
-        aggregated = ClueAggregation(self.bynode.iteritems())
+        if not self.bynode:
+            return None
+        
+        aggregated = ClueAggregation(self.bynode.items())
         return aggregated.toJson()
