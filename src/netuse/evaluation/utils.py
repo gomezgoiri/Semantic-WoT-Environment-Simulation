@@ -27,7 +27,7 @@ class ParametrizationUtils():
         else:
             nodes = list(self.possibleNodes) # copies the list (or more cryptic: self.possibleNodes[:])
             for i in range(numNodes-len(self.possibleNodes)):
-                nodes.append('DOE_'+i) #TODO mecanismo para meter nodos sin contenido (o contenido de pega)
+                nodes.append('DOE_'+i)
         
         if nodeTypes==None:
             nodeTypes = (RegularComputer.TYPE_ID,)*numNodes
