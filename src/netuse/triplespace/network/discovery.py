@@ -18,6 +18,12 @@ class DiscoveryFactory(object):
         return SimpleDiscoveryMechanism(localNode, restOfTheNodes)
 
 
+class DiscoveryRecordObserver(object):
+    __metaclass__ = ABCMeta
+    
+    @abstractmethod
+    def notify_changes(self):
+        pass
 
 class DiscoveryRecord(object):
     INFINITE_BATTERY = 'inf' # plugged in to the plug
@@ -91,23 +97,42 @@ class DiscoveryRecord(object):
     
 
 
-class DiscoveryRecordObserver(object):
+class SimpleDiscoveryObserver(object):
     __metaclass__ = ABCMeta
     
     @abstractmethod
-    def notify_changes(self):
+    def on_whitepage_selected_after_none(self):
+        '''
+        When no whitepage existed in the space and a new one has been selected.
+        '''
         pass
 
-
 class SimpleDiscoveryMechanism(DiscoveryRecordObserver):
+    
     def __init__(self, me, rest):
         self.me = me
         self.rest = rest
         for node in self.rest:
             node.discovery_record.add_change_observer(self)
+        self.observers = []
+        self.whitepage_exist = False
+            
+    def add_changes_observers(self, observer):
+        self.observers.append(observer)
+        
+    def _notify_on_whitepage_selected_after_none(self):
+        for observer in self.observers:
+            observer.on_whitepage_selected_after_none()
     
     def notify_changes(self):
-        pass
+        wp = self.get_whitepage()
+        if not self.whitepage_exist:
+            if wp!=None:
+                self.whitepage_exist = True
+                self._notify_on_whitepage_selected_after_none()
+        else:
+            if wp==None:
+                self.whitepage_exist = False
     
     def get_whitepage(self):
         '''Returns the node currently acting as whitepage. None if no whitepage exists in the space.'''

@@ -13,6 +13,7 @@ from SimPy.Simulation import now, Process, activate, hold
 from netuse.results import G
 from netuse.nodes import NodeGenerator
 from netuse.triplespace.our_solution.whitepage.whitepage import Whitepage
+from netuse.triplespace.our_solution.provider.provider import Provider
 from netuse.triplespace.our_solution.consumer.consumer import Consumer
 from netuse.triplespace.dataaccess.store import DataAccess
 from netuse.triplespace.network.server import CustomSimulationHandler
@@ -114,12 +115,19 @@ class OurSolution(TripleSpace, RequestObserver, Process):
     def __init__(self, discovery): # ontologyGraph, which may be already expanded or not
         Process.__init__(self)
         TripleSpace.__init__(self, discovery)
+        self.provider = None
         self.consumer = None
         self.whitepage = None # just the whitepage will have this attribute to !=None
     
     @schedule
     def write(self, triples):
         self.dataaccess.write(triples)
+        
+        if self.provider==None:
+            self.provider = Provider(self.dataaccess, self.discovery)
+            activate(self.provider, self.provider.update_clues_on_whitepage())
+            
+        # TODO if clues have been updated, let the provider module now
     
     @schedule
     def query(self, template):        

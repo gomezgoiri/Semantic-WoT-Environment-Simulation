@@ -30,11 +30,11 @@ if __name__ == '__main__':
     p = ParametrizationUtils('network_usage', '/home/tulvur/dev/workspaces/doctorado/files/semantic')
     
     param = p.getDefaultParametrization(Parametrization.our_solution,
-                                   amountOfQueries = 1,
+                                   amountOfQueries = 20,
                                    writeFrequency = 10000,
                                    simulateUntil = 60000,
                                    queries = ((None, None, None),),
-                                   numNodes = 2,
-                                   numConsumers = 1
+                                   numNodes = 3,
+                                   numConsumers = 2
                                    )
     performSimulation(param)
