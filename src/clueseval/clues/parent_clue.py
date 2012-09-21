@@ -48,7 +48,16 @@ class Clue(object):
     
     def _extractNamespaces(self, graph):
         schemas = []
-        for pref in graph.namespace_manager.namespaces(): # or graph.namespaces()?
+        
+        # Is call just to ensure that automatic binding is performed.
+        # TODO find a better alternative of forcing automatic binding!
+        graph.serialize(format='n3')
+        
+        # WARNING:
+        #    The iteration works well in different ways for:
+        #       + rdflib.Graph: where we should use graph.namespace_manager.namespaces()
+        #       + rdflib.Graph.Graph: The one used in dataaccess layer, where we use graph.namespaces()
+        for pref in graph.namespaces():
             if not pref[1].startswith('file://'):
                 schemas.append(pref)
         return schemas
