@@ -35,7 +35,7 @@ if __name__ == '__main__':
                                    amountOfQueries = 20,
                                    writeFrequency = 10000,
                                    simulateUntil = 60000,
-                                   queries = ((None, URIRef('http://www.deusto.es/predicate'), None),),
+                                   queries = ((None, URIRef('http://www.deusto.es/fakepredicate'), None),),
                                    numNodes = 3,
                                    numConsumers = 2
                                    )

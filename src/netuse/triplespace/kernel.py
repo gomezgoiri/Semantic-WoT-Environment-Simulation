@@ -135,12 +135,14 @@ class OurSolution(TripleSpace, RequestObserver, Process):
         if self.consumer==None:
             self.consumer = Consumer(self.discovery) # change the discovery registry to set "sac" property
         
-        # local query
+        
         
         # remote queries
         activate(self, self._finish_query_waiting(template)) # to wait for whitepages
     
     def _finish_query_waiting(self, template):
+        # local query
+        
         
         selected_nodes = None
         while selected_nodes==None:
@@ -153,18 +155,18 @@ class OurSolution(TripleSpace, RequestObserver, Process):
         
         destNodes = []
         for node_name in selected_nodes:
-            destNodes.append(NodeGenerator.getNodeByName(node_name))
+            if node_name is not self.discovery.me.name: # local query already done
+                destNodes.append(NodeGenerator.getNodeByName(node_name))
         
         req = RequestInstance(self.discovery.me, destNodes,
                               '/' + self.fromSpaceToURL() + "query/" + self.fromTemplateToURL(template),
                               name="queryAt"+str(now()))
         RequestManager.launchNormalRequest(req)
-        
+    
     def be_whitepage(self):
         self.whitepage = Whitepage()
         self.discovery.me.discovery_record.is_whitepage=True
         # TODO check if another whitepage already exist and resolve conflict (step 6)
-        print "Whitepage selected: ", now()        
-        
+    
     def notifyRequestFinished(self, request_instance):
         pass # do I really need the results?

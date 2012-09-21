@@ -39,9 +39,7 @@ class ParametrizationUtils():
                         nodes = nodes,
                         nodeTypes = nodeTypes,
                         simulateUntil = simulateUntil,
-                        queries = ((None, RDF.type, URIRef('http://knoesis.wright.edu/ssw/ont/weather.owl#RainfallObservation')),
-                                    (URIRef('http://dev.morelab.deusto.es/bizkaisense/resource/station/ABANTO'), None, None)
-                                    ,)
+                        queries = queries
                         )
         return params
     

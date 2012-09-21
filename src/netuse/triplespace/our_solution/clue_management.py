@@ -28,7 +28,6 @@ class ClueStore(object):
     
     # return the nodes which may have relevant data for a given query
     def get_query_candidates(self, template):
-        print "blagh"
         candidates = set()
         for node_name, clue in self.bynode.iteritems():
             if clue.isCandidate(template):

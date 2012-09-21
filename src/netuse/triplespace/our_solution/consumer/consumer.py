@@ -61,7 +61,7 @@ class LocalConnector(AbstractConnector):
     
     def __init__(self, discovery):
         self.local_whitepage = discovery.me.ts.whitepage
-        
+    
     def get_query_candidates(self, template):
         return self.local_whitepage.get_query_candidates(template)
 
@@ -81,7 +81,7 @@ class RemoteConnector(AbstractConnector, RequestObserver):
     def _initialize_clues(self):
         # request to whitepage
         RequestManager.launchNormalRequest(self._get_update_request())
-        
+    
     def _schedule_future_update(self):
         up_time = self.updateTimeManager.get_updatetime()
         self.scheduled_request = RequestManager.launchScheduledRequest(self._get_update_request(), now()+up_time)
@@ -97,6 +97,7 @@ class RemoteConnector(AbstractConnector, RequestObserver):
                 ca = ClueAggregation()
                 ca.fromJson(unique_response.get_data())
                 self.clues.add_clues(ca)
+        self._schedule_future_update() # next clue update!
     
     def _check_if_next_update_changes(self):
         possible_next = now() + self.updateTimeManager.get_updatetime()
