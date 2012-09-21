@@ -22,23 +22,24 @@ class Consumer(SelectionProcessObserver):
     
     def get_query_candidates(self, template):
         self.__update_connector_if_needed()
+        
         if self.connector==None:
             raise Exception("Try again a little bit latter.")
         return self.connector.get_query_candidates(template)
     
     def __update_connector_if_needed(self):
         wp = self.discovery.get_whitepage()
-        if wp==None:
+        if wp is None:
             if not self.ongoing_selection:
                 self.ongoing_selection = True
                 wsm = WhitepageSelectionManager(self.discovery)
                 wsm.set_observer(self)
                 wsm.choose_whitepage()
         else:
-            if self.wp_node_name==None or self.wp_node_name!=wp.name:
+            if self.wp_node_name is None or self.wp_node_name!=wp.name:
                 self.wp_node_name = wp.name
                 if wp==self.discovery.me:
-                    self.connector = LocalConnector()
+                    self.connector = LocalConnector(self.discovery)
                 else:
                     self.connector = RemoteConnector(self.discovery.me, wp)
                     
@@ -59,7 +60,7 @@ class AbstractConnector(object):
 class LocalConnector(AbstractConnector):
     
     def __init__(self, discovery):
-        self.local_whitepage = self.discovery.me.ts.whitepage
+        self.local_whitepage = discovery.me.ts.whitepage
         
     def get_query_candidates(self, template):
         return self.local_whitepage.get_query_candidates(template)
@@ -94,7 +95,6 @@ class RemoteConnector(AbstractConnector, RequestObserver):
         for unique_response in request_instance.responses:
             if unique_response.getstatus()==200:
                 ca = ClueAggregation()
-                print unique_response.get_data()
                 ca.fromJson(unique_response.get_data())
                 self.clues.add_clues(ca)
     

@@ -85,7 +85,7 @@ class LocalConnector(AbstractConnector):
         self.me = discovery.me
         
     def send_clue(self, clue):
-        self.local_whitepage.add_clue(self.me, clue)
+        self.local_whitepage.add_clue(self.me.name, clue)
 
 
 class RemoteConnector(AbstractConnector, RequestObserver):

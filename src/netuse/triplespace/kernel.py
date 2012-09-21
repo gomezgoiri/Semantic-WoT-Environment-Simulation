@@ -164,7 +164,7 @@ class OurSolution(TripleSpace, RequestObserver, Process):
         self.whitepage = Whitepage()
         self.discovery.me.discovery_record.is_whitepage=True
         # TODO check if another whitepage already exist and resolve conflict (step 6)
-        
+        print "Whitepage selected: ", now()        
         
     def notifyRequestFinished(self, request_instance):
         pass # do I really need the results?
