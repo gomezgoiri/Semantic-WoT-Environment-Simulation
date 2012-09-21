@@ -111,13 +111,17 @@ class Centralized(TripleSpace):
         RequestManager.launchNormalRequest(req)
 
 
-class OurSolution(TripleSpace, RequestObserver, Process):
+class OurSolution(TripleSpace):
     def __init__(self, discovery): # ontologyGraph, which may be already expanded or not
-        Process.__init__(self)
         TripleSpace.__init__(self, discovery)
         self.provider = None
         self.consumer = None
         self.whitepage = None # just the whitepage will have this attribute to !=None
+        
+    def be_whitepage(self):
+        self.whitepage = Whitepage()
+        self.discovery.me.discovery_record.is_whitepage=True
+        # TODO check if another whitepage already exist and resolve conflict (step 6)
     
     @schedule
     def write(self, triples):
@@ -131,42 +135,53 @@ class OurSolution(TripleSpace, RequestObserver, Process):
         self.provider.refresh_clue()
     
     @schedule
-    def query(self, template):        
+    def query(self, template):
         if self.consumer==None:
             self.consumer = Consumer(self.discovery) # change the discovery registry to set "sac" property
         
-        
-        
         # remote queries
-        activate(self, self._finish_query_waiting(template)) # to wait for whitepages
+        qf = QueryFinisher(self.consumer, self.discovery, self.fromSpaceToURL(), self.fromTemplateToURL(template))
+        # when I've tried to do it in the same class (qf = self), some of the activation weren't really activated
+        # may be because a method of the same object cannot be used at the same simulation time?
+        # In this case, when they overlap, the activation of _finish_query_waiting may be ignored when they overlap in time
+        activate(qf, qf._finish_query_waiting(template)) # to wait for whitepages
+
+class QueryFinisher(Process, RequestObserver):
+    
+    def __init__(self, consumer, discovery, fromSpaceToURL, fromTemplateToURLtemplate):
+        Process.__init__(self)
+        self.consumer = consumer
+        self.discovery = discovery
+        self.fromSpaceToURL = fromSpaceToURL
+        self.fromTemplateToURLtemplate = fromTemplateToURLtemplate
     
     def _finish_query_waiting(self, template):
         # local query
-        
         
         selected_nodes = None
         while selected_nodes==None:
             try:
                 selected_nodes = self.consumer.get_query_candidates(template)
-            except Exception:
-                #print "Waiting for a whitepage."
+            except Exception as e:
+                #print "Waiting for a whitepage.", e.args[0]
                 pass
             yield hold, self, 100
         
-        destNodes = []
-        for node_name in selected_nodes:
-            if node_name is not self.discovery.me.name: # local query already done
-                destNodes.append(NodeGenerator.getNodeByName(node_name))
-        
-        req = RequestInstance(self.discovery.me, destNodes,
-                              '/' + self.fromSpaceToURL() + "query/" + self.fromTemplateToURL(template),
-                              name="queryAt"+str(now()))
-        RequestManager.launchNormalRequest(req)
-    
-    def be_whitepage(self):
-        self.whitepage = Whitepage()
-        self.discovery.me.discovery_record.is_whitepage=True
-        # TODO check if another whitepage already exist and resolve conflict (step 6)
+        try:
+            if len(selected_nodes)>0:
+                destNodes = []
+                for node_name in selected_nodes:
+                    if node_name!=self.discovery.me.name: # local query already done
+                        destNodes.append(NodeGenerator.getNodeByName(node_name))
+                
+                req = RequestInstance(self.discovery.me, destNodes,
+                                      '/' + self.fromSpaceToURL + "query/" + self.fromTemplateToURLtemplate,
+                                      name="queryAt"+str(now()))
+                RequestManager.launchNormalRequest(req)
+        except:
+            import traceback
+            traceback.print_exc()
+            raise
     
     def notifyRequestFinished(self, request_instance):
         pass # do I really need the results?

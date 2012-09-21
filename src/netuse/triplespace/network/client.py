@@ -139,7 +139,7 @@ class RequestInstance(Process):
                 #if self.__data!=None:
                 #    G.executionData.requests['data-exchanged'] += len(self.__data)
             else:
-                raise Exception("A request to the same node is impossible!")
+                raise Exception("A request to the same node is impossible! ")
         
         self.timer = Timer(self.__timeout, waitUntil=G.timeout_after)
         activate(self.timer, self.timer.wait(), self.__maxWaitingTime)
