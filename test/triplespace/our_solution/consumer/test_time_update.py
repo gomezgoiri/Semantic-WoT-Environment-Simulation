@@ -24,7 +24,7 @@ class UpdateTimesManagerTestCase(unittest.TestCase):
             rc.add_updatetime(i)
         self.assertEquals(rc.get_updatetime(), UpdateTimesManager.MIN_UPDATE_RATE)
         
-        middle_rate = (RemoteConnector.MAX_UPDATE_RATE - UpdateTimesManager.MIN_UPDATE_RATE) / 2 + RemoteConnector.MIN_UPDATE_RATE
+        middle_rate = (UpdateTimesManager.MAX_UPDATE_RATE - UpdateTimesManager.MIN_UPDATE_RATE) / 2 + UpdateTimesManager.MIN_UPDATE_RATE
         for i in range(0, middle_rate*10, middle_rate):
             rc.add_updatetime(i)
         self.assertEquals(rc.get_updatetime(), middle_rate)
