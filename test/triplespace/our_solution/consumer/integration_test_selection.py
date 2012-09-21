@@ -1,5 +1,7 @@
 from SimPy.Simulation import initialize, simulate
 
+from rdflib import URIRef
+
 from netuse.results import G, FileTracer
 from netuse.nodes import NodeGenerator
 from netuse.activity import ActivityGenerator
@@ -33,7 +35,7 @@ if __name__ == '__main__':
                                    amountOfQueries = 20,
                                    writeFrequency = 10000,
                                    simulateUntil = 60000,
-                                   queries = ((None, None, None),),
+                                   queries = ((None, URIRef('http://www.deusto.es/predicate'), None),),
                                    numNodes = 3,
                                    numConsumers = 2
                                    )

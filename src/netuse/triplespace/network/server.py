@@ -184,7 +184,7 @@ class WhitepageHandler(object):
                 if method=='POST':
                     node_id = clues_path[:-1] if clues_path.endswith('/') else clues_path
                     clueWN = ClueWithNode()
-                    clueWN.fromJson(request.get_data()) # we already know the node_id, but we could get from clueWN also
+                    clueWN.parseJson(request.get_data()) # we already know the node_id, but we could get from clueWN also
                     self.tskernel.whitepage.add_clue(node_id, clueWN.clue)
                     return (200, "The clue was successfully updated", 'text/html')
                 else:

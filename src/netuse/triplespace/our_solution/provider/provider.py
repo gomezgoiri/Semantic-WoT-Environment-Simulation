@@ -95,7 +95,7 @@ class RemoteConnector(AbstractConnector, RequestObserver):
         self.whitepage_node = whitepage_node
     
     def send_clue(self, clue):
-        RequestManager.launchNormalRequest(self._get_update_request(clue.toJson()))
+        RequestManager.launchNormalRequest(self._get_update_request(clue))
     
     def _get_update_request(self, clue):
         c = ClueWithNode(self.me_as_node.name, clue)
