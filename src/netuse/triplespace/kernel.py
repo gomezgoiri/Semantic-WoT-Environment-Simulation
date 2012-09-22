@@ -159,9 +159,11 @@ class QueryFinisher(Process, RequestObserver):
         # local query
         
         selected_nodes = None
+        previously_unsolved = True
         while selected_nodes==None:
             try:
-                selected_nodes = self.consumer.get_query_candidates(template)
+                selected_nodes = self.consumer.get_query_candidates(template, previously_unsolved)
+                previously_unsolved = False
             except Exception as e:
                 #print "Waiting for a whitepage.", e.args[0]
                 pass

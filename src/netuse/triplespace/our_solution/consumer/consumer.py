@@ -5,7 +5,7 @@ Created on Sep 17, 2012
 '''
 
 from abc import ABCMeta, abstractmethod
-from SimPy.Simulation import now
+from SimPy.Simulation import now, hold
 from clueseval.clues.aggregated import ClueAggregation
 from netuse.triplespace.our_solution.clue_management import ClueStore
 from netuse.triplespace.our_solution.consumer.time_update import UpdateTimesManager
@@ -20,12 +20,12 @@ class Consumer(SelectionProcessObserver):
         self.wp_node_name = None
         self.ongoing_selection = False
     
-    def get_query_candidates(self, template):
+    def get_query_candidates(self, template, previously_unresolved=False):
         self.__update_connector_if_needed()
         
         if self.connector==None:
             raise Exception("Try again a little bit latter.")
-        return self.connector.get_query_candidates(template)
+        return self.connector.get_query_candidates(template, previously_unresolved)
     
     def __update_connector_if_needed(self):
         wp = self.discovery.get_whitepage()
@@ -53,7 +53,7 @@ class AbstractConnector(object):
     __metaclass__ = ABCMeta
     
     @abstractmethod
-    def get_query_candidates(self, template):
+    def get_query_candidates(self, template, previously_unresolved):
         pass
 
 
@@ -62,7 +62,7 @@ class LocalConnector(AbstractConnector):
     def __init__(self, discovery):
         self.local_whitepage = discovery.me.ts.whitepage
     
-    def get_query_candidates(self, template):
+    def get_query_candidates(self, template, previously_unresolved):
         return self.local_whitepage.get_query_candidates(template)
 
 
@@ -97,6 +97,7 @@ class RemoteConnector(AbstractConnector, RequestObserver):
                 ca = ClueAggregation()
                 ca.fromJson(unique_response.get_data())
                 self.clues.add_clues(ca)
+                break
         self._schedule_future_update() # next clue update!
     
     def _check_if_next_update_changes(self):
@@ -109,7 +110,11 @@ class RemoteConnector(AbstractConnector, RequestObserver):
             # schedule the next update
             self._schedule_future_update()
     
-    def get_query_candidates(self, template):
-        self.updateTimeManager.add_updatetime(now()) # add a timestamp of now to get the update frequency
-        self._check_if_next_update_changes()
+    def get_query_candidates(self, template, previously_unsolved=False):
+        if not previously_unsolved:
+            self.updateTimeManager.add_updatetime(now()) # add a timestamp of now to get the update frequency
+            self._check_if_next_update_changes()
+        if not self.clues.started:
+            # wait untill the clues are loaded for the first time
+            raise Exception("Wait for the first clue loading.")
         return self.clues.get_query_candidates(template)
