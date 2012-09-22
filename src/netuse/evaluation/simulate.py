@@ -18,6 +18,8 @@ from netuse.nodes import NodeGenerator
 from netuse.database.execution import ExecutionSet
 from netuse.results import G
 
+from multiprocessing import Process
+
 
 
 def performSimulation(execution, semanticPath, preloadedGraph={}):
@@ -68,15 +70,24 @@ def loadGraphsJustOnce(nodeNames, semanticPath, loadedGraph):
                         loadedGraph[node_name].append( Graph().parse(datasetPath+"/"+fname, format="n3") )
 
 def simulateUnsimulatedExecutionSet(semanticPath):
-    loadedGraphs = {} 
+    loadedGraphs = {}
+    
     for es in ExecutionSet.get_unsimulated():
         #es.delete()
+        processes = []
         for ex in es.executions:
             if ex.parameters!=None:
-                performSimulation(ex, semanticPath, loadedGraphs)
+                from multiprocessing import Process
+                p = Process(target=performSimulation, args=(ex, semanticPath, loadedGraphs))
+                p.start()
+                
+                #performSimulation(ex, semanticPath, loadedGraphs)
                 print "New simulation: %s"%(ex.parameters)
+                processes.append(p)
+        for p in processes:
+            p.join()
         break # just one simulation (ExecutionSet) per execution
-
+        
 
 if __name__ == '__main__':
     import argparse

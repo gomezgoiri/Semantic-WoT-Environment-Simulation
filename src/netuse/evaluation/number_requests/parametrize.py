@@ -3,7 +3,7 @@ Created on Jan 30, 2012
 
 @author: tulvur
 '''
-from rdflib import URIRef, RDF
+from rdflib import URIRef, RDF, Namespace
 from netuse.evaluation.utils import ParametrizationUtils
 from netuse.database.parametrization import Parametrization
 from netuse.database.results import RequestsResults
@@ -49,18 +49,49 @@ def getNeededRequests(execution_set):
 if __name__ == '__main__':
     p = ParametrizationUtils('network_usage', '/home/tulvur/dev/workspaces/doctorado/files/semantic')
     
+    
+    SSN = Namespace('http://purl.oclc.org/NET/ssnx/ssn#')
+    SSN_OBSERV = Namespace('http://knoesis.wright.edu/ssw/ont/sensor-observation.owl#')
+    SSN_WEATHER = Namespace('http://knoesis.wright.edu/ssw/ont/weather.owl#')
+    WGS84 = Namespace('http://www.w3.org/2003/01/geo/wgs84_pos#')
+    CF = Namespace('http://purl.oclc.org/NET/ssnx/cf/cf-property#')
+    CF_FEATURE = Namespace('http://purl.oclc.org/NET/ssnx/cf/cf-feature#')
+    SMART_KNIFE = Namespace('http://purl.oclc.org/NET/ssnx/product/smart-knife#')
+    BIZKAI_STATION = Namespace('http://dev.morelab.deusto.es/bizkaisense/resource/station/')
+    
+    
+    templates = (
+      # based on type
+      (None, RDF.type, SSN_WEATHER.RainfallObservation), # in 43 nodes
+      (None, RDF.type, SSN_OBSERV.Observation), # in many nodes, but, without inference?
+      # predicate based
+      (None, SSN_OBSERV.hasLocation, None), # domain LocatedNearRel
+      (None, WGS84.long, None), # 155 objects (long belongs to SpatialThing, Point is subclass of SpatialThing and does not have range)
+      (None, SSN_OBSERV.observedProperty, None), # observedProperty's range is Observation, but we have just subclasses of Observation (e.g. TemperatureObservation)
+      (None, SMART_KNIFE.hasMeasurementPropertyValue, None), # domain ssn:MeasurementProperty child of ssn:Property
+      (BIZKAI_STATION.ABANTO, None, None), # given an instance, we cannot predict anything
+    )
+    
     # important: this for before the strategy for, to have the same nodes in both simulations
-    for numNodes in (100,): #(2, 5, 10, 50, 100, 150):
+    for numNodes in (2, 5, 10, 50, 100, 150):
+        p.createDefaultParametrization(Parametrization.negative_broadcasting,
+                               amountOfQueries = 100,
+                               writeFrequency = 10000,
+                               simulateUntil = 60000,
+                               queries = ((None, RDF.type, URIRef('http://knoesis.wright.edu/ssw/ont/weather.owl#RainfallObservation')),
+                                          (URIRef('http://dev.morelab.deusto.es/bizkaisense/resource/station/ABANTO'), None, None)
+                                          ,),
+                               numNodes = numNodes,
+                               numConsumers = 1 # no importa
+                               )
+        
         for numConsumers in (1, 10, 100):
             if numConsumers<=numNodes:
-                for strategy in (Parametrization.negative_broadcasting, Parametrization.our_solution):
-                    p.createDefaultParametrization(strategy,
+                    p.createDefaultParametrization(Parametrization.our_solution,
                                                    amountOfQueries = 100,
                                                    writeFrequency = 10000,
                                                    simulateUntil = 60000,
-                                                   queries = ((None, RDF.type, URIRef('http://knoesis.wright.edu/ssw/ont/weather.owl#RainfallObservation')),
-                                                              (URIRef('http://dev.morelab.deusto.es/bizkaisense/resource/station/ABANTO'), None, None)
-                                                              ,),
+                                                   queries = templates,
                                                    numNodes = numNodes,
                                                    numConsumers = numConsumers
                                                    )

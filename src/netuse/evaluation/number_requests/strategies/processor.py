@@ -16,19 +16,19 @@ class RawDataProcessor(object):
         
     def _load(self, executionSet, name, strategy, additionalFilter=None):
         nodes_and_requests = [] # tuples of 2 elements: number of nodes in the simulation and requests
-        for execution in executionSet:
+        for execution in executionSet.executions:
             if execution.parameters.strategy==strategy:
                 if additionalFilter==None or additionalFilter(execution.parameters):
                     num_nodes = len(execution.parameters.nodes) # in the reference of mongoengine, they defend this method
-                    num_requests = len(execution.parameters.requests)
+                    num_requests = len(execution.requests)
                     nodes_and_requests.append((num_nodes, num_requests))
         
         # sort by num_nodes
         sort = sorted(nodes_and_requests)
         
         self.data[name] = {}
-        self.data[name][DiagramGenerator.NUM_NODES] = sort.keys()
-        self.data[name][DiagramGenerator.REQUESTS] = sort.values()
+        self.data[name][DiagramGenerator.NUM_NODES] = [e[0] for e in sort]
+        self.data[name][DiagramGenerator.REQUESTS] = [e[1] for e in sort]
     
     def load_all(self):
         for executionSet in ExecutionSet.get_simulated().filter(experiment_id='network_usage'):
@@ -39,9 +39,13 @@ class RawDataProcessor(object):
             break # just one execution set
 
     def toJson(self):
-        json.dumps(self.data)
+        return json.dumps(self.data)
 
 
 if __name__ == '__main__':
     rdp = RawDataProcessor()
     rdp.load_all()
+    json_txt = rdp.toJson()
+    
+    d = DiagramGenerator("Net usage", eval(json_txt))
+    d.save('/tmp/example.pdf')

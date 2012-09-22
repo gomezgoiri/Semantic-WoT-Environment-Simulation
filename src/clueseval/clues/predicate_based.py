@@ -60,8 +60,12 @@ class PredicateBasedClue(Clue):
     def _fromDictionary(self, diction):
         self._schemas = [(name, URIRef(uri)) for name, uri in diction[SchemaBasedClue._SCHEMA()]]
         for prf_name, prf_uri in self._schemas:
-            for uris_endings in diction[PredicateBasedClue._PREDICATE()][prf_name]:
-                self._predicates.add(URIRef(prf_uri + uris_endings)) # cause the URI is passed as a string
+            # in self._schemas there may be more schemas than the actually needed by this clue
+            # if we come to this function because we are parsing an aggregated clue
+            # (i.e. ClueAggregation._fromDictionary()
+            if prf_name in diction[PredicateBasedClue._PREDICATE()].keys():
+                for uris_endings in diction[PredicateBasedClue._PREDICATE()][prf_name]:
+                    self._predicates.add(URIRef(prf_uri + uris_endings)) # cause the URI is passed as a string
     
     def _toDictionary(self):
         diction = {}

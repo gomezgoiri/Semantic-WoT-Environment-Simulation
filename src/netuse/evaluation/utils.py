@@ -20,7 +20,7 @@ class ParametrizationUtils():
     
     def getDefaultParametrization(self, strategy, amountOfQueries, writeFrequency, simulateUntil, queries, numNodes, numConsumers, nodeTypes=None):
         if numNodes<numConsumers:
-            raise Exception('Parametrization error: nore consumers than nodes in the simulation.')
+            raise Exception('Parametrization error: more consumers than nodes in the simulation.')
         
         if numNodes<=len(self.possibleNodes):
             nodes = random.sample(self.possibleNodes, numNodes)
