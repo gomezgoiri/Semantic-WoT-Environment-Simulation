@@ -7,7 +7,6 @@ from rdflib.Graph import Graph
 
 from netuse.triplespace.dataaccess.util import locked
 from netuse.results import G
-from netuse.triplespace.gossiping.gossiped import Gossiped
 
 
 class DataAccess(object):
@@ -117,11 +116,6 @@ class Store(object):
         for t in self.graphs.triples((subject, predicate, obj)):
             ret.add(t)
         return ret if len(ret)>0 else None
-    
-    @locked
-    def get_gossip(self):
-        ret = Gossiped.extractFromGraph(self.graphs)
-        return None if ret.isEmpty() else ret
 
     def _find_graph(self, subject, predicate, obj):
         for graph in self.graphs.contexts(): #(subject, predicate, obj)):

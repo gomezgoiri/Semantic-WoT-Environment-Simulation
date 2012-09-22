@@ -6,7 +6,7 @@ Created on Jan 30, 2012
 from rdflib import URIRef, RDF
 from netuse.evaluation.utils import ParametrizationUtils
 from netuse.database.parametrization import Parametrization
-from netuse.main.showResults import RequestsResults
+from netuse.database.results import RequestsResults
 
 
 def getNeededRequests(execution_set):
@@ -51,9 +51,9 @@ if __name__ == '__main__':
     
     # important: this for before the strategy for, to have the same nodes in both simulations
     for numNodes in (100,): #(2, 5, 10, 50, 100, 150):
-        for numConsumers in (1,): #, 10, 100):
+        for numConsumers in (1, 10, 100):
             if numConsumers<=numNodes:
-                for strategy in (Parametrization.negative_broadcasting, ):#, Parametrization.gossiping):
+                for strategy in (Parametrization.negative_broadcasting, Parametrization.our_solution):
                     p.createDefaultParametrization(strategy,
                                                    amountOfQueries = 100,
                                                    writeFrequency = 10000,

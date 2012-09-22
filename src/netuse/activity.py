@@ -68,7 +68,7 @@ class ActivityGenerator():
                     else:
                         last = self.FAKE_GRAPH
                         
-                    print "%s writes at %s"%(actionNode, startsWriting+writesAt)
+                    #print "%s writes at %s"%(actionNode, startsWriting+writesAt)
                     actionNode.ts.write(starts_at=startsWriting+writesAt, triples=last)
         
     
@@ -82,5 +82,5 @@ class ActivityGenerator():
                 template = G.Rnd.choice(self.__params.queries)
                 
                 requester = consumerNodes.next()
-                print "%s requests at %s"%(requester,startAt)
+                #print "%s requests at %s"%(requester,startAt)
                 requester.ts.query(starts_at=startAt, template=template)
