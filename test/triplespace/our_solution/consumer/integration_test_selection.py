@@ -1,6 +1,6 @@
 from SimPy.Simulation import initialize, simulate
 
-from rdflib import URIRef
+from rdflib import URIRef, Namespace, RDF
 
 from netuse.results import G, FileTracer
 from netuse.nodes import NodeGenerator
@@ -31,12 +31,36 @@ def performSimulation(parameters):
 if __name__ == '__main__':
     p = ParametrizationUtils('network_usage', '/home/tulvur/dev/workspaces/doctorado/files/semantic')
     
+    SSN = Namespace('http://purl.oclc.org/NET/ssnx/ssn#')
+    SSN_OBSERV = Namespace('http://knoesis.wright.edu/ssw/ont/sensor-observation.owl#')
+    SSN_WEATHER = Namespace('http://knoesis.wright.edu/ssw/ont/weather.owl#')
+    WGS84 = Namespace('http://www.w3.org/2003/01/geo/wgs84_pos#')
+    CF = Namespace('http://purl.oclc.org/NET/ssnx/cf/cf-property#')
+    CF_FEATURE = Namespace('http://purl.oclc.org/NET/ssnx/cf/cf-feature#')
+    SMART_KNIFE = Namespace('http://purl.oclc.org/NET/ssnx/product/smart-knife#')
+    BIZKAI_STATION = Namespace('http://dev.morelab.deusto.es/bizkaisense/resource/station/')
+    
+    
+    templates = (
+      # based on type
+#      (None, RDF.type, SSN_WEATHER.RainfallObservation), # in 43 nodes
+#      (None, RDF.type, SSN_OBSERV.Observation), # in many nodes, but, without inference?
+      # predicate based
+#      (None, SSN_OBSERV.hasLocation, None), # domain LocatedNearRel
+#      (None, WGS84.long, None), # 155 objects (long belongs to SpatialThing, Point is subclass of SpatialThing and does not have range)
+      (None, SSN_OBSERV.hasLocatedNearRel, None), # observedProperty's range is Observation, but we have just subclasses of Observation (e.g. TemperatureObservation)
+#      (None, SMART_KNIFE.hasMeasurementPropertyValue, None), # domain ssn:MeasurementProperty child of ssn:Property
+#      (BIZKAI_STATION.ABANTO, None, None), # given an instance, we cannot predict anything
+    )
+    
+    temp = ((None, URIRef('http://www.deusto.es/fakepredicate'), None),)
+    
     param = p.getDefaultParametrization(Parametrization.our_solution,
-                                   amountOfQueries = 20,
+                                   amountOfQueries = 100,
                                    writeFrequency = 10000,
                                    simulateUntil = 60000,
-                                   queries = ((None, URIRef('http://www.deusto.es/fakepredicate'), None),),
-                                   numNodes = 3,
-                                   numConsumers = 2
+                                   queries = temp,
+                                   numNodes = 150,
+                                   numConsumers = 100
                                    )
     performSimulation(param)
