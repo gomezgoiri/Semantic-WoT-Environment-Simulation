@@ -25,13 +25,15 @@ def performSimulation(parameters):
     activity = ActivityGenerator(parameters, preloadedGraph)
     activity.generateActivity()
     
+    del preloadedGraph # maybe with this we can save a little memory for the simulation?
+    
     # activate
     cool_down = 500
     simulate(until=parameters.simulateUntil+cool_down)
     
     G.shutdown()
 
-
+@profile
 def main():
     p = ParametrizationUtils('network_usage', '/home/tulvur/dev/workspaces/doctorado/files/semantic')
     
@@ -57,15 +59,15 @@ def main():
 #      (BIZKAI_STATION.ABANTO, None, None), # given an instance, we cannot predict anything
     )
     
-    temp = ((None, URIRef('http://www.deusto.es/fakepredicate'), None),)
+    temp = ((None, SSN.observationResult, None),)
     
     param = p.getDefaultParametrization(Parametrization.our_solution,
-                                                   amountOfQueries = 100,
+                                                   amountOfQueries = 10,
                                                    writeFrequency = 10000,
-                                                   simulateUntil = 60000,
-                                                   queries = templates,
-                                                   numNodes = 50,
-                                                   numConsumers = 50
+                                                   simulateUntil = 3600000,
+                                                   queries = temp,
+                                                   numNodes = 10,
+                                                   numConsumers = 5
                                                    )
     print param
     performSimulation(param) 
