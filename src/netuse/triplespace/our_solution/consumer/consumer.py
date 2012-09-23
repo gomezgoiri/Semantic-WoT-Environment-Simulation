@@ -5,7 +5,7 @@ Created on Sep 17, 2012
 '''
 
 from abc import ABCMeta, abstractmethod
-from SimPy.Simulation import now, hold
+from SimPy.Simulation import now
 from clueseval.clues.aggregated import ClueAggregation
 from netuse.triplespace.our_solution.clue_management import ClueStore
 from netuse.triplespace.our_solution.consumer.time_update import UpdateTimesManager

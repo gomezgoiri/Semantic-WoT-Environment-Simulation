@@ -5,6 +5,7 @@ Created on Sep 10, 2012
 '''
 
 from SimPy.Simulation import *
+import weakref
 from abc import ABCMeta, abstractmethod
 from netuse.triplespace.network.httpelements import HttpRequest
 from netuse.results import G
@@ -108,8 +109,8 @@ class RequestInstance(Process):
     
     def __init__(self, actionNode, destinationNodes, url, data=None, waitUntil=10000.0, name="request"):
         Process.__init__(self, name=name)
-        self.__actionNode = actionNode
-        self.__destinationNodes = destinationNodes # tuple with all the nodes to be requested
+        self.__actionNode = actionNode #weakref.ref(actionNode)
+        self.__destinationNodes = weakref.WeakSet(destinationNodes) # tuple with all the nodes to be requested
         self.__url = url
         self.__data = data
         
@@ -120,7 +121,7 @@ class RequestInstance(Process):
         
         self.__timeout = SimEvent()
         self.__newResponseReceived = SimEvent()
-        self.__observers = []
+        self.__observers = weakref.WeakSet()
         
     def startup(self):
         t_init = now()
@@ -223,7 +224,7 @@ class RequestInstance(Process):
         return self.__actionNode
     
     def addObserver(self, observer):
-        self.__observers.append(observer)
+        self.__observers.add(observer)
 
 
 class Timer(Process):
