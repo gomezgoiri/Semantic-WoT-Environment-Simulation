@@ -98,6 +98,12 @@ class RemoteConnector(AbstractConnector, RequestObserver):
                 ca.fromJson(unique_response.get_data())
                 self.clues.add_clues(ca)
                 break
+            else:
+                # TODO
+                # If it has not been received, the next request should be quickly,
+                # otherwise the node is going to wait too much if the WP
+                # is just setting up and receiving clues for the first time!
+                pass
         self._schedule_future_update() # next clue update!
     
     def _check_if_next_update_changes(self):
@@ -115,6 +121,6 @@ class RemoteConnector(AbstractConnector, RequestObserver):
             self.updateTimeManager.add_updatetime(now()) # add a timestamp of now to get the update frequency
             self._check_if_next_update_changes()
         if not self.clues.started:
-            # wait untill the clues are loaded for the first time
+            # wait until the clues are loaded for the first time
             raise Exception("Wait for the first clue loading.")
         return self.clues.get_query_candidates(template)
