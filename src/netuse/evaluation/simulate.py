@@ -4,6 +4,7 @@ Created on Nov 26, 2011
 @author: tulvur
 '''
 import os
+import datetime
 from rdflib import Graph
 
 # "SimulationTrace" instead of "Simulation" to debug
@@ -71,11 +72,17 @@ def loadGraphsJustOnce(nodeNames, semanticPath, loadedGraph):
                     if fname.find(node_name)!=-1:
                         loadedGraph[node_name].append( Graph().parse(datasetPath+"/"+fname, format="n3") )
 
+
+def mark_execution(execution):
+    ''' This method is used to warn another processes that this one is already processing it.'''
+    execution.execution_date = datetime.datetime.now
+    execution.save()
+
 def execute_all_concurrently(executions):
     processes = []
     for ex in executions:
         if ex.execution_date!=None and ex.parameters!=None:
-            from multiprocessing import Process
+            mark_execution(ex)
             p = Process(target=performSimulation, args=(ex, semanticPath))
             p.start()
             processes.append(p)
@@ -86,8 +93,8 @@ def execute_once_each_time(executions):
     # loadedGraphs = {}
     for ex in executions:
         if ex.execution_date!=None and ex.parameters!=None:
+            mark_execution(ex)            
             # In a new process to ensure that the memory is freed after that
-            from multiprocessing import Process
             p = Process(target=performSimulation, args=(ex, semanticPath))
             p.start()
             p.join()

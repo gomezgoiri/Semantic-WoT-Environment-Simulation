@@ -13,7 +13,7 @@ class Execution(Document):
     
     # executions are repeated if they have exactly the same "parameters" attribute
     parameters = ReferenceField(Parametrization) 
-    execution_date = DateTimeField(default=None) # when this was simulated?
+    execution_date = DateTimeField(default=None) # when this was started being simulated?
     requests = ListField(ReferenceField(NetworkTrace))
     
     def save(self, *args, **kwargs):
