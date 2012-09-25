@@ -3,23 +3,10 @@ Created on Sep 7, 2012
 
 @author: tulvur
 
-First of all, install the project and its dependencies using pip:
-    sudo pip install ./
-    sudo pip install ./ --upgrade
-    sudo pip uninstall netuse
-
-After installing, we should patch "n3meta.py" (issue related with n3 parsing)
-    patch installation-path/rdflib/syntax/parsers/n3p/n3meta.py ./patches/n3meta.py.diff
-
-Then, download the semantic files needed for the simulation.
-Note that there is a folder with too much base-data not necessary.
-To avoid downloading it, we mark the checkout as as not recursive (-N) and then we download just the needed folders. 
-     svn co https://dev.morelab.deusto.es/svn/aigomez/trunk/dataset/ -N [localfolder]/
-     svn co https://dev.morelab.deusto.es/svn/aigomez/trunk/dataset/base_ontologies/ [localfolder]/base_ontologies
-     svn co https://dev.morelab.deusto.es/svn/aigomez/trunk/dataset/data/ [localfolder]/data
-
-Then, create a simbolic link to point from ~/dev/dataset to the actual location of the dataset:
-     ln -s  path/[localfolder] ~/dev/dataset
+To install/reinstall/uninstall the project and its dependencies using pip:
+     sudo pip install ./
+     sudo pip install ./ --upgrade
+     sudo pip uninstall netuse
 '''
 from setuptools import setup, find_packages
 
