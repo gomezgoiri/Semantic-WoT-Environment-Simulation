@@ -10,6 +10,11 @@ First of all, install the project and its dependencies using pip:
      sudo pip install ./ --upgrade
   (And to uninstall:)
      sudo pip uninstall netuse
+     
+During the installation process, some dependencies won't be installed correctly.
+While the setup.py is fixed, install them manually:
+     sudo pip install numpy
+     sudo pip install simpy
 
 After installing, we should patch "n3meta.py" (issue related with n3 parsing)
      patch installation-path/rdflib/syntax/parsers/n3p/n3meta.py ./patches/n3meta.py.diff

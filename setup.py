@@ -20,8 +20,9 @@ setup(name="netuse",
       },
       packages = find_packages('src'),  # include all packages under src
       install_requires = [
-                          'SimPy',
+                          'simpy',
                           'rdflib<3a',
+                          'pymongo',
                           'mongoengine',
                           'mock', # http://www.voidspace.org.uk/python/mock/
                           'numpy',
