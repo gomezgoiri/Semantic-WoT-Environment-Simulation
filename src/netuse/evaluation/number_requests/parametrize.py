@@ -75,9 +75,9 @@ if __name__ == '__main__':
     # important: this for before the strategy for, to have the same nodes in both simulations
     for numNodes in range(5,101,5): # 150 is too much :-S
         p.createDefaultParametrization(Parametrization.negative_broadcasting,
-                               amountOfQueries = 100,
+                               amountOfQueries = 1000,
                                writeFrequency = 10000,
-                               simulateUntil = 60000,
+                               simulateUntil = 3600000, # 1h of simulation time
                                queries = templates,
                                numNodes = numNodes,
                                numConsumers = 1 # no importa
@@ -86,9 +86,9 @@ if __name__ == '__main__':
         for numConsumers in (1, 10, 100):
             if numConsumers<=numNodes:
                     p.createDefaultParametrization(Parametrization.our_solution,
-                                                   amountOfQueries = 100,
+                                                   amountOfQueries = 1000,
                                                    writeFrequency = 10000,
-                                                   simulateUntil = 60000,
+                                                   simulateUntil = 3600000,
                                                    queries = templates,
                                                    numNodes = numNodes,
                                                    numConsumers = numConsumers
