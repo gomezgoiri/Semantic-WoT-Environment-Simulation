@@ -92,7 +92,7 @@ def execute_all_concurrently(executions):
 def execute_once_each_time(executions):
     # loadedGraphs = {}
     for ex in executions:
-        if ex.execution_date!=None and ex.parameters!=None:
+        if ex.execution_date==None and ex.parameters!=None:
             mark_execution(ex)            
             # In a new process to ensure that the memory is freed after that
             p = Process(target=performSimulation, args=(ex,))
