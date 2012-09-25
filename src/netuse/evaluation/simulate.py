@@ -75,7 +75,7 @@ def loadGraphsJustOnce(nodeNames, semanticPath, loadedGraph):
 
 def mark_execution(execution):
     ''' This method is used to warn another processes that this one is already processing it.'''
-    execution.execution_date = datetime.datetime.now
+    execution.execution_date = datetime.datetime.now()
     execution.save()
 
 def execute_all_concurrently(executions):

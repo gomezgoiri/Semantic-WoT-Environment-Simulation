@@ -15,14 +15,6 @@ class Execution(Document):
     parameters = ReferenceField(Parametrization) 
     execution_date = DateTimeField(default=None) # when this was started being simulated?
     requests = ListField(ReferenceField(NetworkTrace))
-    
-    def save(self, *args, **kwargs):
-        """Apart from saving the object, the execution time of its ExecutionSet is modified and updated in the database."""
-        for es in ExecutionSet.objects:
-            if self in es.executions:
-                es.execution_date = datetime.datetime.now()
-                es.save()
-        return super(Execution, self).save(*args, **kwargs)
 
 
 class ExecutionSet(Document):
