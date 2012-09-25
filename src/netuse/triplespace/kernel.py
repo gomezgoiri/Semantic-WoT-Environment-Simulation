@@ -160,30 +160,36 @@ class QueryFinisher(Process, RequestObserver):
         
         selected_nodes = None
         previously_unsolved = True
-        while selected_nodes==None:
+        attempts = 5 # to avoid too many process on memory when no clue has been checked
+        while selected_nodes==None and attempts>0:
             try:
                 selected_nodes = self.consumer.get_query_candidates(template, previously_unsolved)
                 previously_unsolved = False
             except Exception as e:
                 #print "Waiting for a whitepage.", e.args[0]
-                pass
+                attempts -= 1
             yield hold, self, 100
-        
-        try:
-            if len(selected_nodes)>0:
-                destNodes = []
-                for node_name in selected_nodes:
-                    if node_name!=self.discovery.me.name: # local query already done
-                        destNodes.append(NodeGenerator.getNodeByName(node_name))
-                
-                req = RequestInstance(self.discovery.me, destNodes,
-                                      '/' + self.fromSpaceToURL + "query/" + self.fromTemplateToURLtemplate,
-                                      name="queryAt"+str(now()))
-                RequestManager.launchNormalRequest(req)
-        except:
-            import traceback
-            traceback.print_exc()
-            raise
+            
+        if attempts==0:
+            # somehow record this failure
+            print "No clues have been initialized"
+            pass
+        else:
+            try:
+                if len(selected_nodes)>0:
+                    destNodes = []
+                    for node_name in selected_nodes:
+                        if node_name!=self.discovery.me.name: # local query already done
+                            destNodes.append(NodeGenerator.getNodeByName(node_name))
+                    
+                    req = RequestInstance(self.discovery.me, destNodes,
+                                          '/' + self.fromSpaceToURL + "query/" + self.fromTemplateToURLtemplate,
+                                          name="queryAt"+str(now()))
+                    RequestManager.launchNormalRequest(req)
+            except:
+                import traceback
+                traceback.print_exc()
+                raise
     
     def notifyRequestFinished(self, request_instance):
         pass # do I really need the results?
