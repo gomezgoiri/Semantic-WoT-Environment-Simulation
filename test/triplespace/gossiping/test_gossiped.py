@@ -16,7 +16,7 @@ from netuse.triplespace.gossiping.gossiped import Gossiped
 from netuse.main.simulate import loadGraphsJustOnce
 
 
-semanticPath = '/home/tulvur/dev/workspaces/doctorado/files/semantic'
+semanticPath = '~/dev/dataset'
 
 
 response = """

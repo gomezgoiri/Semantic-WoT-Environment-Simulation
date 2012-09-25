@@ -14,7 +14,7 @@ from netuse.database.parametrization import Parametrization
 
 def performSimulation(parameters):    
     preloadedGraph = {}
-    loadGraphsJustOnce(parameters.nodes, '/home/tulvur/dev/workspaces/doctorado/files/semantic', preloadedGraph)
+    loadGraphsJustOnce(parameters.nodes, '~/dev/dataset', preloadedGraph)
     
     initialize()
     G.setNewExecution(None, tracer=FileTracer('/tmp/trace.txt'))

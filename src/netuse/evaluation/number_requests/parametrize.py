@@ -47,7 +47,7 @@ def getNeededRequests(execution_set):
 
 
 if __name__ == '__main__':
-    p = ParametrizationUtils('network_usage', '/home/tulvur/dev/workspaces/doctorado/files/semantic')
+    p = ParametrizationUtils('network_usage', '~/dev/dataset')
     
     
     SSN = Namespace('http://purl.oclc.org/NET/ssnx/ssn#')

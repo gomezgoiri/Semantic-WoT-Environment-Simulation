@@ -115,7 +115,7 @@ def simulateUnsimulatedExecutionSet(semanticPath):
 if __name__ == '__main__':
     import argparse
     
-    semanticPath = '/home/tulvur/dev/workspaces/doctorado/files/semantic'
+    semanticPath = '~/dev/dataset'
     
     parser = argparse.ArgumentParser(description='Start simulation process.')
     parser.add_argument('-ds','--data-set', default=semanticPath, dest='dataset_path',
