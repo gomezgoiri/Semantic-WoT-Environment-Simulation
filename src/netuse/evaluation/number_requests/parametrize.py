@@ -73,7 +73,7 @@ if __name__ == '__main__':
     )
     
     # important: this for before the strategy for, to have the same nodes in both simulations
-    for numNodes in (2, 5, 10, 50, 100, 150):
+    for numNodes in range(5,101,5): # 150 is too much :-S
         p.createDefaultParametrization(Parametrization.negative_broadcasting,
                                amountOfQueries = 100,
                                writeFrequency = 10000,
