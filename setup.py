@@ -10,7 +10,7 @@ sudo pip uninstall netuse
 from setuptools import setup, find_packages
 
 setup(name="netuse",
-      version="0.1",
+      version="0.2",
       description="An evaluation of our approach network usage",
       author="Aitor Gomez-Goiri",
       author_email="aitor.gomez@deusto.es",
@@ -24,18 +24,16 @@ setup(name="netuse",
                           'mongoengine',
                           'mock', # http://www.voidspace.org.uk/python/mock/
                           'numpy',
-                          'scipy',
-                          #'matplotlib',
+                          'matplotlib',
                           ],
       #license = "Apache",
       keywords = "webOfThings wot semanticWeb distribution internetOfThings iot",
       #url = "",
       entry_points = {
        'console_scripts': [
-           'parametrize = netuse.main.parametrize:main',
-           'parametrize.create = netuse.main.parametrize:create',
-           'parametrize.delete = netuse.main.parametrize:delete',
-           'simulate = netuse.main.simulate:main',
+           'parametrize = netuse.evaluation.number_requests.parametrize:main',
+           'simulate = netuse.evaluation.simulate:main',
+           'process_results = netuse.evaluation.number_requests.strategies.processor:main',
         ],
       }
       #zip_safe=False
