@@ -13,7 +13,7 @@ class Execution(Document):
     
     # executions are repeated if they have exactly the same "parameters" attribute
     parameters = ReferenceField(Parametrization) 
-    #results = ReferenceField(Results)
+    execution_date = DateTimeField(default=None) # when this was simulated?
     requests = ListField(ReferenceField(NetworkTrace))
     
     def save(self, *args, **kwargs):
@@ -28,13 +28,12 @@ class Execution(Document):
 class ExecutionSet(Document):
     meta = {
             'collection': 'executionSet',
-            'ordering': ['-execution_date'] # latest first
+            'ordering': ['-creation_date'] # latest first
             }
     
     # to identify the experiment
     experiment_id = StringField(default='default')
     creation_date = DateTimeField(default=datetime.datetime.now)
-    execution_date = DateTimeField(default=None) # when this was simulated?
     
     # more than one execution with the same parametrization can be stored
     # to average the results for an specific parametrization
@@ -45,8 +44,24 @@ class ExecutionSet(Document):
     
     @queryset_manager
     def get_simulated(doc_cls, queryset):
-        return queryset.filter(execution_date__ne=None)
+        #queryset.filter(execution_date__ne=None)
+        for es in queryset:
+            all_simulated = True 
+            for ex in es.executions:
+                if ex.execution_date is None:
+                    all_simulated = False
+                    break
+            if all_simulated:
+                yield es
 
     @queryset_manager
     def get_unsimulated(doc_cls, queryset):
-        return queryset.filter(execution_date=None)
+        #queryset.filter(execution_date__ne=None)
+        for es in queryset:
+            some_unsimulated = False 
+            for ex in es.executions:
+                if ex.execution_date is None:
+                    some_unsimulated = True
+                    break
+            if some_unsimulated:
+                yield es
