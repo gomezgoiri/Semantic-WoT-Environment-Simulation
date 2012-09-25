@@ -29,7 +29,10 @@ def performSimulation(parameters):
 
 
 if __name__ == '__main__':
-    p = ParametrizationUtils('network_usage', '~/dev/dataset')
+    from netuse.sim_utils import OwnArgumentParser
+    parser = OwnArgumentParser('Activity test')
+    parser.parse_args() # do nothing with the args (already done)
+    
     
     SSN = Namespace('http://purl.oclc.org/NET/ssnx/ssn#')
     SSN_OBSERV = Namespace('http://knoesis.wright.edu/ssw/ont/sensor-observation.owl#')
@@ -52,9 +55,9 @@ if __name__ == '__main__':
 #      (None, SMART_KNIFE.hasMeasurementPropertyValue, None), # domain ssn:MeasurementProperty child of ssn:Property
 #      (BIZKAI_STATION.ABANTO, None, None), # given an instance, we cannot predict anything
     )
-    
     temp = ((None, URIRef('http://www.deusto.es/fakepredicate'), None),)
     
+    p = ParametrizationUtils('network_usage', G.dataset_path)
     param = p.getDefaultParametrization(Parametrization.our_solution,
                                    amountOfQueries = 100,
                                    writeFrequency = 10000,

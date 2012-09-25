@@ -24,8 +24,6 @@ PREFIXES = {
             'rdf': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#'
             }
 
-semanticPath = '../files/semantic'
-
 class TestNodes(unittest.TestCase):
     
     def setUp(self):
@@ -46,7 +44,7 @@ class TestNodes(unittest.TestCase):
         self.nodes = NodeGenerator(parameters)
         self.nodes.generateNodes()
         
-        preloadedGraphs = loadGraphsJustOnce(parameters.nodes, semanticPath)
+        preloadedGraphs = loadGraphsJustOnce(parameters.nodes, G.dataset_path)
         activity = ActivityGenerator(parameters, preloadedGraphs)
         activity.generateActivity()
         
@@ -100,14 +98,9 @@ class TestNodes(unittest.TestCase):
             self.assertEquals(numberoftimes, count)
 
 if __name__ == '__main__':
-    import argparse
-    
-    parser = argparse.ArgumentParser(description='Start simulation process.')
-    parser.add_argument('-ds','--data-set', default=semanticPath, dest='dataset_path',
-                help='Specify the folder containing the dataset to perform the simulation.')
-    
-    args = parser.parse_args()
-    semanticPath = args.dataset_path
+    from netuse.sim_utils import OwnArgumentParser
+    parser = OwnArgumentParser()
+    parser.parse_args() # do nothing with the args (already done)
     
     # before you pas control to unittest code, so that the latter code doesn't try to interpret your command line options again when you've already dealt with them
     del sys.argv[1:]

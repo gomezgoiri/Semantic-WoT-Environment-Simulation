@@ -4,6 +4,7 @@ Created on Jan 30, 2012
 @author: tulvur
 '''
 from rdflib import URIRef, RDF, Namespace
+from netuse.results import G
 from netuse.evaluation.utils import ParametrizationUtils
 from netuse.database.parametrization import Parametrization
 from netuse.database.results import RequestsResults
@@ -47,7 +48,12 @@ def getNeededRequests(execution_set):
 
 # Entry point for setup.py
 def main():
-    p = ParametrizationUtils('network_usage', '~/dev/dataset')
+    from netuse.sim_utils import OwnArgumentParser
+    parser = OwnArgumentParser()
+    parser.parse_args('Start simulation process.')
+    
+    
+    p = ParametrizationUtils('network_usage', G.dataset_path)
     
     
     SSN = Namespace('http://purl.oclc.org/NET/ssnx/ssn#')

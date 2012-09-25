@@ -23,10 +23,10 @@ from multiprocessing import Process
 
 
 
-def performSimulation(execution, semanticPath, preloadedGraph={}):
+def performSimulation(execution, preloadedGraph={}):
     print "New simulation: %s"%(execution.parameters)
     
-    loadGraphsJustOnce(execution.parameters.nodes, semanticPath, preloadedGraph)
+    loadGraphsJustOnce(execution.parameters.nodes, G.dataset_path, preloadedGraph)
     
     initialize()
     G.setNewExecution(execution)
@@ -83,7 +83,7 @@ def execute_all_concurrently(executions):
     for ex in executions:
         if ex.execution_date!=None and ex.parameters!=None:
             mark_execution(ex)
-            p = Process(target=performSimulation, args=(ex, semanticPath))
+            p = Process(target=performSimulation, args=(ex,))
             p.start()
             processes.append(p)
     for p in processes:
@@ -95,13 +95,13 @@ def execute_once_each_time(executions):
         if ex.execution_date!=None and ex.parameters!=None:
             mark_execution(ex)            
             # In a new process to ensure that the memory is freed after that
-            p = Process(target=performSimulation, args=(ex, semanticPath))
+            p = Process(target=performSimulation, args=(ex,))
             p.start()
             p.join()
             # Otherwise, to avoid loading graphs each time...
-            #performSimulation(ex, semanticPath, loadedGraphs)
+            #performSimulation(ex, loadedGraphs)
 
-def simulateUnsimulatedExecutionSet(semanticPath):
+def simulateUnsimulatedExecutionSet():
     one_es_per_execution = True # just one simulation (ExecutionSet) per execution
     
     for es in ExecutionSet.get_unsimulated():
@@ -113,17 +113,10 @@ def simulateUnsimulatedExecutionSet(semanticPath):
 
 # Entry point for setup.py
 def main():
-    import argparse
-    
-    semanticPath = '~/dev/dataset'
-    
-    parser = argparse.ArgumentParser(description='Start simulation process.')
-    parser.add_argument('-ds','--data-set', default=semanticPath, dest='dataset_path',
-                help='Specify the folder containing the dataset to perform the simulation.')
-    
-    args = parser.parse_args()
-    semanticPath = args.dataset_path
-    simulateUnsimulatedExecutionSet(semanticPath)
+    from netuse.sim_utils import OwnArgumentParser
+    parser = OwnArgumentParser()
+    parser.parse_args('Start simulation process.')
+    simulateUnsimulatedExecutionSet()
     
 if __name__ == '__main__':
     main()

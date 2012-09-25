@@ -5,7 +5,6 @@ Created on Dec 31, 2011
 '''
 import os
 import random
-from rdflib import URIRef, RDF
 from netuse.devices import RegularComputer
 from netuse.database.execution import ExecutionSet, Execution
 from netuse.database.parametrization import Parametrization

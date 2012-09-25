@@ -14,7 +14,7 @@ from netuse.database.parametrization import Parametrization
 
 def performSimulation(parameters):    
     preloadedGraph = {}
-    loadGraphsJustOnce(parameters.nodes, '~/dev/dataset', preloadedGraph)
+    loadGraphsJustOnce(parameters.nodes, G.dataset_path, preloadedGraph)
     
     initialize()
     G.setNewExecution(None, tracer=FileTracer('/tmp/trace.txt'))
@@ -35,7 +35,10 @@ def performSimulation(parameters):
 
 @profile
 def main():
-    p = ParametrizationUtils('network_usage', '/home/tulvur/dev/workspaces/doctorado/files/semantic')
+    from netuse.sim_utils import OwnArgumentParser
+    parser = OwnArgumentParser('Memory integration test')
+    parser.parse_args() # do nothing with the args (already done)
+    
     
     SSN = Namespace('http://purl.oclc.org/NET/ssnx/ssn#')
     SSN_OBSERV = Namespace('http://knoesis.wright.edu/ssw/ont/sensor-observation.owl#')
@@ -58,9 +61,10 @@ def main():
 #      (None, SMART_KNIFE.hasMeasurementPropertyValue, None), # domain ssn:MeasurementProperty child of ssn:Property
 #      (BIZKAI_STATION.ABANTO, None, None), # given an instance, we cannot predict anything
     )
-    
     temp = ((None, SSN.observationResult, None),)
     
+    
+    p = ParametrizationUtils('network_usage', '/home/tulvur/dev/workspaces/doctorado/files/semantic')
     param = p.getDefaultParametrization(Parametrization.our_solution,
                                                    amountOfQueries = 10,
                                                    writeFrequency = 10000,
