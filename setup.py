@@ -22,6 +22,7 @@ setup(name="netuse",
       install_requires = [
                           'simpy',
                           'rdflib<3a',
+                          'fuxi',
                           'pymongo',
                           'mongoengine',
                           'mock', # http://www.voidspace.org.uk/python/mock/
