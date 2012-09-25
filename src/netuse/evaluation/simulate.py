@@ -23,6 +23,8 @@ from multiprocessing import Process
 
 
 def performSimulation(execution, semanticPath, preloadedGraph={}):
+    print "New simulation: %s"%(execution.parameters)
+    
     loadGraphsJustOnce(execution.parameters.nodes, semanticPath, preloadedGraph)
     
     initialize()
@@ -69,25 +71,39 @@ def loadGraphsJustOnce(nodeNames, semanticPath, loadedGraph):
                     if fname.find(node_name)!=-1:
                         loadedGraph[node_name].append( Graph().parse(datasetPath+"/"+fname, format="n3") )
 
+def execute_all_concurrently(executions):
+    processes = []
+    for ex in executions:
+        if ex.execution_date!=None and ex.parameters!=None:
+            from multiprocessing import Process
+            p = Process(target=performSimulation, args=(ex, semanticPath))
+            p.start()
+            processes.append(p)
+    for p in processes:
+        p.join()
+    
+def execute_once_each_time(executions):
+    # loadedGraphs = {}
+    for ex in executions:
+        if ex.execution_date!=None and ex.parameters!=None:
+            # In a new process to ensure that the memory is freed after that
+            from multiprocessing import Process
+            p = Process(target=performSimulation, args=(ex, semanticPath))
+            p.start()
+            p.join()
+            # Otherwise, to avoid loading graphs each time...
+            #performSimulation(ex, semanticPath, loadedGraphs)
+
 def simulateUnsimulatedExecutionSet(semanticPath):
-    loadedGraphs = {}
+    one_es_per_execution = True # just one simulation (ExecutionSet) per execution
     
     for es in ExecutionSet.get_unsimulated():
-        #es.delete()
-        processes = []
-        for ex in es.executions:
-            if ex.parameters!=None:
-                from multiprocessing import Process
-                p = Process(target=performSimulation, args=(ex, semanticPath, loadedGraphs))
-                p.start()
-                
-                #performSimulation(ex, semanticPath, loadedGraphs)
-                print "New simulation: %s"%(ex.parameters)
-                processes.append(p)
-        for p in processes:
-            p.join()
-        break # just one simulation (ExecutionSet) per execution
+        #execute_all_concurrently(es.executions)
+        execute_once_each_time(es.executions)
         
+        if one_es_per_execution:
+            break
+
 
 if __name__ == '__main__':
     import argparse
