@@ -49,8 +49,8 @@ def getNeededRequests(execution_set):
 # Entry point for setup.py
 def main():
     from netuse.sim_utils import OwnArgumentParser
-    parser = OwnArgumentParser()
-    parser.parse_args('Start simulation process.')
+    parser = OwnArgumentParser('Start simulation process.')
+    parser.parse_args()
     
     
     p = ParametrizationUtils('network_usage', G.dataset_path)
