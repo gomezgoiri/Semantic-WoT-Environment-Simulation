@@ -109,7 +109,7 @@ class RequestInstance(Process):
     
     def __init__(self, actionNode, destinationNodes, url, data=None, waitUntil=10000.0, name="request"):
         Process.__init__(self, name=name)
-        self.__actionNode = actionNode #weakref.ref(actionNode)
+        self.__actionNode = weakref.proxy(actionNode) #weakref.ref(actionNode)
         self.__destinationNodes = weakref.WeakSet(destinationNodes) # tuple with all the nodes to be requested
         self.__url = url
         self.__data = data
