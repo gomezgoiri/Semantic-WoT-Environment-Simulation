@@ -49,7 +49,7 @@ class G:  # global variables
     Rnd = random.Random(12345)
     timeout_after = 2000
     defaultSpace = "http://www.default.es/space"
-    dataset_path = "/home/tulvur/dev/dataset/data"    
+    dataset_path = "/home/tulvur/dev/dataset"    
     _tracer = None
     
     
