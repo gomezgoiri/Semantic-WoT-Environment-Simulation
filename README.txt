@@ -26,6 +26,17 @@ Then, create a simbolic link to point from ~/dev/dataset to the actual location 
 
 
 
+Configuration
+-------------
+
+ * Dataset:
+     - By default, the dataset is supposed to be in ~/dev/dataset.
+     - Eventhough, all the entry points which need it should receive it as a parameter (e.g. '-ds','--data-set).
+     - The tests are may contain hardcoded paths.
+ * Mongodb:
+     - The database connection can be changed in src/netuse/database/__init__.py
+
+
 Usage
 -----
 
