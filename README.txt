@@ -5,7 +5,11 @@ Installation
 ------------
 
 First of all, install the project and its dependencies using pip:
-     sudo pip install ./
+  (Recommended option for development: checkout the code and edit it whenever you need)
+	 pip install -e svn+https://dev.morelab.deusto.es/svn/aigomez/trunk/NetworkUsage/#egg=netuse
+	 
+  (If you have already download the code and don't need to edit it to be synchronized with the SVN)
+     pip install ./
   (If a previous version was already installed use this:)
      sudo pip install ./ --upgrade
   (And to uninstall:)
@@ -37,7 +41,6 @@ Configuration
  * Dataset:
      - By default, the dataset is supposed to be in ~/dev/dataset.
      - Even though, all the entry points which need it should receive it as a parameter (e.g. '-ds','--data-set).
-     - The tests are may contain hardcoded paths.
  * Mongodb:
      - The database connection can be changed in src/netuse/database/__init__.py
 
