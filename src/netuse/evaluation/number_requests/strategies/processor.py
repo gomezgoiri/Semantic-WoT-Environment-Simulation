@@ -42,10 +42,15 @@ class RawDataProcessor(object):
         return json.dumps(self.data)
 
 
-if __name__ == '__main__':
+# Entry point for setup.py
+def main():
     rdp = RawDataProcessor()
     rdp.load_all()
     json_txt = rdp.toJson()
     
     d = DiagramGenerator("Net usage", eval(json_txt))
     d.save('/tmp/example.pdf')
+
+
+if __name__ == '__main__':
+    main()

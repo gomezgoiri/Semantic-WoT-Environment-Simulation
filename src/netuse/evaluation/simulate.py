@@ -111,8 +111,8 @@ def simulateUnsimulatedExecutionSet(semanticPath):
         if one_es_per_execution:
             break
 
-
-if __name__ == '__main__':
+# Entry point for setup.py
+def main():
     import argparse
     
     semanticPath = '~/dev/dataset'
@@ -124,3 +124,6 @@ if __name__ == '__main__':
     args = parser.parse_args()
     semanticPath = args.dataset_path
     simulateUnsimulatedExecutionSet(semanticPath)
+    
+if __name__ == '__main__':
+    main()

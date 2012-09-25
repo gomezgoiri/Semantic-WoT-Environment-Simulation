@@ -11,7 +11,7 @@ To install/reinstall/uninstall the project and its dependencies using pip:
 from setuptools import setup, find_packages
 
 setup(name="netuse",
-      version="0.2",
+      version="0.21",
       description="An evaluation of our approach network usage",
       author="Aitor Gomez-Goiri",
       author_email="aitor.gomez@deusto.es",

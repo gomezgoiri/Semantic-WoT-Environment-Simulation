@@ -45,8 +45,8 @@ def getNeededRequests(execution_set):
         
     return x, y, None
 
-
-if __name__ == '__main__':
+# Entry point for setup.py
+def main():
     p = ParametrizationUtils('network_usage', '~/dev/dataset')
     
     
@@ -93,3 +93,6 @@ if __name__ == '__main__':
                                                    numNodes = numNodes,
                                                    numConsumers = numConsumers
                                                    )
+
+if __name__ == '__main__':
+    main()
