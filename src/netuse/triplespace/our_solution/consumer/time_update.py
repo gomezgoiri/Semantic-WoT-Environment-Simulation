@@ -4,7 +4,7 @@ import numpy
 class UpdateTimesManager(object):
     LAST_UPDATES = 10
     MAX_UPDATE_RATE = 600000
-    MIN_UPDATE_RATE = 5000
+    MIN_UPDATE_RATE = 60000
     DEFAULT_UPDATE_TIME = MIN_UPDATE_RATE
     
     def __init__(self):
