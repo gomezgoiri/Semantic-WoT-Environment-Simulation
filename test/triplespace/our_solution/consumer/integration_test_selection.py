@@ -30,7 +30,7 @@ def performSimulation(parameters):
 
 if __name__ == '__main__':
     from netuse.sim_utils import OwnArgumentParser
-    parser = OwnArgumentParser('Activity test')
+    parser = OwnArgumentParser('WP selection integration test')
     parser.parse_args() # do nothing with the args (already done)
     
     
