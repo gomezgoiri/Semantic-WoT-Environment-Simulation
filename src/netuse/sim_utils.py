@@ -79,7 +79,7 @@ class ResultContainer(object):
 class OwnArgumentParser(ArgumentParser):
     
     def __init__(self, description="Default description"):
-        ArgumentParser.__init__(description=description)
+        ArgumentParser.__init__(self, description=description)
         from netuse.results import G
         self.add_argument('-ds','--data-set', default=G.dataset_path, dest='dataset_path',
                     help='Specify the folder containing the dataset to perform the simulation.')
