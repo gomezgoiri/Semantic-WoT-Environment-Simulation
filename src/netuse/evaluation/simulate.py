@@ -104,7 +104,7 @@ def execute_once_each_time(executions):
 def simulateUnsimulatedExecutionSet():
     one_es_per_execution = True # just one simulation (ExecutionSet) per execution
     
-    for es in ExecutionSet.get_unsimulated:
+    for es in ExecutionSet.objects.get_unsimulated():
         #execute_all_concurrently(es.executions)
         execute_once_each_time(es.executions)
         

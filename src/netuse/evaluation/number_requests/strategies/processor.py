@@ -31,7 +31,7 @@ class RawDataProcessor(object):
         self.data[name][DiagramGenerator.REQUESTS] = [e[1] for e in sort]
     
     def load_all(self):
-        for executionSet in ExecutionSet.get_simulated().filter(experiment_id='network_usage'):
+        for executionSet in ExecutionSet.objects(experiment_id='network_usage').get_simulated():
             self._load(executionSet, DiagramGenerator.NB, Parametrization.negative_broadcasting)
             self._load(executionSet, DiagramGenerator.OURS_1C, Parametrization.our_solution, additionalFilter=lambda p: p.numConsumers==1)
             self._load(executionSet, DiagramGenerator.OURS_10C, Parametrization.our_solution, additionalFilter=lambda p: p.numConsumers==10)
@@ -47,7 +47,7 @@ def main():
     rdp = RawDataProcessor()
     rdp.load_all()
     json_txt = rdp.toJson()
-    
+    print json_txt
     d = DiagramGenerator("Net usage", eval(json_txt))
     d.save('/tmp/example.pdf')
 

@@ -5,6 +5,7 @@ Created on Nov 27, 2011
 '''
 import datetime
 from mongoengine import Document, DateTimeField, ListField, StringField, ReferenceField, queryset_manager
+from mongoengine.queryset import QuerySet
 from netuse.database.parametrization import Parametrization
 from netuse.database.results import NetworkTrace
 
@@ -17,10 +18,37 @@ class Execution(Document):
     requests = ListField(ReferenceField(NetworkTrace))
 
 
+class AwesomerQuerySet(QuerySet):
+    
+    def get_simulated(self):
+        #queryset.filter(execution_date__ne=None)
+        for es in self:
+            all_simulated = True 
+            for ex in es.executions:
+                if ex.execution_date is None:
+                    all_simulated = False
+                    break
+            if all_simulated:
+                yield es
+
+    def get_unsimulated(self):
+        #queryset.filter(execution_date__ne=None)
+        for es in self:
+            some_unsimulated = False 
+            for ex in es.executions:
+                if ex.execution_date is None:
+                    some_unsimulated = True
+                    break
+            if some_unsimulated:
+                yield es
+
+
 class ExecutionSet(Document):
+    
     meta = {
             'collection': 'executionSet',
-            'ordering': ['-creation_date'] # latest first
+            'ordering': ['-creation_date'], # latest first
+            'queryset_class': AwesomerQuerySet
             }
     
     # to identify the experiment
@@ -33,27 +61,3 @@ class ExecutionSet(Document):
     
     def addExecution(self, execution):
         self.executions.append(execution)
-    
-    @queryset_manager
-    def get_simulated(doc_cls, queryset):
-        #queryset.filter(execution_date__ne=None)
-        for es in queryset:
-            all_simulated = True 
-            for ex in es.executions:
-                if ex.execution_date is None:
-                    all_simulated = False
-                    break
-            if all_simulated:
-                yield es
-
-    @queryset_manager
-    def get_unsimulated(doc_cls, queryset):
-        #queryset.filter(execution_date__ne=None)
-        for es in queryset:
-            some_unsimulated = False 
-            for ex in es.executions:
-                if ex.execution_date is None:
-                    some_unsimulated = True
-                    break
-            if some_unsimulated:
-                yield es

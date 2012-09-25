@@ -6,12 +6,11 @@ Created on Jan 4, 2012
 
 import unittest
 import datetime
-from netuse.database.execution import Execution, ExecutionSet
+from netuse.database.execution import Execution, ExecutionSet, AwesomerQuerySet
 from netuse.database.parametrization import Parametrization
-from netuse.database.results import RequestsResults, Results
 
 Execution.meta = {'collection': 'executionsTest'}
-ExecutionSet.meta = {'collection': 'executionSetTest'}
+ExecutionSet.meta ={'collection': 'executionSetTest', 'ordering': ['-creation_date'], 'queryset_class': AwesomerQuerySet}
         
 class TestDatabase(unittest.TestCase):
     
@@ -53,12 +52,12 @@ class TestDatabase(unittest.TestCase):
         self.reset_database()
     
     def test_get_simulated_execution_sets(self):
-        for sim in ExecutionSet.get_simulated:
+        for sim in ExecutionSet.objects.get_simulated():
             for ex in sim.executions:
                 self.assertTrue(ex.execution_date is not None)
     
     def test_get_unsimulated_execution_sets(self):
-        for unsim in ExecutionSet.get_unsimulated:
+        for unsim in ExecutionSet.objects.get_unsimulated():
             unexecuted = False
             for ex in unsim.executions:
                 if ex.execution_date is None:
