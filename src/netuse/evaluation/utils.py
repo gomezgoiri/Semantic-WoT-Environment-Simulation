@@ -72,7 +72,7 @@ class ParametrizationUtils():
                     print e
         
         ret = []
-        dirList=os.listdir(semanticPath+'/dataset')
+        dirList=os.listdir(semanticPath+'/data')
         for fname in dirList:
             if not fname.startswith("."): # ignore non visible file names
                 ret.append( fname.partition("_")[0] )

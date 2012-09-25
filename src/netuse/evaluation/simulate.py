@@ -52,7 +52,7 @@ def expand_ontology(tBoxGraph):
     return network.inferredFacts
 
 def loadGraphsJustOnce(nodeNames, semanticPath, loadedGraph):
-    datasetPath = semanticPath+"/dataset"
+    datasetPath = semanticPath+"/data"
     ontologiesPath = semanticPath+"/base_ontologies"
     
     if 'ontology' not in loadedGraph:

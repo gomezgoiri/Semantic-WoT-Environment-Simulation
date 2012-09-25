@@ -22,7 +22,7 @@ def getStationNames(semanticPath):
                 print e
     
     ret = []
-    dirList=os.listdir(semanticPath+'/dataset')
+    dirList=os.listdir(semanticPath+'/data')
     for fname in dirList:
         if not fname.startswith("."): # ignore non visible file names
             ret.append( fname.partition("_")[0] )
@@ -38,7 +38,7 @@ def selectStations(semanticPath, numberOfNodes="all"):
     return random.sample(possibleNodes, numberOfNodes)
 
 def loadGraphsJustOnce(nodeNames, semanticPath, loadedGraph):
-    datasetPath = semanticPath+"/dataset"
+    datasetPath = semanticPath+"/data"
     ontologiesPath = semanticPath+"/base_ontologies"
     
     if 'ontology' not in loadedGraph:
