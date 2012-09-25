@@ -5,8 +5,6 @@ Created on Sep 6, 2012
 '''
 from abc import abstractmethod, ABCMeta
 import json
-import bson
-from dict2xml import dict2xml
 
 
 class Clue(object):
@@ -41,10 +39,12 @@ class Clue(object):
         self._fromDictionary(diction)
     
     def toBson(self): # but BSON is longer than JSON in many cases
+        import bson
         return bson.dumps({'b':self._toDictionary()}) # key-value needed (the list cannot be serialized as is
     
     def toXML(self):
-        return dict2xml(self._toDictionary())
+        import dict2xml
+        return dict2xml.dict2xml(self._toDictionary())
     
     def _extractNamespaces(self, graph):
         schemas = []
