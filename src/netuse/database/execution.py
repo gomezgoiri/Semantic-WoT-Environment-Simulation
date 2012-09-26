@@ -4,7 +4,7 @@ Created on Nov 27, 2011
 @author: tulvur
 '''
 import datetime
-from mongoengine import Document, DateTimeField, ListField, StringField, ReferenceField, queryset_manager
+from mongoengine import Document, DateTimeField, ListField, StringField, ReferenceField
 from mongoengine.queryset import QuerySet
 from netuse.database.parametrization import Parametrization
 from netuse.database.results import NetworkTrace
@@ -19,6 +19,9 @@ class Execution(Document):
 
 
 class AwesomerQuerySet(QuerySet):
+    
+    def AwesomerQuerySet(self):
+        super(AwesomerQuerySet, self).__init__()
     
     def get_simulated(self):
         #queryset.filter(execution_date__ne=None)
