@@ -11,6 +11,7 @@ class NetworkTrace(Document):
     timestamp = FloatField(default=0.0)
     client = StringField()
     server = StringField()
+    path = StringField()
     status = IntField(default=0)
     response_time = FloatField(default=0.0)
     
