@@ -47,8 +47,8 @@ def introspect():
         names[obj_name] = names.get(obj_name, 0) + 1
 
     ordered = _dict2list(names, len(objects))
-    open('introspection.dump','w').write(str(ordered))
+    open('/tmp/introspection.dump','w').write(str(ordered))
     ordered = _dict2list(further_information['__builtin__.dict'], len(objects))
-    open('further_introspection_dict.dump','w').write(str(ordered))
+    open('/tmp/further_introspection_dict.dump','w').write(str(ordered))
     ordered = _dict2list(further_information['__builtin__.builtin_function_or_method'], len(objects))
-    open('further_introspection_builtin.dump','w').write(str(ordered))
+    open('/tmp/further_introspection_builtin.dump','w').write(str(ordered))
