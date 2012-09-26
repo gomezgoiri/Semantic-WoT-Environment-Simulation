@@ -12,7 +12,7 @@ def dump_into_file(execution, file_path):
     ft = FileTracer(file_path)
     ft.start()
     for req in execution.requests:
-        ft.trace(req.timestamp, req.client, req.server, req.path, req.status, req.response_time)
+        ft.trace(req.timestamp, req.client, req.server, "", req.status, req.response_time)
     ft.stop()
 
 
@@ -22,7 +22,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Manage data.')
     parser.add_argument('-o','--oid', default=None, dest='oid',
                 help='Specify the object id of the execution set to be used.')
-    parser.add_argument('-p','--path', default='/tmp/trace.txt', dest='path',
+    parser.add_argument('-p','--path', default='/tmp/trace.txt', dest='file_path',
                 help='Specify the path of the file where the trace is going to be written.')
     
     args = parser.parse_args()
@@ -31,4 +31,4 @@ if __name__ == '__main__':
     if objID==None:
         raise Exception("A oid should be provided.")
     else:
-        dump_into_file(Execution.objects(id=ObjectId(objID)).first())
+        dump_into_file(Execution.objects(id=ObjectId(objID)).first(), args.file_path)

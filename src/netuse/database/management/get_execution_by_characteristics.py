@@ -21,9 +21,9 @@ if __name__ == '__main__':
                 help='Specify the object id of the execution set to be looked for into. Otherwise the last execution set should be selected.')
     parser.add_argument('-s','--strategy', default=Parametrization.our_solution, dest='strategy',
                 help='The strategy the searched execution should have.')
-    parser.add_argument('-N','--num_nodes', default=100, dest='num_nodes',
+    parser.add_argument('-N','--num_nodes', type=int, default=100, dest='num_nodes',
                 help='The number of nodes the searched execution should have.')
-    parser.add_argument('-Nc','--num_consumers', default=100, dest='num_consumers',
+    parser.add_argument('-Nc','--num_consumers', type=int, default=100, dest='num_consumers',
                 help='The number of consumer nodes the searched execution should have.')
     
     args = parser.parse_args()
