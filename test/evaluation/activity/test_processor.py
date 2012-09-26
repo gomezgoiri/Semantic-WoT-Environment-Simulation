@@ -119,7 +119,7 @@ class TestRawDataProcessor(unittest.TestCase):
         self.assertSequenceEqual( ((1, 4), (11, 14), (21, 24), (31, 54), (61, 64), (71, 74), (81, 84), (91, 94)), previous_activities )
     
     
-    def test_load(self):
+    def test_calculate_activity(self):
         requests = []
         requests.append( FakeRequest('n1', 'n2', 10, 5) )
         requests.append( FakeRequest('n1', 'n2', 12, 5) )
@@ -130,7 +130,7 @@ class TestRawDataProcessor(unittest.TestCase):
         requests.append( FakeRequest('n4', 'n5', 95, 5) )
         requests.append( FakeRequest('n4', 'n5', 100, 5) )
         
-        results = self.processor._load(requests)
+        results = self.processor._calculate_activity(requests)
         self.assertEquals( results['n1'], 12) # 10-17, 20-25
         self.assertEquals( results['n2'], 22) # 10-17, 20-25, 100-105, 110-115
         self.assertEquals( results['n3'], 12) # 98-105, 110-115
