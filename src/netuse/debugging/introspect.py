@@ -12,7 +12,7 @@ Uso:
 
 Y mientras esta parado, miras el dump:
     cat introspection.dump
-    Ahí tendras pistas del uso de objetos: ordenados de mayor a menor frecuencia, cuantos son, y con porcentaje.
+    Ahi tendras pistas del uso de objetos: ordenados de mayor a menor frecuencia, cuantos son, y con porcentaje.
     
 
 '''
