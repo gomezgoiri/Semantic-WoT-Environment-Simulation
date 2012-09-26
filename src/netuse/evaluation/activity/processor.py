@@ -43,7 +43,7 @@ class RawDataProcessor(object):
 
         return overlaping
     
-    # Changes activity_periods without creating a new list
+    # activity_periods is modified (to avoid creating a new list)
     def _merge_periods_and_add(self, activity_periods, new_activity, overlaping_periods):
         delete_activities = []
         merged_activity = new_activity
@@ -92,10 +92,11 @@ class RawDataProcessor(object):
         new_activity = (init, finish)
         overlaping = self._select_overlaping_periods(activities[node_name], new_activity)
         if not overlaping:
+            # if does not overlap, just add it in the correct order
             activities[node_name].append((init, finish))
             activities[node_name].sort()
         else:
-            self._merge_periods_and_add(activities, new_activity, overlaping)
+            self._merge_periods_and_add(activities[node_name], new_activity, overlaping)
     
     
     def _load(self, traces):
@@ -119,7 +120,7 @@ class RawDataProcessor(object):
         # sort by num_nodes
         results = {}
         
-        for node_name, activity_periods in results.iteritems():
+        for node_name, activity_periods in temp.iteritems():
             busy_time = 0
             for activity in activity_periods:
                 busy_time += (activity[1] - activity[0])
