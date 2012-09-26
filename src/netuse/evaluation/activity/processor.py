@@ -12,10 +12,15 @@ class RawDataProcessor(object):
     def _select_overlaping_periods(self, activity_periods, new_activity):
         overlaping = []
         for older_activity in activity_periods: # activity_periods are sorted by init time
+            #   |----|            (new_activity)
+            #           |----|    (older_activity)
+            # Since the next activities won't overlap with the new one, skip the search
+            if new_activity[1]<older_activity[0]:
+                break
             #           |----|    (new_activity)
             #   |----|            (older_activity)
             # We are approaching to the overlaping areas, but not there yet...
-            if older_activity[1]>=new_activity[0]:
+            elif older_activity[1]>=new_activity[0]:
                 #   |----------|      (new_activity)
                 #        |----------| (older_activity)
                 if new_activity[0]<=older_activity[0] and new_activity[1]<=older_activity[1]:
@@ -35,12 +40,6 @@ class RawDataProcessor(object):
                 #      |----|         (older_activity)
                 elif new_activity[0]<older_activity[0] and new_activity[1]>older_activity[1]:
                     overlaping.append(older_activity)
-                
-            #   |----|            (new_activity)
-            #           |----|    (older_activity)
-            # Since the next activities won't overlap with the new one, skip the search
-            elif new_activity[1]<older_activity[0]:
-                break
 
         return overlaping
     
