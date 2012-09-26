@@ -4,6 +4,13 @@ Created on Sep 22, 2012
 @author: tulvur
 '''
 
+import json
+import numpy
+from netuse.database.execution import ExecutionSet
+from netuse.database.parametrization import Parametrization
+from netuse.evaluation.number_requests.strategies.diagram import DiagramGenerator
+
+
 class RawDataProcessor(object):
 
     def __init__(self):
@@ -99,7 +106,7 @@ class RawDataProcessor(object):
             self._merge_periods_and_add(activities[node_name], new_activity, overlaping)
     
     
-    def _load(self, traces):
+    def _calculate_activity(self, traces):
         '''
         "traces" is a list of NetworkTrace instances.
         
@@ -129,9 +136,41 @@ class RawDataProcessor(object):
         return results
 
 
+    def _load(self, executionSet, name, strategy, additionalFilter=None):
+        nodes_and_activity_means = [] # tuples of 2 elements: number of nodes in the simulation and requests
+        for execution in executionSet.executions:
+            if execution.parameters.strategy==strategy:
+                if additionalFilter==None or additionalFilter(execution.parameters):
+                    num_nodes = len(execution.parameters.nodes) # in the reference of mongoengine, they defend this method
+                    activities = self._calculate_activity(execution.requests)
+                    activity_mean = numpy.mean(activities.values())
+                    nodes_and_activity_means.append((num_nodes, activity_mean))
+        
+        # sort by num_nodes
+        sort = sorted(nodes_and_activity_means)
+        
+        self.data[name] = {}
+        self.data[name][DiagramGenerator.NUM_NODES] = [e[0] for e in sort]
+        self.data[name][DiagramGenerator.REQUESTS] = [e[1] for e in sort]
+
+
+    def load_all(self):
+        for executionSet in ExecutionSet.objects(experiment_id='network_usage').get_simulated():
+            self._load(executionSet, DiagramGenerator.NB, Parametrization.negative_broadcasting)
+            self._load(executionSet, DiagramGenerator.OURS_1C, Parametrization.our_solution, additionalFilter=lambda p: p.numConsumers==1)
+            self._load(executionSet, DiagramGenerator.OURS_10C, Parametrization.our_solution, additionalFilter=lambda p: p.numConsumers==10)
+            self._load(executionSet, DiagramGenerator.OURS_100C, Parametrization.our_solution, additionalFilter=lambda p: p.numConsumers==100)
+            break # just one execution set
+
+    def toJson(self):
+        return json.dumps(self.data)
+
+
 # Entry point for setup.py
 def main():
     rdp = RawDataProcessor()
+    rdp.load_all()
+    print rdp.toJson()
 
 
 if __name__ == '__main__':
