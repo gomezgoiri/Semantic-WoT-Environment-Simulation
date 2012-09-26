@@ -35,7 +35,7 @@ class FileTracer(AbstractTracer):
         self.f.close()
     
     def trace(self, timestamp, client, server, path, status, response_time):
-        self.f.write("%0.2f\t%s\t%s\t%s\t%d\n"%(timestamp,client,server,path,status))
+        self.f.write("%0.2f\t%0.2f\t%s\t%s\t%s\t%d\n"%(timestamp,response_time,client,server,path,status))
 
 
 class MongoDBTracer(AbstractTracer):
