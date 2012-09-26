@@ -58,6 +58,7 @@ class MongoDBTracer(AbstractTracer):
             timestamp=timestamp,
             client=client,
             server=server,
+            path=path,
             status=status,
             response_time=response_time)
         self.execution.requests.append(n)
