@@ -14,18 +14,19 @@ class A(object):
     def __del__(self):
         print "Me muero: " + self.name
 
-a = A("a")
-b = A("b")
-a.b = b
-b.a = a
-a = None
-b = None
-
-c = A("c")
-
-gc.collect()
-
-# Referencia circular en aquellos que tienen __del__() redefinido hace que no lo elimine por precaucion
-#     (no sabe como eliminarlo, que eliminar antes...)
-# Deja la posible mierda en gc.garbage
-print gc.garbage
+if __name__ == '__main__':
+    a = A("a")
+    b = A("b")
+    a.b = b
+    b.a = a
+    a = None
+    b = None
+    
+    c = A("c")
+    
+    gc.collect()
+    
+    # Referencia circular en aquellos que tienen __del__() redefinido hace que no lo elimine por precaucion
+    #     (no sabe como eliminarlo, que eliminar antes...)
+    # Deja la posible mierda en gc.garbage
+    print gc.garbage
