@@ -3,7 +3,8 @@ Created on Nov 26, 2011
 
 @author: tulvur
 '''
-from SimPy.Simulation import *
+from SimPy.Simulation import Process, activate, passivate, reactivate, hold, release, request, now
+import weakref
 from devices import DeviceType, RegularComputer
 from netuse.triplespace.network.discovery import DiscoveryRecord
 
@@ -39,7 +40,7 @@ class ConcurrentThread(Process):
         
     def __init__(self, node, deviceType=None, name="thread" ):
         Process.__init__(self, name=name)
-        self.__node = node
+        self.__node = weakref.proxy(node)
         self.__device = deviceType
     
     def executeTask(self, handler, req):
@@ -86,7 +87,6 @@ class Node(Process):
                                                 sac = sac,
                                                 battery_lifetime = battery_lifetime if device.hasBattery else DiscoveryRecord.INFINITE_BATTERY)
         
-        self.__httpOut = {}
         self.__httpIn = []
         self.__reqIdGenerator = 0
         self.__waitingRequesters_and_InitTime = {} # TODO the "InitTime" is not longer used in this class
@@ -97,12 +97,10 @@ class Node(Process):
                 yield passivate, self
             else:
                 # reqIdGenerator was not intended to be used to generate a name for CurrentThread, but I've reused :-P
-                thMngr = ConcurrentThread(self, self.__device, name=self.name+"_th"+str(self.__reqIdGenerator))               
+                thMngr = ConcurrentThread(self, self.__device, name=self.name+"_th"+str(self.__reqIdGenerator))
                 activate(thMngr, thMngr.executeTask(self.ts.handler, self.__httpIn.pop()))
         
-    def addResponse(self, response):
-        self.__httpOut[response.getid()] = response
-        
+    def addResponse(self, response):        
         requester, _ = self.__waitingRequesters_and_InitTime[response.getid()]
         del self.__waitingRequesters_and_InitTime[response.getid()]
         
