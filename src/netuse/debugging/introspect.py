@@ -10,9 +10,9 @@ Uso:
     introspect()
     raw_input("Before (press enter)")
 
-Y mientras está parado, miras el dump:
+Y mientras esta parado, miras el dump:
     cat introspection.dump
-    Ahí tendrás pistas del uso de objetos: ordenados de mayor a menor frecuencia, cuantos son, y con porcentaje.
+    Ahí tendras pistas del uso de objetos: ordenados de mayor a menor frecuencia, cuantos son, y con porcentaje.
     
 
 '''
