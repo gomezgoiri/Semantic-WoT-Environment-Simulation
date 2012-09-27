@@ -14,6 +14,11 @@ class ClueStore(object):
         
     def add_clue(self, node_name, clue, expiry_time=-1):
         self.started = True
+        
+        # Warning: this may have caused a huge memory consumption! (clues no longer used were stored in byexpirytime)
+        if node_name in self.bynode:
+            self.bynode = filter(lambda e: e[1]!=node_name, self.bynode) # delete overrided clues from byexpirytime
+        
         self.bynode[node_name] = clue
         self.byexpirytime.append( (expiry_time, node_name, clue) )
         self.byexpirytime = sorted(self.byexpirytime, compare_expiry)       
