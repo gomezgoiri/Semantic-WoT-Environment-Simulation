@@ -20,8 +20,9 @@ While the setup.py is fixed, install them manually:
      sudo pip install numpy
      sudo pip install simpy
 
-After installing, we should patch "n3meta.py" (issue related with n3 parsing)
+After installing, we should patch "n3meta.py" (issue related with n3 parsing) and "InfixOWL.py":
      patch installation-path/rdflib/syntax/parsers/n3p/n3meta.py ./patches/n3meta.py.diff
+     patch installation-path/FuXi/Syntax/InfixOWL.py ./patches/InfixOWL.py.patch
 
 Then, download the semantic files needed for the simulation.
 Note that there is a folder with too much base-data not necessary.
