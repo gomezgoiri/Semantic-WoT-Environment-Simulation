@@ -5,11 +5,12 @@ Created on Sep 27, 2012
 '''
 
 from pymongo import Connection
+from mongoengine.connection import get_connection
 
 class PyMongoDAO(object):
 
     def __init__(self, database='network_usage'):
-        self.connection = Connection('localhost', 27017)
+        self.connection = get_connection() #Connection('localhost', 27017)
         self.db = self.connection[database]
     
     def count_traces_in_execution(self, objectid):

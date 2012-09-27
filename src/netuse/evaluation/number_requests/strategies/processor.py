@@ -5,6 +5,7 @@ Created on Sep 22, 2012
 '''
 
 import json
+from netuse.database.pymongo_dao import PyMongoDAO
 from netuse.database.execution import ExecutionSet
 from netuse.database.parametrization import Parametrization
 from netuse.evaluation.number_requests.strategies.diagram import DiagramGenerator
@@ -37,6 +38,11 @@ class RawDataProcessor(object):
             self._load(executionSet, DiagramGenerator.OURS_10C, Parametrization.our_solution, additionalFilter=lambda p: p.numConsumers==10)
             self._load(executionSet, DiagramGenerator.OURS_100C, Parametrization.our_solution, additionalFilter=lambda p: p.numConsumers==100)
             break # just one execution set
+        
+    def load_all2(self):
+        dao = PyMongoDAO()
+        for executionSet_id in dao.get_simulated_execution_sets():
+            print executionSet_id
 
     def toJson(self):
         return json.dumps(self.data)
