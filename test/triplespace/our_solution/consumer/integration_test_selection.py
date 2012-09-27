@@ -2,7 +2,8 @@ from SimPy.Simulation import initialize, simulate
 
 from rdflib import URIRef, Namespace, RDF
 
-from netuse.results import G, FileTracer
+from netuse.results import G
+from netuse.tracers import FileTracer
 from netuse.nodes import NodeGenerator
 from netuse.activity import ActivityGenerator
 from netuse.evaluation.utils import ParametrizationUtils

@@ -2,7 +2,8 @@ from SimPy.Simulation import initialize, simulate
 
 from rdflib import URIRef, Namespace, RDF
 
-from netuse.results import G, FileTracer
+from netuse.results import G
+from netuse.tracers import FileTracer
 from netuse.nodes import NodeGenerator
 from netuse.evaluation.simulate import loadGraphsJustOnce
 from netuse.activity import ActivityGenerator
@@ -33,7 +34,6 @@ def performSimulation(parameters):
     
     G.shutdown()
 
-@profile
 def main():
     from netuse.sim_utils import OwnArgumentParser
     parser = OwnArgumentParser('Memory integration test')
@@ -64,14 +64,14 @@ def main():
     temp = ((None, SSN.observationResult, None),)
     
     
-    p = ParametrizationUtils('network_usage', '/home/tulvur/dev/workspaces/doctorado/files/semantic')
+    p = ParametrizationUtils('network_usage', '/home/tulvur/dev/dataset')
     param = p.getDefaultParametrization(Parametrization.our_solution,
                                                    amountOfQueries = 10,
                                                    writeFrequency = 10000,
                                                    simulateUntil = 3600000,
                                                    queries = temp,
-                                                   numNodes = 10,
-                                                   numConsumers = 5
+                                                   numNodes = 100,
+                                                   numConsumers = 100
                                                    )
     print param
     performSimulation(param) 
