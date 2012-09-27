@@ -7,7 +7,6 @@ import datetime
 from mongoengine import Document, DateTimeField, ListField, StringField, ReferenceField
 from mongoengine.queryset import QuerySet
 from netuse.database.parametrization import Parametrization
-from netuse.database.results import NetworkTrace
 
 class Execution(Document):
     meta = {'collection': 'executions'}
@@ -15,7 +14,7 @@ class Execution(Document):
     # executions are repeated if they have exactly the same "parameters" attribute
     parameters = ReferenceField(Parametrization) 
     execution_date = DateTimeField(default=None) # when this was started being simulated?
-    requests = ListField(ReferenceField(NetworkTrace))
+    #requests = ListField(ReferenceField(NetworkTrace))
 # db.eval(function(){return db.executions.find().map(function (obj) { return obj.requests.length });})
 
 class AwesomerQuerySet(QuerySet):
@@ -23,7 +22,6 @@ class AwesomerQuerySet(QuerySet):
     def AwesomerQuerySet(self):
         super(AwesomerQuerySet, self).__init__()
     
-    # inefficient
     def get_simulated(self):
         #queryset.filter(execution_date__ne=None)
         for es in self:
@@ -35,7 +33,6 @@ class AwesomerQuerySet(QuerySet):
             if all_simulated:
                 yield es
     
-    # inefficient
     def get_unsimulated(self):
         #queryset.filter(execution_date__ne=None)
         for es in self:

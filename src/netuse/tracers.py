@@ -47,7 +47,8 @@ class MongoDBTracer(AbstractTracer):
         pass
         
     def stop(self):
-        self.execution.save()
+        #self.execution.save()
+        pass
         # Apparently, calling to self.execution.save() each time an element
         # is appended to the list introduces a huge latency
     
@@ -55,11 +56,11 @@ class MongoDBTracer(AbstractTracer):
     def trace(self, timestamp, client, server, path, status, response_time):
         from netuse.database.results import NetworkTrace
         n = NetworkTrace(
+            execution=self.execution,
             timestamp=timestamp,
             client=client,
             server=server,
             path=path,
             status=status,
             response_time=response_time)
-        self.execution.requests.append(n)
         n.save()
