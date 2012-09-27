@@ -1,8 +1,5 @@
 #!/bin/bash
 
-sudo aptitude install mongodb-server
-
-
 mkvirtualenv netuse
 workon netuse
 
