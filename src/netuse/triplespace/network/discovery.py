@@ -5,6 +5,7 @@ Created on Sep 16, 2012
 '''
 
 from abc import ABCMeta, abstractmethod
+import weakref
 
 
 class DiscoveryFactory(object):
@@ -30,7 +31,7 @@ class DiscoveryRecord(object):
     
     def __init__(self, memory='1MB', storage='1MB',
                  joined_since=1, sac=False, battery_lifetime=INFINITE_BATTERY, is_whitepage=False):
-        self.change_observers = []
+        self.change_observers = weakref.WeakSet()
         self.memory = self._separate_units_from_values(memory) # does not change
         self.storage = self._separate_units_from_values(storage) # does not change
         self.__joined_since = joined_since
@@ -49,7 +50,7 @@ class DiscoveryRecord(object):
         return standardized
         
     def add_change_observer(self, observer):
-        self.change_observers.append(observer)
+        self.change_observers.add(observer)
 
     def __record_updated(self):
         for observer in self.change_observers:
@@ -114,11 +115,11 @@ class SimpleDiscoveryMechanism(DiscoveryRecordObserver):
         self.rest = rest
         for node in self.rest:
             node.discovery_record.add_change_observer(self)
-        self.observers = []
+        self.observers = weakref.WeakSet()
         self.whitepage_exist = False
             
     def add_changes_observers(self, observer):
-        self.observers.append(observer)
+        self.observers.add(observer)
         
     def _notify_on_whitepage_selected_after_none(self):
         for observer in self.observers:
