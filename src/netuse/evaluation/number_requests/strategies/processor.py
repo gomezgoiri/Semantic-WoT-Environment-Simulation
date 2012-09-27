@@ -42,7 +42,8 @@ class RawDataProcessor(object):
     def load_all2(self):
         dao = PyMongoDAO()
         for executionSet_id in dao.get_simulated_execution_sets():
-            print executionSet_id
+            dao.count_traces_in_execution(executionSet_id)
+            # TODO ...
 
     def toJson(self):
         return json.dumps(self.data)
