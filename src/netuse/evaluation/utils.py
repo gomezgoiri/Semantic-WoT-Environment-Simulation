@@ -26,7 +26,7 @@ class ParametrizationUtils():
         else:
             nodes = list(self.possibleNodes) # copies the list (or more cryptic: self.possibleNodes[:])
             for i in range(numNodes-len(self.possibleNodes)):
-                nodes.append('DOE_'+i)
+                nodes.append("DOE_%d"%(i))
         
         if nodeTypes==None:
             nodeTypes = (RegularComputer.TYPE_ID,)*numNodes
