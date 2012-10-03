@@ -5,14 +5,15 @@ Created on Jan 7, 2012
 '''
 from bson.objectid import ObjectId
 from netuse.tracers import FileTracer
-from netuse.database.execution import Execution
+from netuse.database.results import NetworkTrace
 
 
-def dump_into_file(execution, file_path):
+def dump_into_file(execution_id, file_path):
     ft = FileTracer(file_path)
     ft.start()
-    for req in execution.requests:
-        ft.trace(req.timestamp, req.client, req.server, "", req.status, req.response_time)
+    
+    for req in NetworkTrace.objects(execution=execution_id):
+        ft.trace(req.timestamp, req.client, req.server, req.path, req.status, req.response_time)
     ft.stop()
 
 
@@ -31,4 +32,4 @@ if __name__ == '__main__':
     if objID==None:
         raise Exception("A oid should be provided.")
     else:
-        dump_into_file(Execution.objects(id=ObjectId(objID)).first(), args.file_path)
+        dump_into_file(ObjectId(objID), args.file_path)
