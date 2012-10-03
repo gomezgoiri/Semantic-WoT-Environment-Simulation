@@ -104,17 +104,23 @@ class RemoteConnector(AbstractConnector, RequestObserver):
                 # otherwise the node is going to wait too much if the WP
                 # is just setting up and receiving clues for the first time!
                 pass
-        self._schedule_future_update() # next clue update!
+        self._check_if_next_update_changes() # next clue update!
     
     def _check_if_next_update_changes(self):
-        possible_next = now() + self.updateTimeManager.get_updatetime()
-        # if we don't have a scheduled update or we have a candidate to update our next update with an earlier update...
-        if possible_next < self.scheduled_request.at:
-            # stop any previously scheduled request, start a new request
-            RequestManager.cancelRequest(self.scheduled_request)
-            
-            # schedule the next update
+        if self.scheduled_request.at <= now(): # if last update already done...
+            # ...schedule the next one
             self._schedule_future_update()
+        else: # one request already scheduled, other may override it
+            
+            possible_next = now() + self.updateTimeManager.get_updatetime()
+            
+            # if we  have a candidate to update our next update with an earlier update...
+            if possible_next < self.scheduled_request.at:
+                # stop any previously scheduled request, start a new request
+                RequestManager.cancelRequest(self.scheduled_request)
+                
+                # schedule the next update
+                self._schedule_future_update()
     
     def get_query_candidates(self, template, previously_unsolved=False):
         if not previously_unsolved:
