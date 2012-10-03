@@ -41,6 +41,7 @@ class Provider(Process, SimpleDiscoveryObserver):
         self.connector = None
         
         self.externalCondition = SimEvent()
+        self.clueChanged = SimEvent()
         self.timer = None
     
     def update_clues_on_whitepage(self):
@@ -50,7 +51,7 @@ class Provider(Process, SimpleDiscoveryObserver):
                 self.connector.send_clue(self.clue_manager.get_clue())
             self.timer = Timer(Provider.UPDATE_TIME)
             activate(self.timer, self.timer.wait())
-            yield waitevent, self, (self.timer.event, self.externalCondition)
+            yield waitevent, self, (self.timer.event, self.externalCondition, self.clueChanged)
     
     def __update_connector_if_needed(self):
         wp = self.discovery.get_whitepage()
@@ -63,7 +64,9 @@ class Provider(Process, SimpleDiscoveryObserver):
                     self.connector = RemoteConnector(self.discovery.me, wp)
                     
     def refresh_clue(self):
-        self.clue_manager.refresh()
+        refreshed = self.clue_manager.refresh()
+        if refreshed:
+            self.clueChanged.signal()
     
     def on_whitepage_selected_after_none(self):
         if self.timer==None: self.cancel(self.timer)  

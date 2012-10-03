@@ -12,12 +12,18 @@ class ClueManager:
         self.refresh()
         
     def refresh(self):
+        '''
+        Checks in the data access layer if the clue needs to be updated.
+        If the clue is updated, it returns True.
+        '''
         g = self.dataaccess.getSpace(None).graphs
         clue = PredicateBasedClue()
         clue.parseGraph(g)
         
         if clue!=self.cached_clue:
             self.cached_clue = clue
+            return True
+        return False
             
     def get_clue(self):
         return self.cached_clue
