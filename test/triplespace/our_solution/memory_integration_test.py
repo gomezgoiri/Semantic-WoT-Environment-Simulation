@@ -66,12 +66,12 @@ def main():
     
     p = ParametrizationUtils('network_usage', '/home/tulvur/dev/dataset')
     param = p.getDefaultParametrization(Parametrization.our_solution,
-                                                   amountOfQueries = 10,
+                                                   amountOfQueries = 1000,
                                                    writeFrequency = 10000,
                                                    simulateUntil = 3600000,
                                                    queries = temp,
-                                                   numNodes = 100,
-                                                   numConsumers = 100
+                                                   numNodes = 15,
+                                                   numConsumers = 10
                                                    )
     print param
     performSimulation(param) 
