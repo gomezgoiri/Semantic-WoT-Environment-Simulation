@@ -8,7 +8,7 @@ from mongoengine import Document, StringField, FloatField, IntField, ReferenceFi
 
 class NetworkTrace(Document):
     meta = {'collection': 'net_trace',
-            'indexes': 'execution',
+            'indexes': ['execution',],
     }
     
     execution = ReferenceField(Execution)
