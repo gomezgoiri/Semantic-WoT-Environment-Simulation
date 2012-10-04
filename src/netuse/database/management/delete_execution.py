@@ -5,12 +5,15 @@ Created on Jan 7, 2012
 '''
 from bson.objectid import ObjectId
 from netuse.database.execution import Execution
+from netuse.database.results import NetworkTrace
 
-def delete(execution):
-    for r in execution.requests:
-        r.delete()
-    execution.execution_date = None
-    execution.save()
+def delete(execution_id):    
+    for req in NetworkTrace.objects(execution=execution_id):
+        req.delete()
+    
+    ex = Execution.objects(id=execution_id).first()
+    ex.execution_date = None
+    ex.save()
 
 if __name__ == '__main__':
     import argparse
@@ -25,4 +28,4 @@ if __name__ == '__main__':
     if objID==None:
         raise Exception("A oid should be provided.")
     else:
-        delete(Execution.objects(id=ObjectId(objID)).first())
+        delete(ObjectId(objID))
