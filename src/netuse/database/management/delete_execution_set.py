@@ -18,7 +18,8 @@ def delete(executionSets):
             ex.delete()
         es.delete()
 
-if __name__ == '__main__':
+
+def main():
     import argparse
     
     parser = argparse.ArgumentParser(description='Manage data.')
@@ -32,3 +33,6 @@ if __name__ == '__main__':
         delete(ExecutionSet.objects.get_unsimulated())
     else:
         delete(ExecutionSet.objects(id=ObjectId(objID)))
+
+if __name__ == '__main__':
+    main()

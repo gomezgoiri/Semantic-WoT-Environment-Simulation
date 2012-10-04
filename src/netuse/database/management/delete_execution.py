@@ -15,7 +15,8 @@ def delete(execution_id):
     ex.execution_date = None
     ex.save()
 
-if __name__ == '__main__':
+
+def main():
     import argparse
     
     parser = argparse.ArgumentParser(description='Manage data.')
@@ -29,3 +30,7 @@ if __name__ == '__main__':
         raise Exception("A oid should be provided.")
     else:
         delete(ObjectId(objID))
+
+
+if __name__ == '__main__':
+    main()

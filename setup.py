@@ -36,7 +36,12 @@ setup(name="netuse",
        'console_scripts': [
            'parametrize = netuse.evaluation.number_requests.parametrize:main',
            'simulate = netuse.evaluation.simulate:main',
-           'process_results = netuse.evaluation.number_requests.strategies.processor:main',
+           'process.strat = netuse.evaluation.number_requests.strategies.processor:main',
+           'diagram.strat = netuse.evaluation.number_requests.strategies.diagram:main',
+           'del.execution_set = netuse.database.management.delete_execution_set:main',
+           'del.execution = netuse.database.management.delete_execution:main',
+           'dump.execution = netuse.database.management.dump_execution_into_file:main',
+           'get.execution = netuse.database.management.get_execution_by_characteristics:main',           
         ],
       }
       #zip_safe=False

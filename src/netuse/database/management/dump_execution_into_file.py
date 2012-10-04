@@ -17,7 +17,7 @@ def dump_into_file(execution_id, file_path):
     ft.stop()
 
 
-if __name__ == '__main__':
+def main():
     import argparse
     
     parser = argparse.ArgumentParser(description='Manage data.')
@@ -33,3 +33,7 @@ if __name__ == '__main__':
         raise Exception("A oid should be provided.")
     else:
         dump_into_file(ObjectId(objID), args.file_path)
+
+
+if __name__ == '__main__':
+    main()

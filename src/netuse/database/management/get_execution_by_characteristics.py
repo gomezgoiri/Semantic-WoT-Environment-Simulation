@@ -13,7 +13,8 @@ def search_execution(execution_set, strategy, num_nodes, num_consumers):
         if params.strategy==strategy and len(params.nodes)==num_nodes and params.numConsumers==num_consumers:
             print ex.id
 
-if __name__ == '__main__':
+
+def main():
     import argparse
     
     parser = argparse.ArgumentParser(description='Manage data.')
@@ -33,3 +34,7 @@ if __name__ == '__main__':
         search_execution(ExecutionSet.objects.first(), args.strategy, args.num_nodes, args.num_consumers)
     else:
         search_execution(ExecutionSet.objects(id=ObjectId(objID)).first(), args.strategy, args.num_nodes, args.num_consumers)
+
+
+if __name__ == '__main__':
+    main()
