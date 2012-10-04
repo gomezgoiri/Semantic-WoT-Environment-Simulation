@@ -7,7 +7,9 @@ from netuse.database.execution import Execution
 from mongoengine import Document, StringField, FloatField, IntField, ReferenceField
 
 class NetworkTrace(Document):
-    meta = {'collection': 'net_trace'}
+    meta = {'collection': 'net_trace',
+            'indexes': 'execution',
+    }
     
     execution = ReferenceField(Execution)
     timestamp = FloatField(default=0.0)
