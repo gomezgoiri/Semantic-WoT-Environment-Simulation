@@ -49,8 +49,10 @@ def main():
     rdp.load_all()
     json_txt = rdp.toJson()
     #print json_txt
-    d = DiagramGenerator("Net usage", eval(json_txt))
-    d.save('/tmp/example.pdf')
+    
+    f = open('/tmp/strategies_eval.json', 'w')
+    f.write(json_txt)
+    f.close()
 
 
 if __name__ == '__main__':

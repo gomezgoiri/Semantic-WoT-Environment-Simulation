@@ -81,22 +81,31 @@ class DiagramGenerator:
         
     def save(self, filename):
         plt.savefig(filename, bbox_inches=0)
+
+
+def main():
+#    json = '''
+#          {
+#    'ours_1': { 'num_nodes': [1,10,50,100,200], 'requests': [100,120,400,320,500] },
+#    'ours_10': { 'num_nodes': [10,50,100,200], 'requests': [220,500,420,600] },
+#    'ours_100': { 'num_nodes': [100,200], 'requests': [520,700] },
+#    'nb': { 'num_nodes': [1,10,50,100,200], 'requests': [300,420,600,720,900] }
+#          }
+#        '''
+#    json = json.replace(' ','')
+#    json = json.replace('\n','')
+#    json = json.replace('\t','')
+    
+    f = open('/tmp/strategies_eval.json', 'r')
+    json_txt = f.read()
+    f.close()
+    
+    d = DiagramGenerator("Net usage", eval(json_txt))
+    d.save('/tmp/diagram.pdf')
         
-if __name__ == '__main__':
-    
-    json = '''
-              {
-        'ours_1': { 'num_nodes': [1,10,50,100,200], 'requests': [100,120,400,320,500] },
-        'ours_10': { 'num_nodes': [10,50,100,200], 'requests': [220,500,420,600] },
-        'ours_100': { 'num_nodes': [100,200], 'requests': [520,700] },
-        'nb': { 'num_nodes': [1,10,50,100,200], 'requests': [300,420,600,720,900] }
-              }
-            '''
-    json = json.replace(' ','')
-    json = json.replace('\n','')
-    json = json.replace('\t','')
-    
-    d = DiagramGenerator("Net usage", eval(json))
     #d.show()
     #raw_input("Press ENTER to exit")
-    d.save('/tmp/example.pdf')
+
+
+if __name__ == '__main__':   
+    main()
