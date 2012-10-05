@@ -49,7 +49,7 @@ def getNeededRequests(execution_set):
 # Entry point for setup.py
 def main():
     from netuse.sim_utils import OwnArgumentParser
-    parser = OwnArgumentParser('Start simulation process.')
+    parser = OwnArgumentParser('Parametrization for number of requests measuring.')
     parser.parse_args()
     
     
