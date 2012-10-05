@@ -39,8 +39,12 @@ class DeviceType():
             return XBee()
         elif device_type==FoxG20.TYPE_ID:
             return FoxG20()
+        elif device_type==SamsungGalaxyTab.TYPE_ID:
+            return SamsungGalaxyTab()
         elif device_type==RegularComputer.TYPE_ID:
             return RegularComputer()
+        elif device_type==Server.TYPE_ID:
+            return Server()
         else:
             raise Exception('Invalid device type:', device_type)
     
