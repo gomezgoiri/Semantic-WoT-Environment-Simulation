@@ -5,16 +5,17 @@ Created on Jan 7, 2012
 '''
 from bson.objectid import ObjectId
 from netuse.database.execution import ExecutionSet
+from netuse.database.results import NetworkTrace
+from netuse.database.parametrization import Parametrization
 
 def delete(executionSets):
     for es in executionSets:
         for ex in es.executions:
-            if ex.parameters!=None:
-                ex.parameters.delete()
-            if ex.results!=None:
-                if ex.results.requests!=None:
-                    ex.results.requests.delete()
-                ex.results.delete()
+            for req in NetworkTrace.objects(execution=ex.id):
+                req.delete()
+            params = Parametrization.objects(id=ObjectId(ex.parameters.id)).first()
+            if params!=None:
+                params.delete()
             ex.delete()
         es.delete()
 
