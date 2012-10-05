@@ -3,7 +3,7 @@ Created on Jan 30, 2012
 
 @author: tulvur
 '''
-from rdflib import URIRef, RDF, Namespace
+from rdflib import RDF, Namespace
 from netuse.results import G
 from netuse.evaluation.utils import ParametrizationUtils
 from netuse.database.parametrization import Parametrization
@@ -79,7 +79,7 @@ def main():
     )
     
     # important: this for before the strategy for, to have the same nodes in both simulations
-    for numNodes in range(5,101,5): # 150 is too much :-S
+    for numNodes in range(5,301,10):
         p.createDefaultParametrization(Parametrization.negative_broadcasting,
                                amountOfQueries = 1000,
                                writeFrequency = 10000,

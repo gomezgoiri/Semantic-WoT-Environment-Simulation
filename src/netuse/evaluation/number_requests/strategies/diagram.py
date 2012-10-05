@@ -101,12 +101,12 @@ def main():
 #    json = json.replace('\n','')
 #    json = json.replace('\t','')
     
-    f = open('/tmp/strategies_eval.json', 'r')
+    f = open('/tmp/requests_by_strategies.json', 'r')
     json_txt = f.read()
     f.close()
     
     d = DiagramGenerator("Network usage", eval(json_txt))
-    d.save('/tmp/diagram.pdf')
+    d.save('/tmp/requests_by_strategies.pdf')
         
     #d.show()
     #raw_input("Press ENTER to exit")

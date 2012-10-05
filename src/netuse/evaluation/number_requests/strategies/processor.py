@@ -50,7 +50,7 @@ def main():
     json_txt = rdp.toJson()
     #print json_txt
     
-    f = open('/tmp/strategies_eval.json', 'w')
+    f = open('/tmp/requests_by_strategies.json', 'w')
     f.write(json_txt)
     f.close()
 

@@ -94,16 +94,16 @@ def mainTest():
     json_txt = json_txt.replace('\t','')
     
     d = DiagramGenerator("Roles on the network use", eval(json_txt))
-    d.save('/tmp/diagram.pdf')
+    d.save('/tmp/test_diagram.pdf')
 
 def main():    
-    f = open('/tmp/strategies_eval.json', 'r')
+    f = open('/tmp/requests_by_roles.json', 'r')
     json_txt = f.read()
     f.close()
     
     d = DiagramGenerator("Roles on the network use", eval(json_txt))
-    d.save('/tmp/diagram.pdf')
+    d.save('/tmp/requests_by_roles.pdf')
 
 
 if __name__ == '__main__':   
-    mainTest()
+    main()
