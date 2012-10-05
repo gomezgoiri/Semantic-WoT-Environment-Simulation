@@ -47,12 +47,13 @@ class DiagramGenerator:
         )
                 
         ax = fig.add_subplot(1,1,1)
-        self.generate_subplot(ax, data, "Total")
+        self.generate_subplot(ax, data, self.title)
     
-    def generate_subplot(self, ax, data, title):        
+    def generate_subplot(self, ax, data, title=None):        
         plt.xlabel(self.xlabel)
         plt.ylabel(self.ylabel)
-        plt.title(title)
+        if title is not None:
+            plt.title(title)
         
         shapes = cycle(self.linesShapes)
         colors = cycle(self.linesColors)
@@ -75,6 +76,10 @@ class DiagramGenerator:
         
         ax.set_xlim(0)
         ax.set_ylim(0)
+        
+        handles, labels = ax.get_legend_handles_labels()
+        #ax.legend(handles[::-1], labels[::-1]) # reverse the order
+        ax.legend(handles, labels, loc="upper left")
     
     def show(self):
         plt.show()
@@ -100,7 +105,7 @@ def main():
     json_txt = f.read()
     f.close()
     
-    d = DiagramGenerator("Net usage", eval(json_txt))
+    d = DiagramGenerator("Network usage", eval(json_txt))
     d.save('/tmp/diagram.pdf')
         
     #d.show()
