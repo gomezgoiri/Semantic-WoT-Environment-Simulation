@@ -7,7 +7,7 @@ from bson.objectid import ObjectId
 from netuse.database.execution import Execution
 from netuse.database.results import NetworkTrace
 
-def delete(execution_id):    
+def reset_execution(execution_id):    
     for req in NetworkTrace.objects(execution=execution_id):
         req.delete()
     
@@ -29,7 +29,7 @@ def main():
     if objID==None:
         raise Exception("A oid should be provided.")
     else:
-        delete(ObjectId(objID))
+        reset_execution(ObjectId(objID))
 
 
 if __name__ == '__main__':
