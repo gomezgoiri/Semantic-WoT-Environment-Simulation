@@ -155,7 +155,7 @@ class RawDataProcessor(object):
 
 
     def load_all(self):
-        for executionSet in ExecutionSet.objects(experiment_id='network_usage').get_simulated():
+        for executionSet in ExecutionSet.objects(experiment_id='energy_consumption').get_simulated():
             self._load(executionSet, DiagramGenerator.NB, Parametrization.negative_broadcasting)
             self._load(executionSet, DiagramGenerator.OURS_1C, Parametrization.our_solution, additionalFilter=lambda p: p.numConsumers==1)
             self._load(executionSet, DiagramGenerator.OURS_10C, Parametrization.our_solution, additionalFilter=lambda p: p.numConsumers==10)
