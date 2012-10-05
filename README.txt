@@ -31,7 +31,7 @@ To avoid downloading it, we mark the checkout as as not recursive (-N) and then 
      svn co https://dev.morelab.deusto.es/svn/aigomez/trunk/dataset/base_ontologies/ [localfolder]/base_ontologies
      svn co https://dev.morelab.deusto.es/svn/aigomez/trunk/dataset/data/ [localfolder]/data
 
-Then, create a simbolic link to point from ~/dev/dataset to the actual location of the dataset:
+Then, create a symbolic link to point from ~/dev/dataset to the actual location of the dataset:
      ln -s  path/[localfolder] ~/dev/dataset
 
 
