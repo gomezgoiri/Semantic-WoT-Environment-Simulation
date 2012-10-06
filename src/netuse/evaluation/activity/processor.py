@@ -6,6 +6,7 @@ Created on Sep 22, 2012
 
 import json
 import numpy
+from netuse.database.results import NetworkTrace
 from netuse.database.execution import ExecutionSet
 from netuse.database.parametrization import Parametrization
 from netuse.evaluation.number_requests.strategies.diagram import DiagramGenerator
@@ -142,7 +143,7 @@ class RawDataProcessor(object):
             if execution.parameters.strategy==strategy:
                 if additionalFilter==None or additionalFilter(execution.parameters):
                     num_nodes = len(execution.parameters.nodes) # in the reference of mongoengine, they defend this method
-                    activities = self._calculate_activity(execution.requests)
+                    activities = self._calculate_activity(NetworkTrace.objects(execution=execution.id))
                     activity_mean = numpy.mean(activities.values())
                     nodes_and_activity_means.append((num_nodes, activity_mean))
         
