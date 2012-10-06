@@ -76,7 +76,7 @@ class Node(Process):
     def canReason(self):
         return self.__device.canReason
     
-    def __init__(self, name="node", device=None, joined_since=1, sac=False, battery_lifetime='1d'):
+    def __init__(self, name="node", device=None, joined_since=1, sac=False, battery_lifetime=1):
         Process.__init__(self, name=name)
         self._ts = None
         self.__device = device if device!=None else RegularComputer() # device type 
