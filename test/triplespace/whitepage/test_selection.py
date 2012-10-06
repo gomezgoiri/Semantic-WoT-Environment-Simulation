@@ -2,6 +2,8 @@ import unittest
 import urllib
 from rdflib import URIRef
 from rdflib.Literal import Literal, _XSD_NS
+from netuse.nodes import Node
+from netuse.devices import DeviceType, XBee, SamsungGalaxyTab, FoxG20, Server
 from netuse.triplespace.network.discovery import DiscoveryRecord
 from netuse.triplespace.our_solution.whitepage.selection import WhitepageSelector
 
@@ -58,12 +60,23 @@ class WhitepageSelectorTestCase(unittest.TestCase):
         
     def test_filter_unsteady_nodes(self):
         filtered_nodes = WhitepageSelector._filter_unsteady_nodes(list(self.nodes)) # 500 nodes * (1KB * 1024) = at least 42MBs
-        expected = (self.nodes[0], self.nodes[1], self.nodes[2], self.nodes[3], self.nodes[5])
+        expected = (self.nodes[0], self.nodes[3])
         self.assertItemsEqual(filtered_nodes, expected)
 
     def test_select_whitepage_with_infinite_battery_candidates(self):        
         selected_node = WhitepageSelector.select_whitepage(self.nodes)
         self.assertEquals(self.nodes[2], selected_node)
+        
+    def test_select_with_real_devices(self):
+        candidates = []
+        
+        for _ in range(1): candidates.append( Node("server", DeviceType.create(Server.TYPE_ID)) )
+        for i in range(30): candidates.append( Node("galaxy_%d"%(i), DeviceType.create(SamsungGalaxyTab.TYPE_ID)) )
+        for i in range(69): candidates.append( Node("fox_%d"%(i), DeviceType.create(FoxG20.TYPE_ID)) )
+        for i in range(200): candidates.append( Node("xbee_%d"%(i), DeviceType.create(XBee.TYPE_ID)) )
+        
+        selected_node = WhitepageSelector.select_whitepage(candidates)
+        self.assertEquals("server", selected_node.name)
 
 
 if __name__ == '__main__':
