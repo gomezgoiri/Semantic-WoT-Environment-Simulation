@@ -8,11 +8,11 @@ class WhitepageSelector(object):
     @staticmethod
     def _zscores(elements): # to avoid importing the whole scipy
         std_dev = std(elements)
-        mean = std(elements)
+        meaN = mean(elements)
         
         zscores = []
         for e in elements:
-            zscores.append( (e-mean) / std_dev )
+            zscores.append( (e-meaN) / std_dev )
             
         return zscores
     
@@ -28,6 +28,8 @@ class WhitepageSelector(object):
             return 1024*1024*value
         elif unit=='GB':
             return 1024*1024*1024*value
+        elif unit=='TB':
+            return 1024*1024*1024*1024*value
         else:
             return value
     
