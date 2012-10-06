@@ -8,6 +8,7 @@ from netuse.nodes import NodeGenerator
 from netuse.activity import ActivityGenerator
 from netuse.evaluation.utils import ParametrizationUtils
 from netuse.database.parametrization import Parametrization
+from netuse.devices import XBee, SamsungGalaxyTab, FoxG20, Server
 
 # This script generates a simulation and records its trace in a file.
 # Used to check the functionalities under really simple simulation conditions.
@@ -58,13 +59,20 @@ if __name__ == '__main__':
     )
     temp = ((None, URIRef('http://www.deusto.es/fakepredicate'), None),)
     
+    numNodes = 300
+    # 1 server, 10% of galaxys, 25% of FoxG20
+    nodeTypes = (Server.TYPE_ID,)*1 + (SamsungGalaxyTab.TYPE_ID,)*((int)(numNodes*0.1)) + (FoxG20.TYPE_ID,)*((int)(numNodes*0.25))
+    # Remaining devices, are XBees
+    nodeTypes += (XBee.TYPE_ID,)*(numNodes-len(nodeTypes))
+    
     p = ParametrizationUtils('network_usage', G.dataset_path)
     param = p.getDefaultParametrization(Parametrization.our_solution,
                                    amountOfQueries = 100,
                                    writeFrequency = 10000,
                                    simulateUntil = 60000,
                                    queries = temp,
-                                   numNodes = 150,
-                                   numConsumers = 100
+                                   numNodes = numNodes,
+                                   numConsumers = 100,
+                                   nodeTypes = nodeTypes
                                    )
     performSimulation(param)
