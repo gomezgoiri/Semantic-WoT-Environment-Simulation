@@ -9,7 +9,7 @@ import numpy
 from netuse.database.results import NetworkTrace
 from netuse.database.execution import ExecutionSet
 from netuse.database.parametrization import Parametrization
-from netuse.evaluation.number_requests.strategies.diagram import DiagramGenerator
+from netuse.evaluation.activity.diagram import DiagramGenerator
 
 
 class RawDataProcessor(object):
@@ -107,7 +107,7 @@ class RawDataProcessor(object):
             self._merge_periods_and_add(activities[node_name], new_activity, overlaping)
     
     
-    def _calculate_activity(self, traces):
+    def _calculate_activity_per_node(self, traces):
         '''
         "traces" is a list of NetworkTrace instances.
         
@@ -124,43 +124,61 @@ class RawDataProcessor(object):
         for trace in traces:
             self._add_activity_period(temp, trace.client, trace.timestamp-trace.response_time, trace.timestamp)
             self._add_activity_period(temp, trace.server, trace.timestamp-trace.response_time, trace.timestamp)
-        
+        return temp
+    
+    def _calculate_activity_of_nodes(self, activity_per_node, node_names):
         # sort by num_nodes
         results = {}
         
-        for node_name, activity_periods in temp.iteritems():
-            busy_time = 0
-            for activity in activity_periods:
-                busy_time += (activity[1] - activity[0])
-            results[node_name] = busy_time
+        for node_name in node_names:
+            if node_name in activity_per_node:
+                busy_time = 0
+                for activity in activity_per_node[node_name]:
+                    busy_time += (activity[1] - activity[0])
+                results[node_name] = busy_time
             
-        return results
+        activity_mean = numpy.mean(results.values())
+        return activity_mean
+    
+    def _calculate_overall_activity(self, traces):
+        activity_per_node = self._calculate_activity_per_node(traces)
+        return self._calculate_activity_of_nodes(self._calculate_activity_per_node(traces), activity_per_node.iterkeys()) # all nodes
 
-
-    def _load(self, executionSet, name, strategy, additionalFilter=None):
-        nodes_and_activity_means = [] # tuples of 2 elements: number of nodes in the simulation and requests
+    def _load_nb(self, executionSet):
+        activity_mean = None
         for execution in executionSet.executions:
-            if execution.parameters.strategy==strategy:
-                if additionalFilter==None or additionalFilter(execution.parameters):
-                    num_nodes = len(execution.parameters.nodes) # in the reference of mongoengine, they defend this method
-                    activities = self._calculate_activity(NetworkTrace.objects(execution=execution.id))
-                    activity_mean = numpy.mean(activities.values())
-                    nodes_and_activity_means.append((num_nodes, activity_mean))
+            if execution.parameters.strategy==Parametrization.negative_broadcasting:
+                activity_mean = self._calculate_overall_activity(NetworkTrace.objects(execution=execution.id))
+                break
         
-        # sort by num_nodes
-        sort = sorted(nodes_and_activity_means)
-        
-        self.data[name] = {}
-        self.data[name][DiagramGenerator.NUM_NODES] = [e[0] for e in sort]
-        self.data[name][DiagramGenerator.REQUESTS] = [e[1] for e in sort]
-
+        self.data[DiagramGenerator.NB] = {}
+        self.data[DiagramGenerator.NB][DiagramGenerator.TOTAL] = activity_mean
+    
+    def _load_ours(self, executionSet):
+        self.data[DiagramGenerator.OURS] = {}
+                
+        for execution in executionSet.executions:
+            if execution.parameters.strategy==Parametrization.our_solution:
+                activity_per_node = self._calculate_activity_per_node(NetworkTrace.objects(execution=execution.id))
+                self.data[DiagramGenerator.OURS][DiagramGenerator.TOTAL] = self._calculate_activity_of_nodes(activity_per_node, activity_per_node.iterkeys()) # all nodes
+                
+                # for each type of device
+                node_names_by_device_type = {}
+                for nodeName, nodeType in zip(execution.parameters.nodes, execution.parameters.nodeTypes):
+                    if nodeType not in node_names_by_device_type:
+                        node_names_by_device_type[nodeType] = []
+                    node_names_by_device_type[nodeType].append(nodeName)
+                    
+                
+                for device_type, node_names in node_names_by_device_type.iteritems():
+                    self.data[DiagramGenerator.OURS][device_type] = self._calculate_activity_of_nodes(activity_per_node, node_names)
+                    
+                break
 
     def load_all(self):
         for executionSet in ExecutionSet.objects(experiment_id='energy_consumption').get_simulated():
-            self._load(executionSet, DiagramGenerator.NB, Parametrization.negative_broadcasting)
-            self._load(executionSet, DiagramGenerator.OURS_1C, Parametrization.our_solution, additionalFilter=lambda p: p.numConsumers==1)
-            self._load(executionSet, DiagramGenerator.OURS_10C, Parametrization.our_solution, additionalFilter=lambda p: p.numConsumers==10)
-            self._load(executionSet, DiagramGenerator.OURS_100C, Parametrization.our_solution, additionalFilter=lambda p: p.numConsumers==100)
+            self._load_nb(executionSet)
+            self._load_ours(executionSet)
             break # just one execution set
 
     def toJson(self):
@@ -171,8 +189,12 @@ class RawDataProcessor(object):
 def main():
     rdp = RawDataProcessor()
     rdp.load_all()
-    print rdp.toJson()
-
+    json_txt = rdp.toJson()
+    #print json_txt
+    
+    f = open('/tmp/activity_measures.json', 'w')
+    f.write(json_txt)
+    f.close()
 
 if __name__ == '__main__':
     main()
