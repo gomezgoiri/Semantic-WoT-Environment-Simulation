@@ -58,7 +58,7 @@ class ConsumerFactory(object):
         return WhitepageSelector._to_bytes(my_drecord.memory) > WhitepageSelector._to_bytes(WhitepageSelector.MEMORY_LIMIT)            
     
     @staticmethod
-    def createConsumerFor(discovery):
+    def createConsumer(discovery):
         if ConsumerFactory.canManageClues(discovery.me.discovery_record):
             return Consumer(discovery)
         else:

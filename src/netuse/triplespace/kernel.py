@@ -107,7 +107,7 @@ class OurSolution(TripleSpace):
     @schedule
     def query(self, template):
         if self.consumer==None:
-            self.consumer = ConsumerFactory.createConsumerFor(self.discovery) # change the discovery registry to set "sac" property
+            self.consumer = ConsumerFactory.createConsumer(self.discovery) # change the discovery registry to set "sac" property
         
         # remote queries
         qf = QueryFinisher(self.consumer, self.discovery, self.serialize_space_to_URL(), URLUtils.serialize_wildcard_to_URL(template))
