@@ -53,7 +53,7 @@ class NegativeBroadcasting(TripleSpace):
         # remote queries
         req = RequestInstance(self.discovery.me,
                               self.discovery.rest,
-                              '/' + self.fromSpaceToURL() + "query/" + self.URLUtils.fromTemplateToURL(template),
+                              '/' + self.serialize_space_to_URL() + "query/" + URLUtils.serialize_wildcard_to_URL(template),
                               name="queryAt"+str(now()))
         RequestManager.launchNormalRequest(req)
         
@@ -67,7 +67,7 @@ class Centralized(TripleSpace):
     def write(self, triples):
         if self.server is not None:
             req = RequestInstance(self.me, (self.server,),
-                                  '/' + self.fromSpaceToURL() + "graphs/",
+                                  '/' + self.serialize_space_to_URL() + "graphs/",
                                   data=triples.serialize(format='n3'),
                                   name="writeAt"+str(now()))
             RequestManager.launchNormalRequest(req)
@@ -75,7 +75,7 @@ class Centralized(TripleSpace):
     @schedule
     def query(self, template):
         req = RequestInstance(self.me, (self.server,),
-                              '/' + self.fromSpaceToURL() + "query/" + URLUtils.fromTemplateToURL(template),
+                              '/' + self.serialize_space_to_URL() + "query/" + URLUtils.serialize_wildcard_to_URL(template),
                               name="queryAt"+str(now()))
         
         RequestManager.launchNormalRequest(req)
@@ -110,7 +110,7 @@ class OurSolution(TripleSpace):
             self.consumer = Consumer(self.discovery) # change the discovery registry to set "sac" property
         
         # remote queries
-        qf = QueryFinisher(self.consumer, self.discovery, self.fromSpaceToURL(), URLUtils.fromTemplateToURL(template))
+        qf = QueryFinisher(self.consumer, self.discovery, self.serialize_space_to_URL(), URLUtils.serialize_wildcard_to_URL(template))
         # when I've tried to do it in the same class (qf = self), some of the activation weren't really activated
         # may be because a method of the same object cannot be used at the same simulation time?
         # In this case, when they overlap, the activation of _finish_query_waiting may be ignored when they overlap in time

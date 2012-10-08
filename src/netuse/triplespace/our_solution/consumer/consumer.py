@@ -3,16 +3,19 @@ Created on Sep 17, 2012
 
 @author: tulvur
 '''
-
+import json
 from abc import ABCMeta, abstractmethod
 from SimPy.Simulation import now
 from clueseval.clues.aggregated import ClueAggregation
+from netuse.triplespace.network.url_utils import URLUtils
 from netuse.triplespace.our_solution.clue_management import ClueStore
 from netuse.triplespace.our_solution.consumer.time_update import UpdateTimesManager
 from netuse.triplespace.our_solution.whitepage.selection import WhitepageSelectionManager, SelectionProcessObserver
 from netuse.triplespace.network.client import RequestInstance, RequestManager, RequestObserver
 
-class Consumer(SelectionProcessObserver):
+class AbstractConsumer(SelectionProcessObserver):
+    
+    __metaclass__ = ABCMeta
     
     def __init__(self, discovery):
         self.discovery = discovery
@@ -36,17 +39,33 @@ class Consumer(SelectionProcessObserver):
                 wsm.set_observer(self)
                 wsm.choose_whitepage()
         else:
-            if self.wp_node_name is None or self.wp_node_name!=wp.name:
-                self.wp_node_name = wp.name
-                if wp==self.discovery.me:
-                    self.connector = LocalConnector(self.discovery)
-                else:
-                    self.connector = RemoteConnector(self.discovery.me, wp)
+            self._update_connector(wp)
+    
+    @abstractmethod
+    def _update_connector(self, wp):
+        pass
                     
     def wp_selection_finished(self, wp_node):
         self.ongoing_selection = False
-        pass
         # TODO update the connector with the new selected white page
+
+class Consumer(AbstractConsumer):
+    def _update_connector(self, wp):
+        if self.wp_node_name is None or self.wp_node_name!=wp.name:
+            self.wp_node_name = wp.name
+            if wp==self.discovery.me:
+                self.connector = LocalConnector(self.discovery)
+            else:
+                self.connector = RemoteConnector(self.discovery.me, wp)
+
+class ConsumerLite(AbstractConsumer):
+    def _update_connector(self, wp):
+        if self.wp_node_name is None or self.wp_node_name!=wp.name:
+            self.wp_node_name = wp.name
+            if wp==self.discovery.me:
+                raise Exception("A lite consumer cannot be whitepage, check the selection algorithm.")
+            else:
+                self.connector = RemoteLiteConnector(self.discovery.me, wp)
 
 
 class AbstractConnector(object):
@@ -130,3 +149,51 @@ class RemoteConnector(AbstractConnector, RequestObserver):
             # wait until the clues are loaded for the first time
             raise Exception("Wait for the first clue loading.")
         return self.clues.get_query_candidates(template)
+
+
+
+class RemoteLiteConnector(AbstractConnector, RequestObserver):
+    
+    def __init__(self, me_as_node, whitepage_node):
+        self.me_as_node = me_as_node
+        self.whitepage_node = whitepage_node
+        self.responses = {}
+    
+    def _get_candidates_from_wp_request(self, templateURL):
+        req = RequestInstance(self.me_as_node, [self.whitepage_node], '/whitepage/clues/query/wildcards/%s'%(templateURL))
+        req.addObserver(self)
+        return req
+    
+    def notifyRequestFinished(self, request_instance):
+        for unique_response in request_instance.responses:
+            if unique_response.getstatus()==200:
+                # get the template URL requested
+                pattern = "/whitepage/clues/query/wildcards/"
+                path = unique_response.getpath()
+                pos = path.find(pattern) + len(pattern) # it could be len(pattern) since pattern will be always at the begining
+                templateURL = path[pos:]
+                
+                # parse a list of names (nodes)
+                list_candidates = json.loads(unique_response.getresponse())
+                self.responses[templateURL] = list_candidates
+                
+                break
+            else:
+                # TODO
+                # What has happened? How to solve it?
+                pass
+    
+    def get_query_candidates(self, template, previously_unsolved=False):
+        templateURL = URLUtils.serialize_wildcard_to_URL(template)
+        
+        if templateURL in self.responses.keys():
+            if self.responses[templateURL]==None:
+                raise Exception("Wait for the answer.")
+            else:
+                # take the response
+                candidates = self.responses[templateURL]
+                del self.responses[templateURL]
+                return candidates
+        else:
+            self.responses[templateURL] = None # create a slot to store the response later and warn that it's being requested until then
+            RequestManager.launchNormalRequest(self._get_candidates_from_wp_request(templateURL))
