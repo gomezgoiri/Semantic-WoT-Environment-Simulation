@@ -5,6 +5,8 @@ from netuse.triplespace.network.client import RequestInstance, RequestManager, R
 
 class WhitepageSelector(object):
     
+    MEMORY_LIMIT = (16,'MB') # e.g. say the limit is 16MB
+    
     @staticmethod
     def _zscores(elements): # to avoid importing the whole scipy
         std_dev = std(elements)
@@ -130,7 +132,7 @@ class WhitepageSelector(object):
         candidates = list(candidate_nodes)
         total_len = len(candidates)
         
-        candidates = WhitepageSelector._filter_less_memory_than(candidates, (16,'MB')) # e.g. say the limit is 16MB
+        candidates = WhitepageSelector._filter_less_memory_than(candidates, WhitepageSelector.MEMORY_LIMIT)
         candidates = WhitepageSelector._filter_less_storage_than(candidates, total_len)
         
         # Si hubiese nodos que tienen bateria a 1...
