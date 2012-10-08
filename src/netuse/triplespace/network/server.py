@@ -3,36 +3,35 @@ Created on Dec 13, 2011
 
 @author: tulvur
 '''
-import traceback
+import json
 import urllib
-from rdflib import Literal, URIRef
-from rdflib.Literal import _XSD_NS
-
+import traceback
 from clueseval.clues.node_attached import ClueWithNode
+from netuse.triplespace.network.url_utils import URLUtils 
 from netuse.triplespace.network.httpelements import HttpResponse
 
 class SpacesHandler(object):
     def __init__(self, stores):
-        self.stores      = stores
+        self.stores = stores
 
     def process_spaces(self, spaces_path, request=None):
         # Simple list of spaces:
         if spaces_path == '':
-            return (200, """Space list (not implemented)""", 'text/html')
+            return (200, """Space list (not implemented)""", CustomSimulationHandler.CONTENT_TYPES['html'])
 
         pos = spaces_path.find('/') 
         if pos >= 0:
-            quoted_space      = spaces_path[:pos]
+            quoted_space = spaces_path[:pos]
         else:
-            quoted_space      = spaces_path
+            quoted_space = spaces_path
 
         space = urllib.unquote(quoted_space)
         if not space in self.stores:
-            return (404, """Space not found""", 'text/html')
+            return (404, """Space not found""", CustomSimulationHandler.CONTENT_TYPES['html'])
 
         space_operation = spaces_path[len(quoted_space) + 1:] # + 1 for the last '/'
         if space_operation == '':
-            return (200, """Operations with space (not implemented)""", 'text/html')
+            return (200, """Operations with space (not implemented)""", CustomSimulationHandler.CONTENT_TYPES['html'])
 
         store = self.stores[space]
 
@@ -49,17 +48,17 @@ class SpacesHandler(object):
             graph_operation = operation[len('gossip/'):]
             return self.process_gossip_operation(store)
         
-        return (404, """Method not found""", 'text/html')
+        return (404, """Method not found""", CustomSimulationHandler.CONTENT_TYPES['html'])
     
     def process_graph_operation(self, store, graph_operation, request):
         if graph_operation == '':
             method = request.get_method()
             if method=='GET':
-                return (200, """Graph list (not implemented)""", 'text/html')
+                return (200, """Graph list (not implemented)""", CustomSimulationHandler.CONTENT_TYPES['html'])
             elif method=='POST':
                 actual_graph = request.get_data() # Graph().parse(StringIO.StringIO(request.get_data()), format='n3')
                 store.write(actual_graph)
-                return (200, """The graph was successfully written""", 'text/html')
+                return (200, """The graph was successfully written""", CustomSimulationHandler.CONTENT_TYPES['html'])
             # cannot be another method, urllib2 does not use them
         
         if graph_operation.find('/') >= 0:
@@ -70,7 +69,7 @@ class SpacesHandler(object):
         # Retrieve the graph
         if quoted_graph_uri == 'wildcards':
             wildcard_str = graph_operation[len('wildcards/'):]
-            wildcard = self.parse_wildcard(wildcard_str)
+            wildcard = URLUtils.parse_wildcard_url(wildcard_str)
             graph = store.read_wildcard(*wildcard)
         else: # We have an URI
             graph_uri = urllib.unquote(quoted_graph_uri)
@@ -80,7 +79,7 @@ class SpacesHandler(object):
     
     def process_query_operation(self, store, graph_operation):
         if graph_operation == '':
-            return (200, """Graph list (not implemented)""", 'text/html')
+            return (200, """Graph list (not implemented)""", CustomSimulationHandler.CONTENT_TYPES['html'])
         
         if graph_operation.find('/') >= 0:
             quoted_graph_uri = graph_operation[:graph_operation.find('/')]
@@ -90,63 +89,22 @@ class SpacesHandler(object):
         # Retrieve the graph
         if quoted_graph_uri == 'wildcards':
             wildcard_str = graph_operation[len('wildcards/'):]
-            wildcard = self.parse_wildcard(wildcard_str)
+            wildcard = URLUtils.parse_wildcard_url(wildcard_str)
             graph = store.query_wildcard(*wildcard)
             return self.process_graph(graph)
         
-        return (404, """Method not found""", 'text/html')
+        return (404, """Method not found""", CustomSimulationHandler.CONTENT_TYPES['html'])
     
     def process_gossip_operation(self, store):
         gossip = store.get_gossip()
         if gossip==None:
-            return (404, """Nothing to gossip""", 'text/html')
+            return (404, """Nothing to gossip""", CustomSimulationHandler.CONTENT_TYPES['html'])
         else:
-            return (200, gossip.serializeToJson(), 'application/json')
-
-    def parse_wildcard(self, wildcard_str):
-        wildcard_tokens = wildcard_str.split('/')
-        if len(wildcard_tokens) == 4 and wildcard_tokens[3]!='': # With type
-            xsd_type  = wildcard_tokens[2]
-            str_value = wildcard_tokens[3]
-            if xsd_type == 'xsd:float':
-                o = Literal(str_value, datatype=_XSD_NS.float)
-            elif xsd_type == 'xsd:double':
-                o = Literal(str_value, datatype=_XSD_NS.double)
-            elif xsd_type == 'xsd:int':
-                o = Literal(str_value, datatype=_XSD_NS.int)
-            elif xsd_type == 'xsd:integer':
-                o = Literal(str_value, datatype=_XSD_NS.integer)
-            elif xsd_type == 'xsd:long':
-                o = Literal(str_value, datatype=_XSD_NS.long)
-            elif xsd_type == 'xsd:boolean':
-                o = Literal(str_value, datatype=_XSD_NS.boolean)
-            elif xsd_type == 'xsd:string':
-                o = Literal(str_value, datatype=_XSD_NS.string)
-            else:
-                raise Exception("Unsupported xsd type: %s" % xsd_type)
-        elif len(wildcard_tokens) == 3 or (len(wildcard_tokens) == 4 and wildcard_tokens[3]==''): # With uri
-            o = urllib.unquote(wildcard_tokens[2])
-            if o == '*':
-                o = None
-            else: o = URIRef(o)
-        else:
-            raise Exception("Malformed wildcard: %s"  % wildcard_str)
-
-        s = urllib.unquote(wildcard_tokens[0])
-        if s == '*':
-            s = None
-        else: s = URIRef(s)
-        
-        p = urllib.unquote(wildcard_tokens[1])
-        if p == '*':
-            p = None
-        else: p = URIRef(p)
-
-        return (s, p, o)
+            return (200, gossip.serializeToJson(), CustomSimulationHandler.CONTENT_TYPES['json'])
 
     def process_graph(self, graph):
         if graph is None:
-            return (404, """Graph not found""", 'text/html')
+            return (404, """Graph not found""", CustomSimulationHandler.CONTENT_TYPES['html'])
         
         ntriples = graph.serialize(format='n3') # or nt, n3, owl...
 
@@ -164,12 +122,12 @@ class WhitepageHandler(object):
             if method=='POST':
                 # set as whitepage
                 self.tskernel.be_whitepage()
-                return (200, """TODO JSON""", 'application/json')
+                return (200, """TODO JSON""", CustomSimulationHandler.CONTENT_TYPES['json'])
             
         elif wp_path.startswith('clues'):
             
             if self.tskernel.whitepage==None:
-                return (501, "Not Implemented", 'text/plain')
+                return (501, "Not Implemented", CustomSimulationHandler.CONTENT_TYPES['plain'])
             
             clues_path = wp_path[len('clues/'):]  #to offer individual access to the clues?
             method = request.get_method()
@@ -177,23 +135,34 @@ class WhitepageHandler(object):
             if len(clues_path)==0:
                 if method=='GET':
                     aggregated_clues = self.tskernel.whitepage.get_aggregated_clues_json()
-                    return (200, aggregated_clues, 'application/json') if aggregated_clues!=None else (404, "No clues in this node.", '')
+                    return (200, aggregated_clues, CustomSimulationHandler.CONTENT_TYPES['json']) if aggregated_clues!=None else (404, "No clues in this node.", '')
                 else:
-                    return (405, "Method not allowed", 'text/plain')
+                    return (405, "Method not allowed", CustomSimulationHandler.CONTENT_TYPES['plain'])
             else: #to offer individual access to the clues, to allow their update or creation
                 if method=='POST':
                     node_id = clues_path[:-1] if clues_path.endswith('/') else clues_path
                     clueWN = ClueWithNode()
                     clueWN.parseJson(request.get_data()) # we already know the node_id, but we could get from clueWN also
                     self.tskernel.whitepage.add_clue(node_id, clueWN.clue)
-                    return (200, "The clue was successfully updated", 'text/html')
+                    return (200, "The clue was successfully updated", CustomSimulationHandler.CONTENT_TYPES['html'])
                 else:
-                    return (405, "Method not allowed", 'text/plain')
+                    if clues_path.startswith('query/wildcards/'):
+                        wildcard_str = clues_path[len('query/wildcards/'):]
+                        wildcard = URLUtils.parse_wildcard_url(wildcard_str)
+                        candidates = self.tskernel.whitepage.get_query_candidates(wildcard)
+                        return (200, json.dumps(candidates), CustomSimulationHandler.CONTENT_TYPES['json'])
+                    else: # FUTURE access to individual clues
+                        return (405, "Method not allowed", CustomSimulationHandler.CONTENT_TYPES['plain'])
             
-        return (404, """Not found.""", 'text/html')
+        return (404, """Not found.""", CustomSimulationHandler.CONTENT_TYPES['html'])
 
 
 class CustomSimulationHandler(object):
+    
+    CONTENT_TYPES = {'html': 'text/html',
+                     'json': 'application/json',
+                     'plain': 'text/plain'
+                     }
     
     def __init__(self, tskernel):
         self.tskernel = tskernel
@@ -207,7 +176,7 @@ class CustomSimulationHandler(object):
                 return spaces_handler.process_spaces(spaces_path, request)
             except Exception, e:
                 traceback.print_exc()
-                return (500, "Error: %s" % e, 'text/html')
+                return (500, "Error: %s" % e, CustomSimulationHandler.CONTENT_TYPES['html'])
         elif path.startswith('/prefixes'):
             print "prefixes..."
         elif path.startswith('/whitepage'):
@@ -216,10 +185,10 @@ class CustomSimulationHandler(object):
                 whitepage_handler = WhitepageHandler(self.tskernel)
                 return whitepage_handler.process_whitepage(whitepage_path, request)
             
-        return (404, "Not found", 'text/plain')
+        return (404, "Not found", CustomSimulationHandler.CONTENT_TYPES['plain'])
     
     def _not_handle(self):
-        return (503, "Service Unavailable: server overload.", 'text/plain')
+        return (503, "Service Unavailable: server overload.", CustomSimulationHandler.CONTENT_TYPES['plain'])
     
     def handle(self, request, overload=False):
         status, response, content_type = self._not_handle() if overload else self._handleRequest(request)
