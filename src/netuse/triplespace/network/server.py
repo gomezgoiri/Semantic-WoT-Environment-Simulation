@@ -44,9 +44,6 @@ class SpacesHandler(object):
         if operation.startswith('query'):
             graph_operation = operation[len('query/'):]
             return self.process_query_operation(store, graph_operation)
-        if operation.startswith('gossip'):
-            graph_operation = operation[len('gossip/'):]
-            return self.process_gossip_operation(store)
         
         return (404, """Method not found""", CustomSimulationHandler.CONTENT_TYPES['html'])
     
@@ -94,13 +91,6 @@ class SpacesHandler(object):
             return self.process_graph(graph)
         
         return (404, """Method not found""", CustomSimulationHandler.CONTENT_TYPES['html'])
-    
-    def process_gossip_operation(self, store):
-        gossip = store.get_gossip()
-        if gossip==None:
-            return (404, """Nothing to gossip""", CustomSimulationHandler.CONTENT_TYPES['html'])
-        else:
-            return (200, gossip.serializeToJson(), CustomSimulationHandler.CONTENT_TYPES['json'])
 
     def process_graph(self, graph):
         if graph is None:
@@ -149,7 +139,7 @@ class WhitepageHandler(object):
                     if clues_path.startswith('query/wildcards/'):
                         wildcard_str = clues_path[len('query/wildcards/'):]
                         wildcard = URLUtils.parse_wildcard_url(wildcard_str)
-                        candidates = self.tskernel.whitepage.get_query_candidates(wildcard)
+                        candidates = list(self.tskernel.whitepage.get_query_candidates(wildcard)) # to convert from set to list
                         return (200, json.dumps(candidates), CustomSimulationHandler.CONTENT_TYPES['json'])
                     else: # FUTURE access to individual clues
                         return (405, "Method not allowed", CustomSimulationHandler.CONTENT_TYPES['plain'])

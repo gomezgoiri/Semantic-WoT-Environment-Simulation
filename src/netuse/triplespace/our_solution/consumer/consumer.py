@@ -55,7 +55,7 @@ class ConsumerFactory(object):
     def canManageClues(my_drecord):
         # really naive condition
         # TODO enhance and take into account selection module
-        return WhitepageSelector._to_bytes(my_drecord.memory) > WhitepageSelector._to_bytes(WhitepageSelector.MEMORY_LIMIT)            
+        return WhitepageSelector._to_bytes(*my_drecord.memory) > WhitepageSelector._to_bytes(*WhitepageSelector.MEMORY_LIMIT)            
     
     @staticmethod
     def createConsumer(discovery):
@@ -175,7 +175,7 @@ class RemoteLiteConnector(AbstractConnector, RequestObserver):
         self.responses = {}
     
     def _get_candidates_from_wp_request(self, templateURL):
-        req = RequestInstance(self.me_as_node, [self.whitepage_node], '/whitepage/clues/query/wildcards/%s'%(templateURL))
+        req = RequestInstance(self.me_as_node, [self.whitepage_node], '/whitepage/clues/query/%s'%(templateURL))
         req.addObserver(self)
         return req
     
@@ -183,13 +183,13 @@ class RemoteLiteConnector(AbstractConnector, RequestObserver):
         for unique_response in request_instance.responses:
             if unique_response.getstatus()==200:
                 # get the template URL requested
-                pattern = "/whitepage/clues/query/wildcards/"
-                path = unique_response.getpath()
+                pattern = "/whitepage/clues/query/"
+                path = unique_response.get_data()
                 pos = path.find(pattern) + len(pattern) # it could be len(pattern) since pattern will be always at the begining
                 templateURL = path[pos:]
                 
                 # parse a list of names (nodes)
-                list_candidates = json.loads(unique_response.getresponse())
+                list_candidates = json.loads(unique_response.get_data())
                 self.responses[templateURL] = list_candidates
                 
                 break
