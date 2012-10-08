@@ -138,7 +138,8 @@ class QueryFinisher(Process, RequestObserver):
             except Exception as e:
                 #print "Waiting for a whitepage.", e.args[0]
                 attempts -= 1
-            yield hold, self, 100
+            if selected_nodes==None and attempts>0:
+                yield hold, self, 100
             
         if attempts==0:
             # somehow record this failure
