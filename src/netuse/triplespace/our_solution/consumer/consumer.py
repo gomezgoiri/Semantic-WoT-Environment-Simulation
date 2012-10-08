@@ -184,7 +184,7 @@ class RemoteLiteConnector(AbstractConnector, RequestObserver):
             if unique_response.getstatus()==200:
                 # get the template URL requested
                 pattern = "/whitepage/clues/query/"
-                path = unique_response.get_data()
+                path = unique_response.geturl()
                 pos = path.find(pattern) + len(pattern) # it could be len(pattern) since pattern will be always at the begining
                 templateURL = path[pos:]
                 
