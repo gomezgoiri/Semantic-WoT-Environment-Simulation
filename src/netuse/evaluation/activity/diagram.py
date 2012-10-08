@@ -86,7 +86,6 @@ class DiagramGenerator:
         ind = range(1, len(elements)+1) # the x locations for the groups
         width = 0.5       # the width of the bars
         
-        print elements.values()
         ax.bar( ind,
                 elements.values(),
                 width, color=self.colors.next())
