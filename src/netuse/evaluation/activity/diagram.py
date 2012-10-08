@@ -29,8 +29,7 @@ class DiagramGenerator:
         }
       }
     '''
-    def __init__(self, title, data):
-        self.title = title
+    def __init__(self, data):
         self.xlabel = 'Number of nodes'
         self.ylabel = 'active time / node'
         self.colors =  cycle(('r','y','g'))
@@ -118,17 +117,17 @@ def mainTest():
     json_txt = json_txt.replace('\n','')
     json_txt = json_txt.replace('\t','')
     
-    d = DiagramGenerator("Roles on the network use", eval(json_txt))
+    d = DiagramGenerator(eval(json_txt))
     d.save('/tmp/test_diagram.pdf')
 
 def main():    
-    f = open('/tmp/requests_by_roles.json', 'r')
+    f = open('/tmp/activity_measures.json', 'r')
     json_txt = f.read()
     f.close()
     
-    d = DiagramGenerator("Roles on the network use", eval(json_txt))
-    d.save('/tmp/requests_by_roles.pdf')
+    d = DiagramGenerator(eval(json_txt))
+    d.save('/tmp/activity_measures.pdf')
 
 
 if __name__ == '__main__':   
-    mainTest()
+    main()
