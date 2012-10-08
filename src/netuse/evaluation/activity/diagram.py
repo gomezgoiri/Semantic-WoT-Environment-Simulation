@@ -14,31 +14,18 @@ class DiagramGenerator:
     OURS = 'ours'
     NB = 'nb'
     TOTAL = 'total'
-    WHITE_PAGES = 'white_pages'
-    CONSUMERS = 'consumers'
-    PROVIDERS = 'providers'
-    ACTIVE_TIME = 'active_time'
     
     '''
       {
         'ours': {
-             'total': {
-                 'active_time': 120
-             },
-             'white_pages': {
-                 'active_time': 320
-             },
-            'consumers': {
-                'active_time': 420
-             },
-            'providers': {
-                'active_time': 510
-             }
+             'total': 120,
+             'dev1': 320,
+             'dev2': 420,
+             ...,
+             'devn': 510
          },
         'nb': {
-            'total': {
-                'active_time': 320
-            }
+            'total': 320
         }
       }
     '''
@@ -65,7 +52,7 @@ class DiagramGenerator:
         self.generate_subplot_strategy_comparison(ax1, data)
         
         ax2 = fig.add_subplot(1,2,2)
-        self.generate_subplot_ours_roles_comparison(ax2, data)
+        self.generate_subplot_ours_device_comparison(ax2, data)
         
         if ax1.get_ylim()>ax2.get_ylim():
             ax2.set_ylim(ax1.get_ylim())
@@ -81,29 +68,31 @@ class DiagramGenerator:
         width = 0.5       # the width of the bars
         
         ax.bar( ind,
-                (data[DiagramGenerator.NB][DiagramGenerator.TOTAL][DiagramGenerator.ACTIVE_TIME],
-                 data[DiagramGenerator.OURS][DiagramGenerator.TOTAL][DiagramGenerator.ACTIVE_TIME]),
+                (data[DiagramGenerator.NB][DiagramGenerator.TOTAL],
+                 data[DiagramGenerator.OURS][DiagramGenerator.TOTAL]),
                width, color=self.colors.next())
         plt.xticks([i+width/2 for i in ind ], ('nb', 'ours') )
         
         ax.set_xlim(0.5,3)
         ax.set_ylim(0)
-        
-    def generate_subplot_ours_roles_comparison(self, ax, data):        
-        plt.xlabel("Roles in our solution")
+    
+    def generate_subplot_ours_device_comparison(self, ax, data):        
+        plt.xlabel("Types of devices")
         plt.ylabel(self.ylabel)
         
-        ind = (1,2,3)  # the x locations for the groups
+        elements = dict(data[DiagramGenerator.OURS])
+        del elements[DiagramGenerator.TOTAL]
+        
+        ind = range(1, len(elements)+1) # the x locations for the groups
         width = 0.5       # the width of the bars
         
+        print elements.values()
         ax.bar( ind,
-                (data[DiagramGenerator.OURS][DiagramGenerator.WHITE_PAGES][DiagramGenerator.ACTIVE_TIME],
-                 data[DiagramGenerator.OURS][DiagramGenerator.CONSUMERS][DiagramGenerator.ACTIVE_TIME],
-                 data[DiagramGenerator.OURS][DiagramGenerator.PROVIDERS][DiagramGenerator.ACTIVE_TIME]),
-                 width, color=self.colors.next())
-        plt.xticks([i+width/2 for i in ind ], ('WP', 'Cons.', 'Prov.') )
+                elements.values(),
+                width, color=self.colors.next())
+        plt.xticks([i+width/2 for i in ind], elements.keys() )
         
-        ax.set_xlim(0.5,4)
+        ax.set_xlim(0.5, len(elements)+1)
         ax.set_ylim(0)
     
     def show(self):
@@ -116,23 +105,13 @@ class DiagramGenerator:
 def mainTest():
     json_txt = '''{
         'ours': {
-             'total': {
-                 'active_time': 120
-             },
-             'white_pages': {
-                 'active_time': 320
-             },
-            'consumers': {
-                'active_time': 420
-             },
-            'providers': {
-                'active_time': 510
-             }
+             'total': 120,
+             'dev1': 320,
+             'dev2': 420,
+             'dev3': 510
          },
         'nb': {
-            'total': {
-                'active_time': 320
-            }
+            'total': 320
         }
     }
     '''
