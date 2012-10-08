@@ -197,3 +197,4 @@ class RemoteLiteConnector(AbstractConnector, RequestObserver):
         else:
             self.responses[templateURL] = None # create a slot to store the response later and warn that it's being requested until then
             RequestManager.launchNormalRequest(self._get_candidates_from_wp_request(templateURL))
+            return None # waiting for it
