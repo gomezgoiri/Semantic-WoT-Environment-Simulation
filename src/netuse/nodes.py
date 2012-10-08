@@ -17,6 +17,8 @@ class NodeGenerator:
     
     def generateNodes(self):
         if not self.__params.nodeTypes:
+            # With ParametrizationUtils this condition will never be true
+            # TODO remove after fully checking that nobody else generates Parametrization documents
             for nodeName in self.__params.nodes:
                 node = Node(nodeName)
                 NodeGenerator.Nodes[nodeName] = node
