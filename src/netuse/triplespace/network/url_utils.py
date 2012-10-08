@@ -13,7 +13,7 @@ from netuse.results import G
 
 class URLUtils:
     @staticmethod
-    def fromTemplateToURL(template):
+    def serialize_wildcard_to_URL(template):
         s = template[0]
         p = template[1]
         o = template[2]
@@ -39,7 +39,7 @@ class URLUtils:
         return ret
     
     @staticmethod
-    def fromSpaceToURL(space=G.defaultSpace):
+    def serialize_space_to_URL(space=G.defaultSpace):
         return 'spaces/' + urllib.quote_plus(space) + '/'
     
     @staticmethod
