@@ -5,17 +5,14 @@ Created on Dec 12, 2011
 '''
 from abc import abstractmethod, ABCMeta
 from netuse.sim_utils import schedule
-import urllib
-from rdflib import URIRef
-from rdflib.Literal import Literal
-
 from SimPy.Simulation import now, Process, activate, hold
-from netuse.results import G
+
 from netuse.nodes import NodeGenerator
 from netuse.triplespace.our_solution.whitepage.whitepage import Whitepage
 from netuse.triplespace.our_solution.provider.provider import Provider
 from netuse.triplespace.our_solution.consumer.consumer import Consumer
 from netuse.triplespace.dataaccess.store import DataAccess
+from netuse.triplespace.network.url_utils import URLUtils
 from netuse.triplespace.network.server import CustomSimulationHandler
 from netuse.triplespace.network.client import RequestManager, RequestInstance, RequestObserver
 
@@ -39,34 +36,7 @@ class TripleSpace(object):
     @abstractmethod
     def query(self, template):
         pass
-    
-    def fromTemplateToURL(self, template):
-        s = template[0]
-        p = template[1]
-        o = template[2]
-        
-        ret = 'wildcards/'
-        
-        ret += urllib.quote_plus(s) if s!=None else '*'
-        ret += '/'
-        ret += urllib.quote_plus(p) if p!=None else '*'
-        ret += '/'
-        
-        if o is None:
-            ret += '*/'
-        elif isinstance(o, URIRef):
-            ret += urllib.quote_plus(o)
-            ret += '/'
-        elif isinstance(o, Literal):
-            ret += urllib.quote_plus(o.datatype)
-            ret += '/'
-            ret += urllib.quote(o) # or o.toPython()
-            ret += '/'
-            
-        return ret
-    
-    def fromSpaceToURL(self, space=G.defaultSpace):
-        return 'spaces/' + urllib.quote_plus(space) + '/'
+
 
 class NegativeBroadcasting(TripleSpace):
     def __init__(self, discovery):
@@ -83,7 +53,7 @@ class NegativeBroadcasting(TripleSpace):
         # remote queries
         req = RequestInstance(self.discovery.me,
                               self.discovery.rest,
-                              '/' + self.fromSpaceToURL() + "query/" + self.fromTemplateToURL(template),
+                              '/' + self.fromSpaceToURL() + "query/" + self.URLUtils.fromTemplateToURL(template),
                               name="queryAt"+str(now()))
         RequestManager.launchNormalRequest(req)
         
@@ -105,7 +75,7 @@ class Centralized(TripleSpace):
     @schedule
     def query(self, template):
         req = RequestInstance(self.me, (self.server,),
-                              '/' + self.fromSpaceToURL() + "query/" + self.fromTemplateToURL(template),
+                              '/' + self.fromSpaceToURL() + "query/" + URLUtils.fromTemplateToURL(template),
                               name="queryAt"+str(now()))
         
         RequestManager.launchNormalRequest(req)
@@ -140,7 +110,7 @@ class OurSolution(TripleSpace):
             self.consumer = Consumer(self.discovery) # change the discovery registry to set "sac" property
         
         # remote queries
-        qf = QueryFinisher(self.consumer, self.discovery, self.fromSpaceToURL(), self.fromTemplateToURL(template))
+        qf = QueryFinisher(self.consumer, self.discovery, self.fromSpaceToURL(), URLUtils.fromTemplateToURL(template))
         # when I've tried to do it in the same class (qf = self), some of the activation weren't really activated
         # may be because a method of the same object cannot be used at the same simulation time?
         # In this case, when they overlap, the activation of _finish_query_waiting may be ignored when they overlap in time
