@@ -49,6 +49,15 @@ class AbstractConsumer(SelectionProcessObserver):
         self.ongoing_selection = False
         # TODO update the connector with the new selected white page
 
+class ConsumerFactory(object):
+    
+    def createConsumerFor(self, discovery):
+        # self.discovery.me.discovery_record
+        if True:
+            return Consumer(discovery)
+        else:
+            return ConsumerLite(discovery)
+
 class Consumer(AbstractConsumer):
     def _update_connector(self, wp):
         if self.wp_node_name is None or self.wp_node_name!=wp.name:

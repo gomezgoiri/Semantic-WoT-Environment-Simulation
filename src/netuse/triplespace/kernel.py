@@ -10,7 +10,7 @@ from SimPy.Simulation import now, Process, activate, hold
 from netuse.nodes import NodeGenerator
 from netuse.triplespace.our_solution.whitepage.whitepage import Whitepage
 from netuse.triplespace.our_solution.provider.provider import Provider
-from netuse.triplespace.our_solution.consumer.consumer import Consumer
+from netuse.triplespace.our_solution.consumer.consumer import ConsumerFactory
 from netuse.triplespace.dataaccess.store import DataAccess
 from netuse.triplespace.network.url_utils import URLUtils
 from netuse.triplespace.network.server import CustomSimulationHandler
@@ -107,7 +107,7 @@ class OurSolution(TripleSpace):
     @schedule
     def query(self, template):
         if self.consumer==None:
-            self.consumer = Consumer(self.discovery) # change the discovery registry to set "sac" property
+            self.consumer = ConsumerFactory.createConsumerFor(self.discovery) # change the discovery registry to set "sac" property
         
         # remote queries
         qf = QueryFinisher(self.consumer, self.discovery, self.serialize_space_to_URL(), URLUtils.serialize_wildcard_to_URL(template))
