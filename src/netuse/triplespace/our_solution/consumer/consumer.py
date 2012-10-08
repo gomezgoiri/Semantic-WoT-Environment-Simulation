@@ -10,7 +10,7 @@ from clueseval.clues.aggregated import ClueAggregation
 from netuse.triplespace.network.url_utils import URLUtils
 from netuse.triplespace.our_solution.clue_management import ClueStore
 from netuse.triplespace.our_solution.consumer.time_update import UpdateTimesManager
-from netuse.triplespace.our_solution.whitepage.selection import WhitepageSelectionManager, SelectionProcessObserver
+from netuse.triplespace.our_solution.whitepage.selection import WhitepageSelector, WhitepageSelectionManager, SelectionProcessObserver
 from netuse.triplespace.network.client import RequestInstance, RequestManager, RequestObserver
 
 class AbstractConsumer(SelectionProcessObserver):
@@ -51,9 +51,15 @@ class AbstractConsumer(SelectionProcessObserver):
 
 class ConsumerFactory(object):
     
-    def createConsumerFor(self, discovery):
-        # self.discovery.me.discovery_record
-        if True:
+    @staticmethod
+    def canManageClues(my_drecord):
+        # really naive condition
+        # TODO enhance and take into account selection module
+        return WhitepageSelector._to_bytes(my_drecord.memory) > WhitepageSelector._to_bytes(WhitepageSelector.MEMORY_LIMIT)            
+    
+    @staticmethod
+    def createConsumerFor(discovery):
+        if ConsumerFactory.canManageClues(discovery.me.discovery_record):
             return Consumer(discovery)
         else:
             return ConsumerLite(discovery)
