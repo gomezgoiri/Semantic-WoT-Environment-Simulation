@@ -154,13 +154,13 @@ class RawDataProcessor(object):
         self.data[DiagramGenerator.NB] = {}
         self.data[DiagramGenerator.NB][DiagramGenerator.TOTAL] = activity_mean
     
-    def _load_ours(self, executionSet):
-        self.data[DiagramGenerator.OURS] = {}
+    def _load_strat(self, executionSet, strategy, key):
+        self.data[key] = {}
                 
         for execution in executionSet.executions:
-            if execution.parameters.strategy==Parametrization.our_solution:
+            if execution.parameters.strategy==strategy:
                 activity_per_node = self._calculate_activity_per_node(NetworkTrace.objects(execution=execution.id))
-                self.data[DiagramGenerator.OURS][DiagramGenerator.TOTAL] = self._calculate_activity_of_nodes(activity_per_node, activity_per_node.iterkeys()) # all nodes
+                self.data[key][DiagramGenerator.TOTAL] = self._calculate_activity_of_nodes(activity_per_node, activity_per_node.iterkeys()) # all nodes
                 
                 # for each type of device
                 node_names_by_device_type = {}
@@ -171,14 +171,14 @@ class RawDataProcessor(object):
                     
                 
                 for device_type, node_names in node_names_by_device_type.iteritems():
-                    self.data[DiagramGenerator.OURS][device_type] = self._calculate_activity_of_nodes(activity_per_node, node_names)
+                    self.data[key][device_type] = self._calculate_activity_of_nodes(activity_per_node, node_names)
                     
                 break
 
     def load_all(self):
         for executionSet in ExecutionSet.objects(experiment_id='energy_consumption').get_simulated():
-            self._load_nb(executionSet)
-            self._load_ours(executionSet)
+            self._load_strat(executionSet, Parametrization.negative_broadcasting, DiagramGenerator.NB)
+            self._load_strat(executionSet, Parametrization.our_solution, DiagramGenerator.OURS)
             break # just one execution set
 
     def toJson(self):

@@ -51,7 +51,7 @@ class DiagramGenerator:
         self.generate_subplot_strategy_comparison(ax1, data)
         
         ax2 = fig.add_subplot(1,2,2)
-        self.generate_subplot_ours_device_comparison(ax2, data)
+        self.generate_subplot_device_comparison(ax2, data)
         
         if ax1.get_ylim()>ax2.get_ylim():
             ax2.set_ylim(ax1.get_ylim())
@@ -75,22 +75,35 @@ class DiagramGenerator:
         ax.set_xlim(0.5,3)
         ax.set_ylim(0)
     
-    def generate_subplot_ours_device_comparison(self, ax, data):        
+    def generate_subplot_device_comparison(self, ax, data):        
         plt.xlabel("Types of devices")
         plt.ylabel(self.ylabel)
         
-        elements = dict(data[DiagramGenerator.OURS])
-        del elements[DiagramGenerator.TOTAL]
+        elements_ours = dict(data[DiagramGenerator.OURS])
+        del elements_ours[DiagramGenerator.TOTAL]
+        elements_nb = dict(data[DiagramGenerator.NB])
+        del elements_nb[DiagramGenerator.TOTAL]
         
-        ind = range(1, len(elements)+1) # the x locations for the groups
-        width = 0.5       # the width of the bars
+        ind = range(1, len(elements_ours)+1) # the x locations for the groups
+        width = 0.3       # the width of the bars
         
         ax.bar( ind,
-                elements.values(),
-                width, color=self.colors.next())
-        plt.xticks([i+width/2 for i in ind], elements.keys() )
+                elements_ours.values(),
+                width, color=self.colors.next(),
+                label=DiagramGenerator.OURS
+                )
+        ax.bar( [i+width for i in ind],
+                elements_nb.values(),
+                width, color=self.colors.next(),
+                label=DiagramGenerator.NB
+                )
+        plt.xticks( [i+width for i in ind], elements_ours.keys())
         
-        ax.set_xlim(0.5, len(elements)+1)
+        handles, labels = ax.get_legend_handles_labels()
+        #ax.legend(handles[::-1], labels[::-1]) # reverse the order
+        ax.legend(handles, labels, loc="upper left")
+        
+        ax.set_xlim(0.5, len(elements_ours)+1)
         ax.set_ylim(0)
     
     def show(self):
