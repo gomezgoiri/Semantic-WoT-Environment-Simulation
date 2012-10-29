@@ -3,6 +3,7 @@ Created on Jan 2, 2012
 
 @author: tulvur
 '''
+import shutil
 from tempfile import mkdtemp
 from SimPy.Simulation import random
 from netuse.tracers import MongoDBTracer #FileTracer
@@ -19,7 +20,7 @@ class G:  # global variables
     
     @staticmethod
     def setNewExecution(execution, tracer=None):
-        temporary_path = mkdtemp(prefix="/tmp/exec_")
+        G.temporary_path = mkdtemp(prefix="/tmp/exec_")
         
         # G._tracer = FileTracer('/tmp/workfile')
         G._tracer = MongoDBTracer(execution) if tracer==None else tracer
@@ -34,3 +35,4 @@ class G:  # global variables
     @staticmethod
     def shutdown():
         G._tracer.stop()
+        shutil.rmtree(G.temporary_path)

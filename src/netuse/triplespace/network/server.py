@@ -6,7 +6,6 @@ Created on Dec 13, 2011
 import json
 import urllib
 import traceback
-from clueseval.clues.node_attached import ClueWithNode
 from netuse.triplespace.network.url_utils import URLUtils 
 from netuse.triplespace.network.httpelements import HttpResponse
 
@@ -131,9 +130,7 @@ class WhitepageHandler(object):
             else: #to offer individual access to the clues, to allow their update or creation
                 if method=='POST':
                     node_id = clues_path[:-1] if clues_path.endswith('/') else clues_path
-                    clueWN = ClueWithNode()
-                    clueWN.parseJson(request.get_data()) # we already know the node_id, but we could get from clueWN also
-                    self.tskernel.whitepage.add_clue(node_id, clueWN.clue)
+                    self.tskernel.whitepage.add_clue(node_id, request.get_data())
                     return (200, "The clue was successfully updated", CustomSimulationHandler.CONTENT_TYPES['html'])
                 else:
                     if clues_path.startswith('query/wildcards/'):

@@ -72,6 +72,7 @@ class SQLiteClueStore(AbstractStore):
         cur = self.conn.execute(SQLiteClueStore._SELECT_SCHEMA + " where uri=:uri", {"uri": URI}) 
         stored_name = cur.fetchone()
         if stored_name==None:
+            print name
             self.conn.execute(SQLiteClueStore._INSERT_SCHEMA, (name, URI))
             self.conn.commit()
         else:

@@ -6,9 +6,9 @@ Created on Sep 17, 2012
 import json
 from abc import ABCMeta, abstractmethod
 from SimPy.Simulation import now
-from clueseval.clues.aggregated import ClueAggregation
+from clueseval.clues.storage.sqlite import SQLiteClueStore
+from netuse.results import G
 from netuse.triplespace.network.url_utils import URLUtils
-from netuse.triplespace.our_solution.clue_management import ClueStore
 from netuse.triplespace.our_solution.consumer.time_update import UpdateTimesManager
 from netuse.triplespace.our_solution.whitepage.selection import WhitepageSelector, WhitepageSelectionManager, SelectionProcessObserver
 from netuse.triplespace.network.client import RequestInstance, RequestManager, RequestObserver
@@ -67,20 +67,28 @@ class ConsumerFactory(object):
 class Consumer(AbstractConsumer):
     def _update_connector(self, wp):
         if self.wp_node_name is None or self.wp_node_name!=wp.name:
+            if self.connector is not None:
+                    self.connector.stop()
+            
             self.wp_node_name = wp.name
-            if wp==self.discovery.me:
+            if wp==self.discovery.me:                
                 self.connector = LocalConnector(self.discovery)
             else:
                 self.connector = RemoteConnector(self.discovery.me, wp)
+            self.connector.start()
 
 class ConsumerLite(AbstractConsumer):
     def _update_connector(self, wp):
         if self.wp_node_name is None or self.wp_node_name!=wp.name:
+            if self.connector is not None:
+                self.connector.stop()
+            
             self.wp_node_name = wp.name
             if wp==self.discovery.me:
                 raise Exception("A lite consumer cannot be whitepage, check the selection algorithm.")
             else:
                 self.connector = RemoteLiteConnector(self.discovery.me, wp)
+            self.connector.start()
 
 
 class AbstractConnector(object):
@@ -88,6 +96,12 @@ class AbstractConnector(object):
     
     @abstractmethod
     def get_query_candidates(self, template, previously_unresolved):
+        pass
+    
+    def start(self):
+        pass
+
+    def stop(self):
         pass
 
 
@@ -107,10 +121,18 @@ class RemoteConnector(AbstractConnector, RequestObserver):
         self.whitepage_node = whitepage_node
         self.updateTimeManager = UpdateTimesManager()
         
-        self.clues = ClueStore()
+        self.clues = SQLiteClueStore(database_path=G.temporary_path)
         
         self._initialize_clues()
         self._schedule_future_update()
+        
+    def start(self):
+        self.clues.start()
+        self._initialize_clues()
+        self._schedule_future_update()
+    
+    def stop(self):
+        self.clues.stop()
     
     def _initialize_clues(self):
         # request to whitepage
@@ -128,9 +150,7 @@ class RemoteConnector(AbstractConnector, RequestObserver):
     def notifyRequestFinished(self, request_instance):
         for unique_response in request_instance.responses:
             if unique_response.getstatus()==200:
-                ca = ClueAggregation()
-                ca.fromJson(unique_response.get_data())
-                self.clues.add_clues(ca)
+                self.clues.fromJson(unique_response.get_data())
                 break
             else:
                 # TODO
