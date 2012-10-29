@@ -89,10 +89,18 @@ class PredicateBasedClue(Clue):
     
     def isCandidate(self, template):
         if template[1] is not None:
+            
+            # Too general properties to predict anything... :-S
+            if template[1].startswith(str(RDF.RDFNS)) or template[1].startswith(str(RDFS.RDFSNS)):
+                return True
+            
             for pred in self._predicates:
                 if template[1]==pred:
                     return True
-        return False
+            return False
+        
+        # If no predicate is provided... how can I determine anything?
+        return True
     
     def __eq__(self, other):
         if isinstance(other, self.__class__):
@@ -107,7 +115,7 @@ class PredicateBasedClue(Clue):
 
 if __name__ == '__main__':
     c1 = PredicateBasedClue()
-    c1.parseFile("../../../files/XSCA3_2003_4_6.n3")
+    c1.parseFile("../../../files/7CAMPA_measures.n3")
     
     json_str = c1.toJson()
     print json_str

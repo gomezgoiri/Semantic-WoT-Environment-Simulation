@@ -4,22 +4,11 @@ Created on Feb 17, 2012
 @author: tulvur
 '''
 import numpy
-from rdflib import RDF, URIRef, Graph
+from rdflib import RDF, Graph, Namespace
 from clueseval.evaluation.utils import loadGraphsJustOnce, selectStations
-from clueseval.evaluation.precision.diagram import DiagramGenerator
 from clueseval.clues.schema_based import SchemaBasedClue
 from clueseval.clues.predicate_based import PredicateBasedClue
 from clueseval.clues.class_based import ClassBasedClue
-
-
-SSN = 'http://purl.oclc.org/NET/ssnx/ssn#'
-SSN_OBSERV = 'http://knoesis.wright.edu/ssw/ont/sensor-observation.owl#'
-SSN_WEATHER = 'http://knoesis.wright.edu/ssw/ont/weather.owl#'
-WGS84 = 'http://www.w3.org/2003/01/geo/wgs84_pos#'
-CF = 'http://purl.oclc.org/NET/ssnx/cf/cf-property#'
-CF_FEATURE = 'http://purl.oclc.org/NET/ssnx/cf/cf-feature#'
-SMART_KNIFE = 'http://purl.oclc.org/NET/ssnx/product/smart-knife#'
-BIZKAI_STATION = 'http://dev.morelab.deusto.es/bizkaisense/resource/station/'
 
 
 def getQueriableNodes(gossipings, template):
@@ -81,28 +70,28 @@ def createGossips(graphs):
                     # arreglar lo de los namespaces en la union!
                
             for g_type in gossips.keys():
-                gossips[g_type][node_name].parseGraph(g)
+                gossips[g_type][node_name].parseGraph(union)
                 if g_type=='class':
                     gossips[g_type][node_name].expand()
             #print "gossip added for", node_name
             count += 1
     return gossips
 
-def calculatePAndRForAllQueries(graphs, gossips):
+def calculatePAndRForAllQueries(graphs, clues, templates):
     results = {}
     results["precision"] = {}
     results["recall"] = {}
     
     for t in templates:
         relevant_nodes = nodesWithoutEmptyResponse(graphs, t)
-        #print relevant_nodes
+        #print t, relevant_nodes
         
-        for g_type in gossips.keys():
+        for g_type in clues.keys():
             if g_type not in results["precision"]:
                 results["precision"][g_type] = []
                 results["recall"][g_type] = []
             
-            queriable_nodes = getQueriableNodes(gossips[g_type], t)
+            queriable_nodes = getQueriableNodes(clues[g_type], t)
             pandr = calculatePrecisionAndRecall(queriable_nodes, relevant_nodes)
             
             results["precision"][g_type].append(pandr[0])
@@ -130,20 +119,29 @@ if __name__ == '__main__':
     
     gossips = createGossips(graphs)
     
+    SSN = Namespace('http://purl.oclc.org/NET/ssnx/ssn#')
+    SSN_OBSERV = Namespace('http://knoesis.wright.edu/ssw/ont/sensor-observation.owl#')
+    SSN_WEATHER = Namespace('http://knoesis.wright.edu/ssw/ont/weather.owl#')
+    WGS84 = Namespace('http://www.w3.org/2003/01/geo/wgs84_pos#')
+    CF = Namespace('http://purl.oclc.org/NET/ssnx/cf/cf-property#')
+    CF_FEATURE = Namespace('http://purl.oclc.org/NET/ssnx/cf/cf-feature#')
+    SMART_KNIFE = Namespace('http://purl.oclc.org/NET/ssnx/product/smart-knife#')
+    BIZKAI_STATION = Namespace('http://helheim.deusto.es/bizkaisense/resource/station/')
+    DC = Namespace('http://purl.org/dc/elements/1.1/')
+    
     # TEST
     templates = (
       # based on type
-      (None, RDF.type, URIRef(SSN_WEATHER+'RainfallObservation')), # in 43 nodes
-      (None, RDF.type, URIRef(SSN_OBSERV+'Observation')), # in many nodes, but, without inference?
-      # predicate based
-      (None, URIRef(SSN_OBSERV+'hasLocation'), None), # domain LocatedNearRel
-      (None, URIRef(WGS84+'long'), None), # 155 objects (long belongs to SpatialThing, Point is subclass of SpatialThing and does not have range)
-      (None, URIRef(SSN_OBSERV+'observedProperty'), None), # observedProperty's range is Observation, but we have just subclasses of Observation (e.g. TemperatureObservation)
-      (None, URIRef(SMART_KNIFE+'hasMeasurementPropertyValue'), None), # domain ssn:MeasurementProperty child of ssn:Property
-      (URIRef(BIZKAI_STATION+'ABANTO'), None, None), # given an instance, we cannot predict anything
+      (None, RDF.type, SSN_WEATHER.RainfallObservation), # in 43 nodes
+      (None, WGS84.long, None), # 155 objects (long belongs to SpatialThing, Point is subclass of SpatialThing and does not have range)
+      (None, SSN.observedProperty, None), # observedProperty's range is Observation, but we have just subclasses of Observation (e.g. TemperatureObservation)
+                                          # knoesis defines its own observedProperty in SSN_OBSERV
+      (BIZKAI_STATION.ABANTO, None, None), # given an instance, we cannot predict anything
+      (None, DC.identifier, None),
     )
     
-    results = calculatePAndRForAllQueries(graphs, gossips)
+    
+    results = calculatePAndRForAllQueries(graphs, gossips, templates)
     print results
     
     g = DiagramGenerator('Recall', 'Recall for each query', results["recall"])

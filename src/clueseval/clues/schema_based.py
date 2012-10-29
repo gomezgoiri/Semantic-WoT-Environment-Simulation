@@ -77,5 +77,5 @@ class SchemaBasedClue(Clue):
 
 if __name__ == '__main__':
     gossip = SchemaBasedClue()
-    gossip.parseFile('../../../files/XSCA3_2003_4_6.n3')
+    gossip.parseFile('../../../files/7CAMPA_measures.n3')
     print gossip.toJson()

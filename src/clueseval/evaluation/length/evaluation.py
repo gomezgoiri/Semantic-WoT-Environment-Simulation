@@ -3,7 +3,6 @@ Created on Feb 17, 2012
 
 @author: tulvur
 '''
-import numpy
 from rdflib import Graph
 from clueseval.evaluation.utils import selectStations, loadGraphsJustOnce
 from clueseval.evaluation.length.diagram import DiagramGenerator
@@ -12,8 +11,7 @@ from clueseval.clues.predicate_based import PredicateBasedClue
 from clueseval.clues.class_based import ClassBasedClue
 
 
-
-def createGossips(graphs):
+def createClues(graphs):
     gossips = {}
     gossips['schema'] = {}
     gossips['predicate'] = {}
@@ -35,20 +33,21 @@ def createGossips(graphs):
                 gossips[g_type][node_name].parseGraph(g)
     return gossips
 
-def calculateLenghtAvgAndDev(gossips):
+def calculateLenghts(clues):
     results = {}
     results['schema'] = {}
     results['predicate'] = {}
     results['class'] = {}
            
-    for g_type in gossips.keys():
+    for c_type in clues.keys():
         lengths = []
-        for gs in gossips[g_type].values():
-            lengths.append( len(gs.toJson()) )
-            
-        results[g_type]['avg'] = numpy.average(lengths)
-        results[g_type]['std'] = numpy.std(lengths)
-            
+        for node_name, clue in clues[c_type].iteritems():
+            if len(clue.toJson())>500:
+                print node_name
+                print clue.toJson()
+            lengths.append( len(clue.toJson()) )
+        results[c_type] = lengths
+    
     return results
             
 if __name__ == '__main__':
@@ -66,9 +65,9 @@ if __name__ == '__main__':
     graphs = {}
     loadGraphsJustOnce(names, semanticPath, graphs)
     
-    gossips = createGossips(graphs)
+    clues = createClues(graphs)
     
-    results = calculateLenghtAvgAndDev(gossips)
+    results = calculateLenghts(clues)
     print results
     
     g = DiagramGenerator("Length of the clues shared", '', results)

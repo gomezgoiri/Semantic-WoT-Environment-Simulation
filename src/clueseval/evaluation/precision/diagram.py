@@ -26,35 +26,64 @@ class DiagramGenerator:
     def __init__(self, title, ylabel, results):
         self.title = title
         self.ylabel = ylabel
-        self.legends = results.keys()
-        self.bars = results.values()
-        self.N = len(self.bars[0])
-        
+        self.color = '#cccccc'
+        self.results = results
         self.generate()
 
-    def generate(self):
+    def generateSubplot(self, ax, strategy):
+        N = len(strategy[1])
+        ind = np.arange( N )  # the x locations for the groups
+        width = 0.5       # the width of the bars
         
-        ind = np.arange(self.N)  # the x locations for the groups
-        width = 0.25       # the width of the bars
-        
-        self.fig = plt.figure()
-        ax = self.fig.add_subplot(111)
-        
-        rects = []
-        i = 0
-        for bar, color in zip(self.bars, ('r', 'y', 'g')):
-            rects.append(ax.bar(ind + width*i, bar, width, color=color))
-            i+=1
+        ax.bar(ind + width, #*i,
+               strategy[1], # width,
+               color=self.color,
+               align='center')
         
         # add some
         plt.ylabel(self.ylabel)
-        plt.title(self.title)
-        plt.xticks(ind+width, ["Q%d"%(i) for i in range(self.N)] )
+        plt.title(strategy[0])
+ 
+        # Set the x tick labels to the group_labels defined above.
+        ax.set_xticks( ind+width )
+        ax.set_xticklabels( ["t%d"%(i+1) for i in range(N)] )
+        ax.set_xlim(0,N)
+
+    def generate(self):
+        self.fig = plt.figure(figsize=(15,3))
         
-        plt.legend( rects, self.legends )
+        plt.subplots_adjust(
+            left=None,   # the left side of the subplots of the figure
+            bottom=None, # the right side of the subplots of the figure
+            right=None,  # the bottom of the subplots of the figure
+            top=None,    # the top of the subplots of the figure
+            wspace=0.3,  # the amount of width reserved for blank space between subplots
+            hspace=0.4   # the amount of height reserved for white space between subplots
+        )
+        
+        num_strats = len(self.results)
+        for strategy, i in zip(self.results.iteritems(), range(num_strats)):
+            ax = self.fig.add_subplot(1,num_strats,i)
+            self.generateSubplot(ax, strategy)
     
     def show(self):
         self.fig.show()
     
     def save(self, filename):
-        self.fig.savefig(filename, bbox_inches=0)
+        self.fig.savefig(filename, bbox_inches='tight')
+
+     
+def main():
+    f = open('/tmp/clues_precision_recall.json', 'r')
+    results = json.loads(f.read())
+    f.close()
+    
+    g = DiagramGenerator('Recall', 'Recall for each query', results["recall"])
+    g.save('/tmp/clues_recall.pdf')
+    
+    g = DiagramGenerator('Precision', 'Precision for each query', results["precision"])
+    g.save('/tmp/clues_precision.pdf')
+    
+
+if __name__ == '__main__':   
+    main()

@@ -156,6 +156,8 @@ class ClassBasedClue(Clue):
         
         _, _, network = SetupRuleStore(makeNetwork=True)
         NormalFormReduction(self.tbox)
+        
+        # Warning: The use of pD-rules is a memory killer!
         for rule in HornFromN3('http://www.agfa.com/w3c/euler/rdfs-rules.n3'): #'../lib/python-dlp/fuxi/test/pD-rules.n3'): #HornFromDL(self.tBoxGraph):
             network.buildNetworkFromClause(rule)
         network.feedFactsToAdd(generateTokenSet(self.tbox))
@@ -169,7 +171,7 @@ if __name__ == '__main__':
     tbox.parse("../../../files/sensor-observation.owl")
     
     c1 = ClassBasedClue(tbox)
-    c1.parseFile("../../../files/XSCA3_2003_4_6.n3")
+    c1.parseFile("../../../files/7CAMPA_measures.n3")
     
     print c1.toJson()
     
