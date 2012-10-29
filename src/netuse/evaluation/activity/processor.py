@@ -6,9 +6,6 @@ Created on Sep 22, 2012
 
 import json
 import numpy
-from netuse.database.results import NetworkTrace
-from netuse.database.execution import ExecutionSet
-from netuse.database.parametrization import Parametrization
 from netuse.evaluation.activity.diagram import DiagramGenerator
 
 
@@ -126,37 +123,27 @@ class RawDataProcessor(object):
             self._add_activity_period(temp, trace.server, trace.timestamp-trace.response_time, trace.timestamp)
         return temp
     
-    def _calculate_activity_of_nodes(self, activity_per_node, node_names):
+    def _calculate_total_activity_of_nodes(self, activity_per_node):
         # sort by num_nodes
         results = {}
-        
-        for node_name in node_names:
-            if node_name in activity_per_node:
-                busy_time = 0
-                for activity in activity_per_node[node_name]:
-                    busy_time += (activity[1] - activity[0])
-                results[node_name] = busy_time
-            
-        activity_mean = numpy.mean(results.values())
-        return activity_mean
+        for node_name, activity in activity_per_node.iteritems():
+            busy_time = 0
+            for act in activity:
+                busy_time += (act[1] - act[0])
+            results[node_name] = busy_time
+        return results
     
     def _calculate_overall_activity(self, traces):
         activity_per_node = self._calculate_activity_per_node(traces)
-        return self._calculate_activity_of_nodes(self._calculate_activity_per_node(traces), activity_per_node.iterkeys()) # all nodes
-
-    def _load_nb(self, executionSet):
-        activity_mean = None
-        for execution in executionSet.executions:
-            if execution.parameters.strategy==Parametrization.negative_broadcasting:
-                activity_mean = self._calculate_overall_activity(NetworkTrace.objects(execution=execution.id))
-                break
-        
-        self.data[DiagramGenerator.NB] = {}
-        self.data[DiagramGenerator.NB][DiagramGenerator.TOTAL] = activity_mean
+        total_activity_per_node = self._calculate_total_activity_of_nodes(activity_per_node) # all nodes
+        activity_mean = numpy.mean(total_activity_per_node.values())
+        return activity_mean
     
     def _load_strat(self, executionSet, strategy, key):
+        # Imported here to enable testing other methods without connecting to mongodb
+        from netuse.database.results import NetworkTrace
+        
         self.data[key] = {}
-                
         for execution in executionSet.executions:
             if execution.parameters.strategy==strategy:
                 activity_per_node = self._calculate_activity_per_node(NetworkTrace.objects(execution=execution.id))
@@ -176,6 +163,10 @@ class RawDataProcessor(object):
                 break
 
     def load_all(self):
+        # Imported here to enable testing other methods without connecting to mongodb
+        from netuse.database.execution import ExecutionSet
+        from netuse.database.parametrization import Parametrization
+        
         for executionSet in ExecutionSet.objects(experiment_id='energy_consumption').get_simulated():
             self._load_strat(executionSet, Parametrization.negative_broadcasting, DiagramGenerator.NB)
             self._load_strat(executionSet, Parametrization.our_solution, DiagramGenerator.OURS)

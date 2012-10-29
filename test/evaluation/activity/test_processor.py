@@ -118,8 +118,7 @@ class TestRawDataProcessor(unittest.TestCase):
         self.processor._merge_periods_and_add(previous_activities, new_activity, overlaping)
         self.assertSequenceEqual( ((1, 4), (11, 14), (21, 24), (31, 54), (61, 64), (71, 74), (81, 84), (91, 94)), previous_activities )
     
-    
-    def test_calculate_overall_activity(self):
+    def test_calculate_total_activity_of_nodes(self):
         requests = []
         requests.append( FakeRequest('n1', 'n2', 10, 5) )
         requests.append( FakeRequest('n1', 'n2', 12, 5) )
@@ -130,12 +129,33 @@ class TestRawDataProcessor(unittest.TestCase):
         requests.append( FakeRequest('n4', 'n5', 95, 5) )
         requests.append( FakeRequest('n4', 'n5', 100, 5) )
         
-        results = self.processor._calculate_overall_activity(requests)
-        self.assertEquals( results['n1'], 12) # 10-17, 20-25
-        self.assertEquals( results['n2'], 22) # 10-17, 20-25, 100-105, 110-115
-        self.assertEquals( results['n3'], 12) # 98-105, 110-115
-        self.assertEquals( results['n4'], 10) # 95-105
-        self.assertEquals( results['n5'], 10) # 95-105
+        results = self.processor._calculate_total_activity_of_nodes( self.processor._calculate_activity_per_node(requests) )
+        self.assertEquals( results['n1'], (17-10) + (25-20)) # 10-17, 20-25
+        self.assertEquals( results['n2'], (17-10) + (25-20) + (105-100) + (115-110) ) # 10-17, 20-25, 100-105, 110-115
+        self.assertEquals( results['n3'], (105-98) + (115-110) ) # 98-105, 110-115
+        self.assertEquals( results['n4'], 105-95) # 95-105
+        self.assertEquals( results['n5'], 105-95) # 95-105
+    
+    
+    def _add_to_trace(self, trace, fake_request, total_diff):
+        total_diff += fake_request.response_time * 2 # we count twice: both for the Provider and Consumer perspective
+        trace.append( fake_request )
+        return total_diff
+    
+    def test_calculate_overall_activity(self):
+        trace = []
+        total_diff = 0
+        # traces do not overlap to simplify total_diff calculation in the test
+        total_diff = self._add_to_trace( trace, FakeRequest('n1', 'n2', 10, 5), total_diff )
+        total_diff = self._add_to_trace( trace, FakeRequest('n1', 'n2', 15, 5), total_diff  )
+        total_diff = self._add_to_trace( trace, FakeRequest('n1', 'n2', 20, 5), total_diff  )
+        total_diff = self._add_to_trace( trace, FakeRequest('n2', 'n3', 100, 5), total_diff  )
+        total_diff = self._add_to_trace( trace, FakeRequest('n2', 'n3', 110, 5), total_diff  )
+        total_diff = self._add_to_trace( trace, FakeRequest('n3', 'n4', 90, 5), total_diff  )
+        total_diff = self._add_to_trace( trace, FakeRequest('n4', 'n5', 100, 5), total_diff  )
+        
+        overall_activity = self.processor._calculate_overall_activity( trace )
+        self.assertEquals( total_diff / 5, overall_activity)
 
 
 class FakeRequest(object):
