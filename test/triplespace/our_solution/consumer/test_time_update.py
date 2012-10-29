@@ -18,7 +18,7 @@ class UpdateTimesManagerTestCase(unittest.TestCase):
     
     def test_get_updatetime(self):
         rc = UpdateTimesManager()
-        self.assertEquals(rc.get_updatetime(), UpdateTimesManager.MAX_UPDATE_RATE)
+        self.assertEquals(rc.get_updatetime(), UpdateTimesManager.DEFAULT_UPDATE_TIME)
         
         for i in range(0, UpdateTimesManager.MIN_UPDATE_RATE*10, UpdateTimesManager.MIN_UPDATE_RATE-10):
             rc.add_updatetime(i)
