@@ -5,6 +5,8 @@ Created on Oct 26, 2012
 '''
 
 import json
+import string
+import random
 import sqlite3
 from tempfile import mkstemp
 from clueseval.clues.storage.abstract_store import AbstractStore, AggregationClueUtils
@@ -62,22 +64,81 @@ class SQLiteClueStore(AbstractStore):
     def stop(self):
         self.cur.close()
         self.conn.close()
-    
-    def _insert_schema_if_not_exist(self, name, URI):
+        
+    def _get_schema_name_for_URI(self, URI):
         '''
-            Insert schema (name, URI) in the proper table if not exists and return None.
+            If the URI of the schema already exists in the table returns its name.
             
-            Otherwise, it returns the stored name for that URI.
+            Otherwise, returns 'None'.
         '''
         cur = self.conn.execute(SQLiteClueStore._SELECT_SCHEMA + " where uri=:uri", {"uri": URI}) 
         stored_name = cur.fetchone()
-        if stored_name==None:
-            print name
-            self.conn.execute(SQLiteClueStore._INSERT_SCHEMA, (name, URI))
-            self.conn.commit()
-        else:
-            return stored_name[0]
+        return None if stored_name is None else stored_name[0]
+    
+    # from http://stackoverflow.com/questions/2257441/python-random-string-generation-with-upper-case-letters-and-digits
+    def id_generator(self, size=6, chars=string.ascii_uppercase + string.digits):        
+        return ''.join(random.choice(chars) for x in range(size))
+    
+    def _get_estimated_size(self, existing_elements):
+            # len(string.ascii_uppercase + string.digits) == 36
+            # len < 36: size=1
+            # len < 36 + 36*36: size=2 (36*36 with 2 slots, plus 36 created with 1 slot)
+            # len < 36 + 36*36 + 36*36*36: size=3
+            # But I will simplify: elements==n => size = n/36 till it "n" is 0
+                        
+            needed_size = 1
+            new_ids_per_size_unit = len(string.ascii_uppercase + string.digits)
+            while existing_elements >= new_ids_per_size_unit :
+                existing_elements /= new_ids_per_size_unit
+                needed_size += 1
+            return needed_size
+    
+    def _get_another_schema_name_if_collisions(self, name_to_check):
+        '''
+            Checks if another prefix has the same name.
+            
+            If so, it proposes a name that does not exist in the table returning it.
+        '''
+        # Another schema name starts with "name_to_check"?
+        cur = self.conn.execute(SQLiteClueStore._SELECT_SCHEMA + " where name like '%s%%'"%(name_to_check))
+        similar_names = [name for name, _ in cur.fetchall()] # names with the same root
         
+        if not similar_names: # empty list => does not collision
+            return name_to_check
+        else:
+            # Highly inefficient approach!
+            size = self._get_estimated_size( len(similar_names) )
+            proposed_name = name_to_check + self.id_generator( size=size )
+            while proposed_name in similar_names:
+                proposed_name = name_to_check + self.id_generator( size=size )
+            
+            return proposed_name
+            
+    def _just_inserts_schema(self, name, URI): # isolated in its own method for testing purposes
+        self.conn.execute(SQLiteClueStore._INSERT_SCHEMA, (name, URI))
+        self.conn.commit()
+        
+    def _insert_schema(self, name, URI):
+        '''
+            Insert schema (name, URI) in the proper table if not exists.
+            
+            It may change the name to avoid collisions or give them a proper name.
+            Therefore this method will return the final name adopted by this prefix.
+        '''
+        existing_name = self._get_schema_name_for_URI(URI)
+        
+        if existing_name is None: # Inserts the one passed on the parameters
+            # Avoid  "_number" like names created by rdflib.
+            if name.startswith("_"):
+                name = self.generate_prefix_name(URI)
+            
+            name = self._get_another_schema_name_if_collisions(name)
+            self._just_inserts_schema(name, URI)
+            
+            return name
+        else:
+            return existing_name
+    
     def get_schemas(self):
         schemas = []
         cur = self.conn.execute(SQLiteClueStore._SELECT_SCHEMA)
@@ -131,8 +192,8 @@ class SQLiteClueStore(AbstractStore):
         elif self.type==PredicateBasedClue.ID():
             mappings = {}
             for name, URI in dictio[SchemaBasedClue._SCHEMA()]:
-                stored_name = self._insert_schema_if_not_exist(name, URI)
-                if stored_name is not None:
+                stored_name = self._insert_schema(name, URI)
+                if stored_name is not name:
                     mappings[name] = stored_name
             for node_name, uris in dictio[PredicateBasedClue._PREDICATE()].iteritems():
                 for prefix, endings in uris.iteritems():
@@ -157,8 +218,8 @@ class SQLiteClueStore(AbstractStore):
             mappings = {}
             dictio = dictio[ClueWithNode.CLUE()]
             for name, URI in dictio[SchemaBasedClue._SCHEMA()]:
-                stored_name = self._insert_schema_if_not_exist(name, URI)
-                if stored_name is not None:
+                stored_name = self._insert_schema(name, URI)
+                if stored_name is not name:
                     mappings[name] = stored_name
             for prefix, endings in dictio[PredicateBasedClue._PREDICATE()].iteritems():
                 actual_prefix = prefix if prefix not in mappings else mappings[prefix]
