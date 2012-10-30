@@ -88,7 +88,9 @@ class LocalConnector(AbstractConnector):
         self.me = discovery.me
         
     def send_clue(self, clue):
-        self.local_whitepage.add_clue(self.me.name, clue)
+        # TODO a method to add local clues to the store without serializing/parsing
+        cwn = ClueWithNode(self.me.name, clue)
+        self.local_whitepage.add_clue(self.me.name, cwn.toJson()) # non-sense: serialize to parse
 
 
 class RemoteConnector(AbstractConnector, RequestObserver):
