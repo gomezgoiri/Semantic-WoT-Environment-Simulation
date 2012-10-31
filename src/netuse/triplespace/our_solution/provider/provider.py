@@ -16,7 +16,7 @@ class Timer(Process):
     def __init__(self, waitUntil=10000.0, name="timer"):
         Process.__init__(self, name=name)
         self.__timeout = waitUntil
-        self.event = SimEvent()
+        self.event = SimEvent(name="timer_event")
         self.ended = False
         
     def wait(self):
@@ -40,8 +40,8 @@ class Provider(Process, SimpleDiscoveryObserver):
         self.wp_node_name = None
         self.connector = None
         
-        self.externalCondition = SimEvent()
-        self.clueChanged = SimEvent()
+        self.externalCondition = SimEvent(name="external_condition_on_%s"%(self.name))
+        self.clueChanged = SimEvent(name="clue_change_on_%s"%(self.name))
         self.timer = None
     
     def update_clues_on_whitepage(self):
