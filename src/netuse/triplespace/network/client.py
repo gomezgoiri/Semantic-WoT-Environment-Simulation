@@ -109,6 +109,7 @@ class RequestInstance(Process):
     
     def __init__(self, actionNode, destinationNodes, url, data=None, waitUntil=10000.0, name="request"):
         Process.__init__(self, name=name)
+        self.name += " (from=%s, url=%s)"%(actionNode.name, url)
         self.__actionNode = weakref.proxy(actionNode) #weakref.ref(actionNode)
         self.__destinationNodes = weakref.WeakSet(destinationNodes) # tuple with all the nodes to be requested
         self.__url = url
@@ -119,8 +120,8 @@ class RequestInstance(Process):
         self.__maxWaitingTime = waitUntil
         self.nodeNamesByReqId = {} # used in the gossiping mechanism with the gossiping requests
         
-        self.__timeout = SimEvent()
-        self.__newResponseReceived = SimEvent()
+        self.__timeout = SimEvent(name="request_timeout_for_%s"%(self.name))
+        self.__newResponseReceived = SimEvent(name="request_response_for_%s"%(self.name))
         self.__observers = weakref.WeakSet()
         
     def startup(self):
