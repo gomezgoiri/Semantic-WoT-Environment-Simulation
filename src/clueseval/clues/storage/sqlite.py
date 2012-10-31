@@ -36,7 +36,7 @@ class SQLiteClueStore(AbstractStore):
             self.db_file = mkstemp(suffix=".db", dir=db_path)[1]
         else:
             self.db_file = database_name
-        self.type = database_name
+        self.type = PredicateBasedClue.ID() # right now, just predicate-based clues have been implemented in SQLite store
         
     def start(self):
         self.conn = sqlite3.connect(self.db_file)
@@ -50,13 +50,15 @@ class SQLiteClueStore(AbstractStore):
         self.cur.execute("""create table if not exists %s (
                             node VARCHAR(255) NOT NULL,
                             prefix VARCHAR(255) NOT NULL,
-                            ending VARCHAR(255) NOT NULL)
+                            ending VARCHAR(255) NOT NULL,
+                            PRIMARY KEY (node, prefix, ending) )
                          """%(SQLiteClueStore.PREDICATES_TABLE)
                          )
         self.cur.execute("""create table if not exists %s (
                             node VARCHAR(255) NOT NULL,
                             prefix VARCHAR(255) NOT NULL,
-                            ending VARCHAR(255) NOT NULL)
+                            ending VARCHAR(255) NOT NULL,
+                            PRIMARY KEY (node, prefix, ending) )
                          """%(SQLiteClueStore.CLASSES_TABLE)
                          )
         self.conn.commit()
@@ -77,7 +79,7 @@ class SQLiteClueStore(AbstractStore):
     
     # from http://stackoverflow.com/questions/2257441/python-random-string-generation-with-upper-case-letters-and-digits
     def id_generator(self, size=6, chars=string.ascii_uppercase + string.digits):        
-        return ''.join(random.choice(chars) for x in range(size))
+        return ''.join(random.choice(chars) for _ in range(size))
     
     def _get_estimated_size(self, existing_elements):
             # len(string.ascii_uppercase + string.digits) == 36
@@ -181,11 +183,18 @@ class SQLiteClueStore(AbstractStore):
                     
         return AggregationClueUtils.toJson(dictio)
     
-    # Overrides previously stored clues
+    def reset_all(self):
+        self.conn.execute("delete from " + SQLiteClueStore.SCHEMAS_TABLE)
+        self.conn.execute("delete from " + SQLiteClueStore.PREDICATES_TABLE)
+        self.conn.execute("delete from " + SQLiteClueStore.CLASSES_TABLE)
+        self.conn.commit()
+    
     def fromJson(self, json_str):
+        # Overrides previously stored clues
+        self.reset_all()
+        
         dictio = AggregationClueUtils.fromJson(json_str)
         self.type = dictio[Clue.ID_P()]
-        self.bynode = {}
         
         if self.type==SchemaBasedClue.ID():
             raise NotImplementedError()
@@ -198,11 +207,18 @@ class SQLiteClueStore(AbstractStore):
             for node_name, uris in dictio[PredicateBasedClue._PREDICATE()].iteritems():
                 for prefix, endings in uris.iteritems():
                     actual_prefix = prefix if prefix not in mappings else mappings[prefix]
-                    self.cur.executemany( SQLiteClueStore._INSERT_PREDICATE, [(node_name, actual_prefix, ending) for ending in endings] )
+                    self.conn.executemany( SQLiteClueStore._INSERT_PREDICATE, [(node_name, actual_prefix, ending) for ending in endings] )
+                    self.conn.commit()
         elif self.type==ClassBasedClue.ID():
             raise NotImplementedError()
     
+    # TODO delete schemas if they are no longer used?
+    def reset_preficates_for_node(self, node_name):
+        self.conn.execute( "delete from %s where node='%s'"%(SQLiteClueStore.PREDICATES_TABLE, node_name) )
+        self.conn.commit()
+    
     def add_clue(self, node_name, clue_json):
+        self.reset_preficates_for_node(node_name)
         dictio = json.loads(clue_json)
         
         clue_type = dictio[Clue.ID_P()]
