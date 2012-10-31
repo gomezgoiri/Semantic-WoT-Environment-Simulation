@@ -13,9 +13,12 @@ from netuse.database.parametrization import Parametrization
 # This script generates a simulation and records its trace in a file.
 # Used to check the functionalities under really simple simulation conditions.
 
-def performSimulation(parameters):    
+def performSimulation(parameters):
     preloadedGraph = {}
     loadGraphsJustOnce(parameters.nodes, G.dataset_path, preloadedGraph)
+    
+    # To log SimPy's events:
+    #trace.tchange(outfile=open(r"/tmp/simulation.log","w"))
     
     initialize()
     G.setNewExecution(None, tracer=FileTracer('/tmp/trace.txt'))
@@ -60,16 +63,15 @@ def main():
       (None, SSN_OBSERV.hasLocatedNearRel, None), # observedProperty's range is Observation, but we have just subclasses of Observation (e.g. TemperatureObservation)
 #      (None, SMART_KNIFE.hasMeasurementPropertyValue, None), # domain ssn:MeasurementProperty child of ssn:Property
 #      (BIZKAI_STATION.ABANTO, None, None), # given an instance, we cannot predict anything
-    )
-    temp = ((None, SSN.observationResult, None),)
-    
+    )    
+    templates = ((None, SSN.observationResult, None),)
     
     p = ParametrizationUtils('network_usage', '/home/tulvur/dev/dataset')
     param = p.getDefaultParametrization(Parametrization.our_solution,
                                                    amountOfQueries = 1000,
                                                    writeFrequency = 10000,
                                                    simulateUntil = 3600000,
-                                                   queries = temp,
+                                                   queries = templates,
                                                    numNodes = 15,
                                                    numConsumers = 10
                                                    )
