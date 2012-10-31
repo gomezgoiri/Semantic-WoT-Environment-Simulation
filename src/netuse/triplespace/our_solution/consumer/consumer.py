@@ -122,9 +122,7 @@ class RemoteConnector(AbstractConnector, RequestObserver):
         self.updateTimeManager = UpdateTimesManager()
         
         self.clues = SQLiteClueStore(database_path=G.temporary_path)
-        
-        self._initialize_clues()
-        self._schedule_future_update()
+        self.first_load_in_store = False
         
     def start(self):
         self.clues.start()
@@ -151,6 +149,7 @@ class RemoteConnector(AbstractConnector, RequestObserver):
         for unique_response in request_instance.responses:
             if unique_response.getstatus()==200:
                 self.clues.fromJson(unique_response.get_data())
+                self.first_load_in_store = True
                 break
             else:
                 # TODO
@@ -180,7 +179,7 @@ class RemoteConnector(AbstractConnector, RequestObserver):
         if not previously_unsolved:
             self.updateTimeManager.add_updatetime(now()) # add a timestamp of now to get the update frequency
             self._check_if_next_update_changes()
-        if not self.clues.started:
+        if not self.first_load_in_store:
             # wait until the clues are loaded for the first time
             raise Exception("Wait for the first clue loading.")
         return self.clues.get_query_candidates(template)
