@@ -3,6 +3,7 @@ import urllib
 from rdflib import URIRef
 from rdflib.Literal import Literal, _XSD_NS
 from netuse.triplespace.kernel import TripleSpace
+from netuse.triplespace.network.url_utils import URLUtils
 
 ANY = None
 SUBJECT = URIRef("http://subject")
@@ -30,19 +31,19 @@ class KernelTestCase(unittest.TestCase):
 
     def test_fromTemplateToURL(self):
         k = ConcreteTS()
-        self.assertEquals( "wildcards/*/*/*/", k.fromTemplateToURL((ANY, ANY, ANY)))
+        self.assertEquals( "wildcards/*/*/*/", URLUtils.serialize_wildcard_to_URL((ANY, ANY, ANY)))
         
-        self.assertEquals( "wildcards/"+SUBJECT_QUOTED+"/*/*/", k.fromTemplateToURL((SUBJECT, ANY, ANY)) )
-        self.assertEquals( "wildcards/"+SUBJECT_QUOTED+"/"+PREDICATE_QUOTED+"/*/", k.fromTemplateToURL((SUBJECT, PREDICATE, ANY)) )
-        self.assertEquals( "wildcards/"+SUBJECT_QUOTED+"/*/"+OBJECT_URI_QUOTED+"/", k.fromTemplateToURL((SUBJECT, ANY, OBJECT_URI)) )
-        self.assertEquals( "wildcards/"+SUBJECT_QUOTED+"/"+PREDICATE_QUOTED+"/"+OBJECT_URI_QUOTED+"/", k.fromTemplateToURL((SUBJECT, PREDICATE, OBJECT_URI)) )
-        self.assertEquals( "wildcards/"+SUBJECT_QUOTED+"/*/"+XSDBASE_URI_QUOTED+"float/21.11/", k.fromTemplateToURL((SUBJECT, ANY, OBJECT_NUMERIC_LITERAL)) )
-        self.assertEquals( "wildcards/"+SUBJECT_QUOTED+"/*/"+XSDBASE_URI_QUOTED+"boolean/True/", k.fromTemplateToURL((SUBJECT, ANY, OBJECT_BOOLEAN_LITERAL)) )
+        self.assertEquals( "wildcards/"+SUBJECT_QUOTED+"/*/*/", URLUtils.serialize_wildcard_to_URL((SUBJECT, ANY, ANY)) )
+        self.assertEquals( "wildcards/"+SUBJECT_QUOTED+"/"+PREDICATE_QUOTED+"/*/", URLUtils.serialize_wildcard_to_URL((SUBJECT, PREDICATE, ANY)) )
+        self.assertEquals( "wildcards/"+SUBJECT_QUOTED+"/*/"+OBJECT_URI_QUOTED+"/", URLUtils.serialize_wildcard_to_URL((SUBJECT, ANY, OBJECT_URI)) )
+        self.assertEquals( "wildcards/"+SUBJECT_QUOTED+"/"+PREDICATE_QUOTED+"/"+OBJECT_URI_QUOTED+"/", URLUtils.serialize_wildcard_to_URL((SUBJECT, PREDICATE, OBJECT_URI)) )
+        self.assertEquals( "wildcards/"+SUBJECT_QUOTED+"/*/"+XSDBASE_URI_QUOTED+"float/21.11/", URLUtils.serialize_wildcard_to_URL((SUBJECT, ANY, OBJECT_NUMERIC_LITERAL)) )
+        self.assertEquals( "wildcards/"+SUBJECT_QUOTED+"/*/"+XSDBASE_URI_QUOTED+"boolean/True/", URLUtils.serialize_wildcard_to_URL((SUBJECT, ANY, OBJECT_BOOLEAN_LITERAL)) )
         
-        self.assertEquals( "wildcards/*/"+PREDICATE_QUOTED+"/*/", k.fromTemplateToURL((ANY, PREDICATE, ANY)) )
-        self.assertEquals( "wildcards/*/"+PREDICATE_QUOTED+"/"+OBJECT_URI_QUOTED+"/", k.fromTemplateToURL((ANY, PREDICATE, OBJECT_URI)) )
+        self.assertEquals( "wildcards/*/"+PREDICATE_QUOTED+"/*/", URLUtils.serialize_wildcard_to_URL((ANY, PREDICATE, ANY)) )
+        self.assertEquals( "wildcards/*/"+PREDICATE_QUOTED+"/"+OBJECT_URI_QUOTED+"/", URLUtils.serialize_wildcard_to_URL((ANY, PREDICATE, OBJECT_URI)) )
 
-        self.assertEquals( "wildcards/*/*/"+OBJECT_URI_QUOTED+"/", k.fromTemplateToURL((ANY, ANY, OBJECT_URI)))
+        self.assertEquals( "wildcards/*/*/"+OBJECT_URI_QUOTED+"/", URLUtils.serialize_wildcard_to_URL((ANY, ANY, OBJECT_URI)))
 
 if __name__ == '__main__':
     unittest.main()
