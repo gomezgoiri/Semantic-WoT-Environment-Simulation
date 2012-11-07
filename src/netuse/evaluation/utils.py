@@ -58,24 +58,13 @@ class ParametrizationUtils():
     # TODO delete from calculateExpectedResults
     # TODO using among different projects (e.g. clueseval)
     @staticmethod
-    def getStationNames(semanticPath):
-        def detectOddFiles(list):
-            k = {}
-            for e in list:
-                if not k.has_key(e):
-                    k[e] = 0
-                k[e] += 1
-            
-            for e in k:
-                if k[e]==1:
-                    print e
-        
-        ret = []
+    def getStationNames(semanticPath, filter_subfolders=None):        
+        ret = set()
         dirList=os.listdir(semanticPath+'/data')
-        for fname in dirList:
-            if not fname.startswith("."): # ignore non visible file names
-                ret.append( fname.partition("_")[0] )
-            
-        # detectOddFiles(ret)
-        
-        return set(ret)
+        for folder in dirList:
+            if not folder.startswith(".") and ( (filter_subfolders is None) or (folder in filter_subfolders) ) :
+                subdirList = os.listdir(semanticPath+'/data/'+folder)
+                for fname in subdirList:
+                    if not fname.startswith("."): # ignore non visible file names
+                        ret.add( fname.partition("_")[0] )
+        return ret
