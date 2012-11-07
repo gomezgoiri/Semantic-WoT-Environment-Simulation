@@ -5,14 +5,14 @@ Created on Sep 26, 2012
 '''
 
 import unittest
-from netuse.evaluation.utils import ParametrizationUtils
+from commons.utils import SemanticFilesLoader
 from netuse.evaluation.activity.processor import RawDataProcessor
 
 
-class TestParametrizationUtils(unittest.TestCase):
+class TestSemanticFilesLoader(unittest.TestCase):
     
     def setUp(self):
-        self.path = "/home/tulvur/dev/dataset"
+        self.sfl = SemanticFilesLoader("/home/tulvur/dev/dataset")
         self.samples = {
                         "aemet": "08001",
                         "bizkaisense": "7CAMPA",
@@ -20,20 +20,20 @@ class TestParametrizationUtils(unittest.TestCase):
                         "morelab": "aitor-almeida"
                         }
         
-    def assert_subfolder_as_expected(self, subfolder_name, min_number_elements):
-        names = ParametrizationUtils.getStationNames(self.path, filter_subfolders=subfolder_name)
+    def assert_subfolder_as_expected(self, subfolder_names, min_number_elements):
+        names = self.sfl.getStationNames(filter_subfolders=subfolder_names)
         self.assertTrue( min_number_elements <= len(names) )
         for subfolder, sample_element in self.samples.iteritems():
-            if subfolder in subfolder_name:
-                self.assertTrue( sample_element in names)
+            if subfolder in subfolder_names:
+                self.assertTrue( subfolder + "/" + sample_element in names)
             else:
-                self.assertFalse( sample_element in names)
+                self.assertFalse( subfolder + "/" + sample_element in names)
     
     def test_getStationNames_all(self):
-        names = ParametrizationUtils.getStationNames(self.path)
+        names = self.sfl.getStationNames()
         self.assertTrue( 500 < len(names) )
         for subfolder, sample_element in self.samples.iteritems():
-                self.assertTrue( sample_element in names)
+                self.assertTrue( subfolder + "/" + sample_element in names)
         
     def test_getStationNames_subfolders(self):
         self.assert_subfolder_as_expected( ("aemet",), 245 )

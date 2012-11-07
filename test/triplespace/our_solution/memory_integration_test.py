@@ -5,7 +5,6 @@ from rdflib import URIRef, Namespace, RDF
 from netuse.results import G
 from netuse.tracers import FileTracer
 from netuse.nodes import NodeGenerator
-from netuse.evaluation.simulate import loadGraphsJustOnce
 from netuse.activity import ActivityGenerator
 from netuse.evaluation.utils import ParametrizationUtils
 from netuse.database.parametrization import Parametrization
@@ -15,7 +14,7 @@ from netuse.database.parametrization import Parametrization
 
 def performSimulation(parameters):
     preloadedGraph = {}
-    loadGraphsJustOnce(parameters.nodes, G.dataset_path, preloadedGraph)
+    ParametrizationUtils.loadGraphsJustOnce(parameters.nodes, G.dataset_path, preloadedGraph)
     
     # To log SimPy's events:
     #trace.tchange(outfile=open(r"/tmp/simulation.log","w"))
