@@ -34,7 +34,7 @@ class SemanticFilesLoader(object):
             return possibleNodes
         return random.sample(possibleNodes, numberOfNodes)
 
-    def expand_ontology(self, tBoxGraph):
+    def _expand_ontology(self, tBoxGraph):
         rule_store, rule_graph, network = SetupRuleStore(makeNetwork=True)
         NormalFormReduction(tBoxGraph)
         network.setupDescriptionLogicProgramming(tBoxGraph)
@@ -51,7 +51,7 @@ class SemanticFilesLoader(object):
             for fname in dirList:
                 if not os.path.isdir(ontologiesPath+'/'+fname):
                     loadedGraph['ontology'] += Graph().parse(ontologiesPath+"/"+fname)
-            #loadedGraph['ontology_expanded'] = self.expand_ontology(loadedGraph['ontology'])
+            #loadedGraph['ontology_expanded'] = self._expand_ontology(loadedGraph['ontology'])
         
         for node_name in nodeNames:
             if node_name not in loadedGraph:

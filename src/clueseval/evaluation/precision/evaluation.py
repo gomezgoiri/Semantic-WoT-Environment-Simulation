@@ -3,9 +3,10 @@ Created on Feb 17, 2012
 
 @author: tulvur
 '''
+import json
 import numpy
 from rdflib import RDF, Graph, Namespace
-from clueseval.evaluation.utils import loadGraphsJustOnce, selectStations
+from commons.utils import SemanticFilesLoader
 from clueseval.clues.schema_based import SchemaBasedClue
 from clueseval.clues.predicate_based import PredicateBasedClue
 from clueseval.clues.class_based import ClassBasedClue
@@ -101,8 +102,9 @@ def calculatePAndRForAllQueries(graphs, clues, templates):
             #print "%s (precision & recall):"%(g_type), pandr
             
     return results
-            
-if __name__ == '__main__':
+
+    
+def main():
     import argparse
     
     semanticPath = '/home/tulvur/dev/workspaces/doctorado/files/semantic'
@@ -113,9 +115,10 @@ if __name__ == '__main__':
     args = parser.parse_args()
     
     
-    names = selectStations(semanticPath)
+    sfl = SemanticFilesLoader(semanticPath)
+    names = sfl.selectStations()
     graphs = {}
-    loadGraphsJustOnce(names, semanticPath, graphs)
+    sfl.loadGraphsJustOnce(names, graphs)
     
     gossips = createGossips(graphs)
     
@@ -142,12 +145,10 @@ if __name__ == '__main__':
     
     
     results = calculatePAndRForAllQueries(graphs, gossips, templates)
-    print results
-    
-    g = DiagramGenerator('Recall', 'Recall for each query', results["recall"])
-    g.save('recall.png')
-    
-    g = DiagramGenerator('Precision', 'Precision for each query', results["precision"])
-    g.save('precision.png')
-    
-    #g.show()
+    f = open('/tmp/clues_precision_recall.json', 'w')
+    f.write(json.dumps(results))
+    f.close()
+
+
+if __name__ == '__main__':   
+    main()

@@ -4,7 +4,7 @@ Created on Oct 14, 2012
 @author: tulvur
 '''
 from rdflib import RDF
-from clueseval.evaluation.utils import selectStations, loadGraphsJustOnce
+from commons.utils import SemanticFilesLoader
 from numpy import mean, std
 
 class DescriptiveStatistics(object):
@@ -25,9 +25,10 @@ class DescriptiveStatistics(object):
         self.load_data_for_stats()
     
     def load_graphs(self, semanticPath):
-        names = selectStations(semanticPath)
+        sfl = SemanticFilesLoader(semanticPath)
+        names = sfl.selectStations()
         self.graphs = {}
-        loadGraphsJustOnce(names, semanticPath, self.graphs)
+        sfl.loadGraphsJustOnce(names, self.graphs)
     
     def load_data_for_stats(self):
         for k, v in self.graphs.iteritems():

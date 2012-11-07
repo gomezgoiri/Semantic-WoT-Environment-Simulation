@@ -3,17 +3,18 @@ Created on Dec 31, 2011
 
 @author: tulvur
 '''
-import os
 import random
 from netuse.devices import RegularComputer
 from netuse.database.execution import ExecutionSet, Execution
 from netuse.database.parametrization import Parametrization
+from commons.utils import SemanticFilesLoader
 
 
 class ParametrizationUtils():
     
     def __init__(self, experiment_id, semanticPath, repetitions=1):
-        self.possibleNodes = ParametrizationUtils.getStationNames(semanticPath)
+        sfl = SemanticFilesLoader(semanticPath)
+        self.possibleNodes = sfl.getStationNames()
         self.es = ExecutionSet(experiment_id=experiment_id) # 'network_use'
         self.repetitions = repetitions
     

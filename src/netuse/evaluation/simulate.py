@@ -11,7 +11,7 @@ from netuse.activity import ActivityGenerator
 from netuse.nodes import NodeGenerator
 from netuse.database.execution import ExecutionSet, Execution
 from netuse.results import G
-from netuse.evaluation.utils import ParametrizationUtils
+from commons.utils import SemanticFilesLoader
 
 from multiprocessing import Process, Queue, cpu_count
 
@@ -19,7 +19,8 @@ from multiprocessing import Process, Queue, cpu_count
 def performSimulation(execution, preloadedGraph={}):
     print "New simulation: %s"%(execution.parameters)
     
-    ParametrizationUtils.loadGraphsJustOnce(execution.parameters.nodes, G.dataset_path, preloadedGraph)
+    sfl = SemanticFilesLoader(G.dataset_path)
+    sfl.loadGraphsJustOnce(execution.parameters.nodes, preloadedGraph)
     
     initialize()
     G.setNewExecution(execution)

@@ -3,8 +3,9 @@ Created on Feb 17, 2012
 
 @author: tulvur
 '''
+import json
 from rdflib import Graph
-from clueseval.evaluation.utils import selectStations, loadGraphsJustOnce
+from commons.utils import SemanticFilesLoader
 from clueseval.evaluation.length.diagram import DiagramGenerator
 from clueseval.clues.schema_based import SchemaBasedClue
 from clueseval.clues.predicate_based import PredicateBasedClue
@@ -53,7 +54,7 @@ def calculateLenghts(clues):
 if __name__ == '__main__':
     import argparse
     
-    semanticPath = '/home/tulvur/dev/workspaces/doctorado/files/semantic/'
+    semanticPath = '/home/tulvur/dev/dataset/'
     
     parser = argparse.ArgumentParser(description='Evaluate gossiping strategies.')
     parser.add_argument('-ds','--data-set', default=semanticPath, dest='dataset_path',
@@ -61,16 +62,15 @@ if __name__ == '__main__':
     args = parser.parse_args()
     
     
-    names = selectStations(semanticPath)
+    sfl = SemanticFilesLoader(semanticPath)
+    names = sfl.selectStations(semanticPath)
     graphs = {}
-    loadGraphsJustOnce(names, semanticPath, graphs)
+    sfl.loadGraphsJustOnce(names, graphs)
     
     clues = createClues(graphs)
     
     results = calculateLenghts(clues)
-    print results
     
-    g = DiagramGenerator("Length of the clues shared", '', results)
-    g.save('length.pdf')
-    
-    #g.show()
+    f = open('/tmp/clues_length.json', 'w')
+    f.write(json.dumps(results))
+    f.close()

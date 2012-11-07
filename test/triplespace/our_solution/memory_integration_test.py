@@ -6,7 +6,7 @@ from netuse.results import G
 from netuse.tracers import FileTracer
 from netuse.nodes import NodeGenerator
 from netuse.activity import ActivityGenerator
-from netuse.evaluation.utils import ParametrizationUtils
+from commons.utils import SemanticFilesLoader
 from netuse.database.parametrization import Parametrization
 
 # This script generates a simulation and records its trace in a file.
@@ -14,7 +14,8 @@ from netuse.database.parametrization import Parametrization
 
 def performSimulation(parameters):
     preloadedGraph = {}
-    ParametrizationUtils.loadGraphsJustOnce(parameters.nodes, G.dataset_path, preloadedGraph)
+    sfl = SemanticFilesLoader(G.dataset_path)
+    sfl.loadGraphsJustOnce(parameters.nodes, preloadedGraph)
     
     # To log SimPy's events:
     #trace.tchange(outfile=open(r"/tmp/simulation.log","w"))
