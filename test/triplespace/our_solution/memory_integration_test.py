@@ -8,6 +8,7 @@ from netuse.nodes import NodeGenerator
 from netuse.activity import ActivityGenerator
 from commons.utils import SemanticFilesLoader
 from netuse.database.parametrization import Parametrization
+from netuse.evaluation.utils import ParametrizationUtils
 
 # This script generates a simulation and records its trace in a file.
 # Used to check the functionalities under really simple simulation conditions.
