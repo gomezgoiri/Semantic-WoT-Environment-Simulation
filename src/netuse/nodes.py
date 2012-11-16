@@ -16,18 +16,10 @@ class NodeGenerator:
         self.__totalRequests = -1
     
     def generateNodes(self):
-        if not self.__params.nodeTypes:
-            # With ParametrizationUtils this condition will never be true
-            # TODO remove after fully checking that nobody else generates Parametrization documents
-            for nodeName in self.__params.nodes:
-                node = Node(nodeName)
-                NodeGenerator.Nodes[nodeName] = node
-                activate(node,node.processRequests())
-        else:
-            for nodeName, nodeType in zip(self.__params.nodes, self.__params.nodeTypes):
-                node = Node(nodeName, DeviceType.create(nodeType))
-                NodeGenerator.Nodes[nodeName] = node
-                activate(node,node.processRequests())
+        for nodeName, nodeType in zip(self.__params.nodes, self.__params.nodeTypes):
+            node = Node(nodeName, DeviceType.create(nodeType))
+            NodeGenerator.Nodes[nodeName] = node
+            activate(node,node.processRequests())
     
     @staticmethod
     def getNodes():

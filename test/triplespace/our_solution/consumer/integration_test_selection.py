@@ -6,7 +6,7 @@ from netuse.results import G
 from netuse.tracers import FileTracer
 from netuse.nodes import NodeGenerator
 from netuse.activity import ActivityGenerator
-from netuse.evaluation.utils import ParametrizationUtils
+from netuse.evaluation.utils import ParametrizationUtils, Parameters
 from netuse.database.parametrization import Parametrization
 from netuse.devices import XBee, SamsungGalaxyTab, FoxG20, Server
 
@@ -65,14 +65,17 @@ if __name__ == '__main__':
     # Remaining devices, are XBees
     nodeTypes += (XBee.TYPE_ID,)*(numNodes-len(nodeTypes))
     
-    p = ParametrizationUtils('network_usage', G.dataset_path)
-    param = p.getDefaultParametrization(Parametrization.our_solution,
-                                   amountOfQueries = 100,
-                                   writeFrequency = 10000,
-                                   simulateUntil = 60000,
-                                   queries = temp,
-                                   numNodes = numNodes,
-                                   numConsumers = 100,
-                                   nodeTypes = nodeTypes
-                                   )
-    performSimulation(param)
+
+    p = ParametrizationUtils('integration_test', G.dataset_path, None)
+    params = Parameters (
+                simulateUntil = 60000,
+                strategy = Parametrization.our_solution,
+                amountOfQueries = 100,
+                writeFrequency = 10000,
+                queries = temp,
+                nodes = p.get_random_nodes(numNodes),
+                numConsumers = 100,
+                nodeTypes = nodeTypes
+             )
+    
+    performSimulation( p.create_parametrization(params) )

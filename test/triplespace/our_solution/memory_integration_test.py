@@ -8,7 +8,7 @@ from netuse.nodes import NodeGenerator
 from netuse.activity import ActivityGenerator
 from commons.utils import SemanticFilesLoader
 from netuse.database.parametrization import Parametrization
-from netuse.evaluation.utils import ParametrizationUtils
+from netuse.evaluation.utils import ParametrizationUtils, Parameters
 
 # This script generates a simulation and records its trace in a file.
 # Used to check the functionalities under really simple simulation conditions.
@@ -67,18 +67,19 @@ def main():
     )    
     templates = ((None, SSN.observationResult, None),)
     
-    p = ParametrizationUtils('network_usage', '/home/tulvur/dev/dataset')
-    param = p.getDefaultParametrization(Parametrization.our_solution,
-                                                   amountOfQueries = 1000,
-                                                   writeFrequency = 10000,
-                                                   simulateUntil = 3600000,
-                                                   queries = templates,
-                                                   numNodes = 15,
-                                                   numConsumers = 10
-                                                   )
-    print param
-    performSimulation(param) 
-
+    
+    p = ParametrizationUtils('memory_integration_test', '/home/tulvur/dev/dataset', None)
+    params = Parameters (
+            simulateUntil = 3600000,
+            strategy = Parametrization.our_solution,
+            amountOfQueries = 1000,
+            writeFrequency = 10000,
+            queries = templates,
+            nodes = p.get_random_nodes(15),
+            numConsumers = 10
+         )
+    
+    performSimulation( p.create_parametrization(params) ) 
 
 
 if __name__ == '__main__':

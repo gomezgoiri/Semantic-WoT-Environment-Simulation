@@ -5,7 +5,7 @@ Created on Jan 30, 2012
 '''
 from rdflib import RDF, Namespace
 from netuse.results import G
-from netuse.evaluation.utils import ParametrizationUtils
+from netuse.evaluation.utils import ParametrizationUtils, Parameters
 from netuse.database.parametrization import Parametrization
 from netuse.devices import XBee, SamsungGalaxyTab, FoxG20, Server
 
@@ -15,9 +15,6 @@ def main():
     from netuse.sim_utils import OwnArgumentParser
     parser = OwnArgumentParser('Parametrization for energy consumption measuring.')
     parser.parse_args()
-    
-    
-    p = ParametrizationUtils('energy_consumption', G.dataset_path)
     
     
     SSN = Namespace('http://purl.oclc.org/NET/ssnx/ssn#')
@@ -42,32 +39,46 @@ def main():
       (BIZKAI_STATION.ABANTO, None, None), # given an instance, we cannot predict anything
     )
     
-        
-    for numNodes in (300,):
-        # 1 server, 10% of galaxys, 25% of FoxG20
-        nodeTypes = (Server.TYPE_ID,)*1 + (SamsungGalaxyTab.TYPE_ID,)*((int)(numNodes*0.1)) + (FoxG20.TYPE_ID,)*((int)(numNodes*0.25))
-        # Remaining devices, are XBees
-        nodeTypes += (XBee.TYPE_ID,)*(numNodes-len(nodeTypes))
-        
-        p.createDefaultParametrization(Parametrization.negative_broadcasting,
-                               amountOfQueries = 1000,
-                               writeFrequency = 10000,
-                               simulateUntil = 3600000, # 1h of simulation time
-                               queries = templates,
-                               numNodes = numNodes,
-                               numConsumers = 1, # no importa
-                               nodeTypes = nodeTypes)
-        
-        numConsumers = 100 # TODO somehow, we should define that Galaxy Tabs have more chances to be consumers than XBees
-        p.createDefaultParametrization(Parametrization.our_solution,
-                                       amountOfQueries = 1000,
-                                       writeFrequency = 10000,
-                                       simulateUntil = 3600000,
-                                       queries = templates,
-                                       numNodes = numNodes,
-                                       numConsumers = numConsumers,
-                                       nodeTypes = nodeTypes
-                                       )
+    
+    numNodes = 300
+    
+    # 1 server, 10% of galaxys, 25% of FoxG20
+    nodeTypes = (Server.TYPE_ID,)*1 + (SamsungGalaxyTab.TYPE_ID,)*((int)(numNodes*0.1)) + (FoxG20.TYPE_ID,)*((int)(numNodes*0.25))
+    # Remaining devices, are XBees
+    nodeTypes += (XBee.TYPE_ID,)*(numNodes-len(nodeTypes))
+    
+    
+    # Prepare constant independent parameters
+    default_params = Parameters (
+                         amountOfQueries = 1000,
+                         writeFrequency = 10000,
+                         simulateUntil = 3600000,  # 1h of simulation time
+                         queries = templates,
+                         nodeTypes = nodeTypes
+                     )
+    p = ParametrizationUtils('energy_consumption', G.dataset_path, default_params, repetitions=1)
+    
+    
+    # Prepare variable independent parameters
+    var_params = []
+    
+    var_params.append (
+       Parameters(
+          strategy = Parametrization.negative_broadcasting,
+          numConsumers = 1 # no importa en NB, y en our_solution se sobreescribe
+        )
+    )
+    
+    var_params.append (
+       Parameters(
+          strategy = Parametrization.our_solution,
+          numConsumers = 100 # TODO somehow, we should define that Galaxy Tabs have more chances to be consumers than XBees
+        )
+    )
+    
+    # Prepare and save executions (possibly repeating them)
+    p.save_repeating( network_size=numNodes, rest_variable_parameters=var_params )
+
 
 if __name__ == '__main__':
     main()

@@ -5,55 +5,16 @@ Created on Jan 30, 2012
 '''
 from rdflib import RDF, Namespace
 from netuse.results import G
-from netuse.evaluation.utils import ParametrizationUtils
+from netuse.evaluation.utils import ParametrizationUtils, Parameters
 from netuse.database.parametrization import Parametrization
 from netuse.database.results import RequestsResults
 
-
-def getNeededRequests(execution_set):
-    def expectedRequests(params):
-        total = 0
-        for q in params.queries:
-            for node in params.nodes:
-                savedresults = RequestsResults.objects(station_name=node)
-                savedresults = filter(lambda r: r.query==q, savedresults)
-                if savedresults:
-                    if savedresults[0].has_result:
-                        total += params.amountOfQueries
-                else:
-                    raise Exception("Result not expected, you should run calculateExpectedResults.py again.")        
-        return total
-    
-    params = []
-    for ex in execution_set.executions:
-        par_id = ex.parameters.id
-        if par_id not in params:
-            params.append(par_id)
-    
-    x = []
-    y_xindex = {}
-    for p_id in params:
-        params = Parametrization.objects(id=p_id).first()
-        num_nodes = len(params.nodes)
-        if num_nodes not in x: # both strategies may have the same configurations, so they should have the same "expectations"
-            x.append(num_nodes)
-            y_xindex[num_nodes] = expectedRequests(params)
-    
-    x.sort()
-    y = []
-    for x_val in x:
-        y.append(y_xindex[x_val])
-        
-    return x, y, None
 
 # Entry point for setup.py
 def main():
     from netuse.sim_utils import OwnArgumentParser
     parser = OwnArgumentParser('Parametrization for number of requests measuring.')
     parser.parse_args()
-    
-    
-    p = ParametrizationUtils('network_usage', G.dataset_path)
     
     
     SSN = Namespace('http://purl.oclc.org/NET/ssnx/ssn#')
@@ -78,27 +39,38 @@ def main():
       (BIZKAI_STATION.ABANTO, None, None), # given an instance, we cannot predict anything
     )
     
-    # important: this for before the strategy for, to have the same nodes in both simulations
-    for numNodes in range(5,301,10):
-        p.createDefaultParametrization(Parametrization.negative_broadcasting,
-                               amountOfQueries = 1000,
-                               writeFrequency = 10000,
-                               simulateUntil = 3600000, # 1h of simulation time
-                               queries = templates,
-                               numNodes = numNodes,
-                               numConsumers = 1 # no importa
-                               )
-        
-        for numConsumers in (1, 10, 100):
-            if numConsumers<=numNodes:
-                    p.createDefaultParametrization(Parametrization.our_solution,
-                                                   amountOfQueries = 1000,
-                                                   writeFrequency = 10000,
-                                                   simulateUntil = 3600000,
-                                                   queries = templates,
-                                                   numNodes = numNodes,
-                                                   numConsumers = numConsumers
-                                                   )
+    
+    # Prepare constant independent parameters
+    default_params = Parameters (
+                             amountOfQueries = 1000,
+                             writeFrequency = 10000,
+                             simulateUntil = 3600000,  # 1h of simulation time
+                             queries = templates,
+                           )
+    p = ParametrizationUtils('network_usage', G.dataset_path, default_params, repetitions=1)
+    
+    
+    # Prepare variable independent parameters
+    var_params = []
+    
+    var_params.append (
+       Parameters(
+          strategy = Parametrization.negative_broadcasting,
+          numConsumers = 1 # no importa en NB, y en our_solution se sobreescribe
+        )
+    )
+    
+    for numConsumers in (1, 10, 100):
+        var_params.append (
+           Parameters(
+              strategy = Parametrization.our_solution,
+              numConsumers = numConsumers
+            )
+        )
+    
+    # Prepare and save executions (possibly repeating them)
+    p.save_repeating_for_network_sizes( network_sizes=range(5,301,10), rest_variable_parameters=var_params)
+
 
 if __name__ == '__main__':
     main()
