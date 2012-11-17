@@ -6,7 +6,7 @@ Installation
 
 First of all, install the project and its dependencies using pip:
   (Recommended option for development: checkout the code and edit it whenever you need)
-	 pip install -e svn+https://dev.morelab.deusto.es/svn/aigomez/trunk/NetworkUsage/#egg=netuse
+	 pip install -e git+https://gomezgoiri@bitbucket.org/gomezgoiri/networkusage.git#egg=netuse
 	 
   (If you have already download the code and don't need to edit it to be synchronized with the SVN)
      pip install ./

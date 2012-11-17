@@ -20,7 +20,7 @@ pip install numpy
 pip install matplotlib
 
 
-pip install -e svn+https://dev.morelab.deusto.es/svn/aigomez/trunk/NetworkUsage/#egg=netuse
+pip install -e git+https://gomezgoiri@bitbucket.org/gomezgoiri/networkusage.git#egg=netuse
 
 
 patch $virtualenv_path/$env_name/lib/python2.7/site-packages/rdflib-2.4.2-py2.7-linux-x86_64.egg/rdflib/syntax/parsers/n3p/n3meta.py $virtualenv_path/$env_name/src/netuse/patches/n3meta.py.diff
