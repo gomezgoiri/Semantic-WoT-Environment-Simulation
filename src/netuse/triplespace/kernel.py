@@ -37,6 +37,9 @@ class TripleSpace(object):
     def query(self, template):
         pass
 
+    def stop(self):
+        pass
+
 
 class NegativeBroadcasting(TripleSpace):
     def __init__(self, discovery):
@@ -115,6 +118,13 @@ class OurSolution(TripleSpace):
         # may be because a method of the same object cannot be used at the same simulation time?
         # In this case, when they overlap, the activation of _finish_query_waiting may be ignored when they overlap in time
         activate(qf, qf._finish_query_waiting(template)) # to wait for whitepages
+
+    def stop(self):
+        if self.provider is not None:
+            self.provider.stop()
+        
+        if self.consumer is not None:
+            self.consumer.stop()
 
 class QueryFinisher(Process, RequestObserver):
     

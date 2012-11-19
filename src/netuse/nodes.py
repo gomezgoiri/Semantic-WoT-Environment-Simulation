@@ -105,5 +105,8 @@ class Node(Process):
         self.__waitingRequesters_and_InitTime[req.getid()] = (requester, now())
         reactivate(self) # starts answering
 
+    def stop(self):
+        self._ts.stop()
+    
     def __str__(self):
         return self.name

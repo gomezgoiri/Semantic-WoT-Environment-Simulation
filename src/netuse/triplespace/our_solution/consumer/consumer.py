@@ -6,12 +6,15 @@ Created on Sep 17, 2012
 import json
 from abc import ABCMeta, abstractmethod
 from SimPy.Simulation import now
+from testing.utils import TimeRecorder
 from clueseval.clues.storage.sqlite import SQLiteClueStore
+from clueseval.clues.storage.memory import MemoryClueStore
 from netuse.results import G
 from netuse.triplespace.network.url_utils import URLUtils
 from netuse.triplespace.our_solution.consumer.time_update import UpdateTimesManager
 from netuse.triplespace.our_solution.whitepage.selection import WhitepageSelector, WhitepageSelectionManager, SelectionProcessObserver
 from netuse.triplespace.network.client import RequestInstance, RequestManager, RequestObserver
+
 
 class AbstractConsumer(SelectionProcessObserver):
     
@@ -26,7 +29,7 @@ class AbstractConsumer(SelectionProcessObserver):
     def get_query_candidates(self, template, previously_unresolved=False):
         self.__update_connector_if_needed()
         
-        if self.connector==None:
+        if self.connector is None:
             raise Exception("Try again a little bit latter.")
         return self.connector.get_query_candidates(template, previously_unresolved)
     
@@ -48,6 +51,11 @@ class AbstractConsumer(SelectionProcessObserver):
     def wp_selection_finished(self, wp_node):
         self.ongoing_selection = False
         # TODO update the connector with the new selected white page
+    
+    def stop(self):
+        if self.connector is not None:
+            self.connector.stop()
+
 
 class ConsumerFactory(object):
     
@@ -68,7 +76,7 @@ class Consumer(AbstractConsumer):
     def _update_connector(self, wp):
         if self.wp_node_name is None or self.wp_node_name!=wp.name:
             if self.connector is not None:
-                    self.connector.stop()
+                self.connector.stop()
             
             self.wp_node_name = wp.name
             if wp==self.discovery.me:                
@@ -124,13 +132,16 @@ class RemoteConnector(AbstractConnector, RequestObserver):
         self.clues = SQLiteClueStore(database_path=G.temporary_path)
         self.first_load_in_store = False
         
+        self.recorder = TimeRecorder()
+        
     def start(self):
         self.clues.start()
         self._initialize_clues()
         self._schedule_future_update()
-    
+        
     def stop(self):
         self.clues.stop()
+        print self.recorder
     
     def _initialize_clues(self):
         # request to whitepage
@@ -148,7 +159,9 @@ class RemoteConnector(AbstractConnector, RequestObserver):
     def notifyRequestFinished(self, request_instance):
         for unique_response in request_instance.responses:
             if unique_response.getstatus()==200:
+                self.recorder.start()
                 self.clues.fromJson(unique_response.get_data())
+                self.recorder.stop()
                 self.first_load_in_store = True
                 break
             else:
@@ -182,7 +195,11 @@ class RemoteConnector(AbstractConnector, RequestObserver):
         if not self.first_load_in_store:
             # wait until the clues are loaded for the first time
             raise Exception("Wait for the first clue loading.")
-        return self.clues.get_query_candidates(template)
+        
+        self.recorder.start()
+        ret = self.clues.get_query_candidates(template)
+        self.recorder.stop()
+        return ret
 
 
 

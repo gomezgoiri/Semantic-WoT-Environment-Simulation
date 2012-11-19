@@ -36,22 +36,23 @@ class Provider(Process, SimpleDiscoveryObserver):
         self.discovery.add_changes_observers(self)
         self.clue_manager = ClueManager(dataaccess)
         
-        self.stop = False
+        self.__stop = False
         self.wp_node_name = None
         self.connector = None
         
         self.externalCondition = SimEvent(name="external_condition_on_%s"%(self.name))
         self.clueChanged = SimEvent(name="clue_change_on_%s"%(self.name))
+        self.stopProvider = SimEvent(name="stop_provider_%s"%(self.name))
         self.timer = None
     
     def update_clues_on_whitepage(self):
-        while not self.stop:
+        while not self.__stop:
             self.__update_connector_if_needed()
             if self.connector!=None:
                 self.connector.send_clue(self.clue_manager.get_clue())
             self.timer = Timer(Provider.UPDATE_TIME)
             activate(self.timer, self.timer.wait())
-            yield waitevent, self, (self.timer.event, self.externalCondition, self.clueChanged)
+            yield waitevent, self, (self.timer.event, self.externalCondition, self.clueChanged, self.stopProvider)
     
     def __update_connector_if_needed(self):
         wp = self.discovery.get_whitepage()
@@ -71,6 +72,11 @@ class Provider(Process, SimpleDiscoveryObserver):
     def on_whitepage_selected_after_none(self):
         if self.timer==None: self.cancel(self.timer)  
         self.externalCondition.signal()
+    
+    # Just in case
+    def stop(self):
+        self.__stop = True
+        self.stopProvider.signal()
 
 
 class AbstractConnector(object):
