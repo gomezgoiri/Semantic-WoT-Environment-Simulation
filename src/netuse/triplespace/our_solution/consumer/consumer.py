@@ -6,7 +6,6 @@ Created on Sep 17, 2012
 import json
 from abc import ABCMeta, abstractmethod
 from SimPy.Simulation import now
-from testing.utils import TimeRecorder
 from clueseval.clues.storage.sqlite import SQLiteClueStore
 from clueseval.clues.storage.memory import MemoryClueStore
 from netuse.results import G
@@ -132,8 +131,6 @@ class RemoteConnector(AbstractConnector, RequestObserver):
         self.clues = SQLiteClueStore(database_path=G.temporary_path)
         self.first_load_in_store = False
         
-        self.recorder = TimeRecorder()
-        
     def start(self):
         self.clues.start()
         self._initialize_clues()
@@ -141,7 +138,6 @@ class RemoteConnector(AbstractConnector, RequestObserver):
         
     def stop(self):
         self.clues.stop()
-        print self.recorder
     
     def _initialize_clues(self):
         # request to whitepage
@@ -159,9 +155,7 @@ class RemoteConnector(AbstractConnector, RequestObserver):
     def notifyRequestFinished(self, request_instance):
         for unique_response in request_instance.responses:
             if unique_response.getstatus()==200:
-                self.recorder.start()
                 self.clues.fromJson(unique_response.get_data())
-                self.recorder.stop()
                 self.first_load_in_store = True
                 break
             else:
@@ -196,11 +190,7 @@ class RemoteConnector(AbstractConnector, RequestObserver):
             # wait until the clues are loaded for the first time
             raise Exception("Wait for the first clue loading.")
         
-        self.recorder.start()
-        ret = self.clues.get_query_candidates(template)
-        self.recorder.stop()
-        return ret
-
+        return self.clues.get_query_candidates(template)
 
 
 class RemoteLiteConnector(AbstractConnector, RequestObserver):
