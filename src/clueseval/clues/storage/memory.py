@@ -15,6 +15,8 @@ def compare_expiry(tuple_a, tuple_b):
         return cmp(int(tuple_a[0]), int(tuple_b[0])) # compare as integers
 
 
+# Note that in-memory version of SQLiteClueStore consumes less memory and takes less time (see issue #2).
+# This "clue store" is kept just because at the moment SQLiteClueStore only supports Predicate-based clues.
 class MemoryClueStore(AbstractStore):
     
     def __init__(self, tipe=None):

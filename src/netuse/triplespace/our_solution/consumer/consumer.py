@@ -128,7 +128,9 @@ class RemoteConnector(AbstractConnector, RequestObserver):
         self.whitepage_node = whitepage_node
         self.updateTimeManager = UpdateTimesManager()
         
-        self.clues = SQLiteClueStore(database_path=G.temporary_path)
+        # Aspecto discutido en issue #1
+        # self.clues = SQLiteClueStore(database_path=G.temporary_path)
+        self.clues = SQLiteClueStore(in_memory=True)
         self.first_load_in_store = False
         
     def start(self):

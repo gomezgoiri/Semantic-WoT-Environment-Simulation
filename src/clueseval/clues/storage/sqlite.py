@@ -29,13 +29,17 @@ class SQLiteClueStore(AbstractStore):
     _SELECT_SCHEMA = "select * from " + SCHEMAS_TABLE    
     _SELECT_PREDICATE = "select * from " + PREDICATES_TABLE
     
-    def __init__(self, database_name=None, database_path=None, tipe=None):
+    def __init__(self, in_memory=False, database_name=None, database_path=None, tipe=None):
         db_path = database_path if database_path is None or database_path.endswith("/") else database_path + "/"
         
-        if database_name is None:
-            self.db_file = mkstemp(suffix=".db", dir=db_path)[1]
+        if in_memory:
+            self.db_file = ":memory:"
         else:
-            self.db_file = database_name
+            if database_name is None:
+                self.db_file = mkstemp(suffix=".db", dir=db_path)[1]
+            else:
+                self.db_file = database_name
+                
         self.type = PredicateBasedClue.ID() # right now, just predicate-based clues have been implemented in SQLite store
         
     def start(self):
