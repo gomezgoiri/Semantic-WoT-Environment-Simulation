@@ -44,14 +44,14 @@ class AggregationClueUtils(object):
     
     @staticmethod
     def toJson(dictionary):
-        if not AggregationClueUtils.validate(dictionary):
-            raise Exception("Malformed clue.")
+        if dictionary and not AggregationClueUtils.validate(dictionary):
+            raise Exception("Malformed clue." + str(dictionary))
         return json.dumps(dictionary)
     
     @staticmethod
     def fromJson(json_str):
         dictionary = json.loads(json_str)
-        if not AggregationClueUtils.validate(dictionary):
+        if dictionary and not AggregationClueUtils.validate(dictionary):
             raise Exception("Malformed clue.")
         return dictionary
 

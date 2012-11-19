@@ -56,22 +56,24 @@ class MemoryClueStore(AbstractStore):
     
     def toJson(self):
         dictio = {}
-        dictio[Clue.ID_P()] = self.type
         
-        if self.type==SchemaBasedClue.ID():
-            dictio[SchemaBasedClue._SCHEMA()] = {}
-            for node, c in self.bynode.iteritems():
-                dictio[SchemaBasedClue._SCHEMA()][node] = c._toDictionary()
-        elif self.type==PredicateBasedClue.ID():
-            tmpDictios = self._create_temporary_dictionaries()
+        if self.type is not None: # if the type is not set, we return an empty dictionary
+            dictio[Clue.ID_P()] = self.type
             
-            dictio[SchemaBasedClue._SCHEMA()] = self._gather_schemas(tmpDictios.itervalues())
-            dictio[PredicateBasedClue._PREDICATE()] = self._gather_shortened_uris_by_node(tmpDictios.iteritems(), PredicateBasedClue._PREDICATE())
-        elif self.type==PredicateBasedClue.ID():
-            tmpDictios = self._create_temporary_dictionaries()
-            
-            dictio[SchemaBasedClue._SCHEMA()] = self._gather_schemas(tmpDictios.itervalues())
-            dictio[ClassBasedClue._CLASS()] = self._gather_shortened_uris_by_node(tmpDictios.iteritems(), ClassBasedClue._CLASS())
+            if self.type==SchemaBasedClue.ID():
+                dictio[SchemaBasedClue._SCHEMA()] = {}
+                for node, c in self.bynode.iteritems():
+                    dictio[SchemaBasedClue._SCHEMA()][node] = c._toDictionary()
+            elif self.type==PredicateBasedClue.ID():
+                tmpDictios = self._create_temporary_dictionaries()
+                
+                dictio[SchemaBasedClue._SCHEMA()] = self._gather_schemas(tmpDictios.itervalues())
+                dictio[PredicateBasedClue._PREDICATE()] = self._gather_shortened_uris_by_node(tmpDictios.iteritems(), PredicateBasedClue._PREDICATE())
+            elif self.type==ClassBasedClue.ID():
+                tmpDictios = self._create_temporary_dictionaries()
+                
+                dictio[SchemaBasedClue._SCHEMA()] = self._gather_schemas(tmpDictios.itervalues())
+                dictio[ClassBasedClue._CLASS()] = self._gather_shortened_uris_by_node(tmpDictios.iteritems(), ClassBasedClue._CLASS())
                     
         return AggregationClueUtils.toJson(dictio)
     
@@ -85,26 +87,28 @@ class MemoryClueStore(AbstractStore):
     # Overrides previously stored clues
     def fromJson(self, json_txt):
         dictio = AggregationClueUtils.fromJson(json_txt)
-        self.type = dictio[Clue.ID_P()]
-        self.bynode = {}
         
-        if self.type==SchemaBasedClue.ID():
-            for node, clue in dictio[SchemaBasedClue._SCHEMA()].iteritems():
-                c = SchemaBasedClue()
-                c._fromDictionary(clue)
-                self.bynode[node] = c
-        elif self.type==PredicateBasedClue.ID():
-            all_schemas = dictio[SchemaBasedClue._SCHEMA()]
-            for node, clue in dictio[PredicateBasedClue._PREDICATE()].iteritems():                 
-                c = PredicateBasedClue()
-                c._fromDictionary( self._divide_clue(all_schemas, clue) )
-                self.bynode[node] = c
-        elif self.type==PredicateBasedClue.ID():
-            all_schemas = dictio[SchemaBasedClue._SCHEMA()]
-            for node, clue in dictio[ClassBasedClue._CLASS()].iteritems():                 
-                c = PredicateBasedClue()
-                c._fromDictionary( self._divide_clue(all_schemas, clue) )
-                self.bynode[node] = c
+        if dictio: # if the dictionary is empty, we don't do anything
+            self.type = dictio[Clue.ID_P()]
+            self.bynode = {}
+            
+            if self.type==SchemaBasedClue.ID():
+                for node, clue in dictio[SchemaBasedClue._SCHEMA()].iteritems():
+                    c = SchemaBasedClue()
+                    c._fromDictionary(clue)
+                    self.bynode[node] = c
+            elif self.type==PredicateBasedClue.ID():
+                all_schemas = dictio[SchemaBasedClue._SCHEMA()]
+                for node, clue in dictio[PredicateBasedClue._PREDICATE()].iteritems():                 
+                    c = PredicateBasedClue()
+                    c._fromDictionary( self._divide_clue(all_schemas, clue) )
+                    self.bynode[node] = c
+            elif self.type==PredicateBasedClue.ID():
+                all_schemas = dictio[SchemaBasedClue._SCHEMA()]
+                for node, clue in dictio[ClassBasedClue._CLASS()].iteritems():                 
+                    c = PredicateBasedClue()
+                    c._fromDictionary( self._divide_clue(all_schemas, clue) )
+                    self.bynode[node] = c
     
     
     def add_clue(self, node_name, clue_json):

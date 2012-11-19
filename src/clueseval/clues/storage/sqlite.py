@@ -171,15 +171,17 @@ class SQLiteClueStore(AbstractStore):
     
     def toJson(self):
         dictio = {}
-        dictio[Clue.ID_P()] = self.type
         
-        if self.type==SchemaBasedClue.ID():
-            raise NotImplementedError()
-        elif self.type==PredicateBasedClue.ID():
-            dictio[SchemaBasedClue._SCHEMA()] = self.get_schemas()
-            dictio[PredicateBasedClue._PREDICATE()] = self.get_predicates()
-        elif self.type==PredicateBasedClue.ID():
-            raise NotImplementedError()
+        if self.type is not None: # if the type is not set, we return an empty dictionary
+            dictio[Clue.ID_P()] = self.type
+            
+            if self.type==SchemaBasedClue.ID():
+                raise NotImplementedError()
+            elif self.type==PredicateBasedClue.ID():
+                dictio[SchemaBasedClue._SCHEMA()] = self.get_schemas()
+                dictio[PredicateBasedClue._PREDICATE()] = self.get_predicates()
+            elif self.type==PredicateBasedClue.ID():
+                raise NotImplementedError()
                     
         return AggregationClueUtils.toJson(dictio)
     
@@ -194,23 +196,25 @@ class SQLiteClueStore(AbstractStore):
         self.reset_all()
         
         dictio = AggregationClueUtils.fromJson(json_str)
-        self.type = dictio[Clue.ID_P()]
         
-        if self.type==SchemaBasedClue.ID():
-            raise NotImplementedError()
-        elif self.type==PredicateBasedClue.ID():
-            mappings = {}
-            for name, URI in dictio[SchemaBasedClue._SCHEMA()]:
-                stored_name = self._insert_schema(name, URI)
-                if stored_name is not name:
-                    mappings[name] = stored_name
-            for node_name, uris in dictio[PredicateBasedClue._PREDICATE()].iteritems():
-                for prefix, endings in uris.iteritems():
-                    actual_prefix = prefix if prefix not in mappings else mappings[prefix]
-                    self.conn.executemany( SQLiteClueStore._INSERT_PREDICATE, [(node_name, actual_prefix, ending) for ending in endings] )
-                    self.conn.commit()
-        elif self.type==ClassBasedClue.ID():
-            raise NotImplementedError()
+        if dictio: # if the dictionary is empty, we don't do anything
+            self.type = dictio[Clue.ID_P()]
+            
+            if self.type==SchemaBasedClue.ID():
+                raise NotImplementedError()
+            elif self.type==PredicateBasedClue.ID():
+                mappings = {}
+                for name, URI in dictio[SchemaBasedClue._SCHEMA()]:
+                    stored_name = self._insert_schema(name, URI)
+                    if stored_name is not name:
+                        mappings[name] = stored_name
+                for node_name, uris in dictio[PredicateBasedClue._PREDICATE()].iteritems():
+                    for prefix, endings in uris.iteritems():
+                        actual_prefix = prefix if prefix not in mappings else mappings[prefix]
+                        self.conn.executemany( SQLiteClueStore._INSERT_PREDICATE, [(node_name, actual_prefix, ending) for ending in endings] )
+                        self.conn.commit()
+            elif self.type==ClassBasedClue.ID():
+                raise NotImplementedError()
     
     # TODO delete schemas if they are no longer used?
     def reset_preficates_for_node(self, node_name):
