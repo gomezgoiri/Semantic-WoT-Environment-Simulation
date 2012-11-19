@@ -191,32 +191,7 @@ class SQLiteClueStore(AbstractStore):
         self.conn.execute("delete from " + SQLiteClueStore.CLASSES_TABLE)
         self.conn.commit()
     
-    def fromJson(self, json_str):
-        # Overrides previously stored clues
-        self.reset_all()
-        
-        dictio = AggregationClueUtils.fromJson(json_str)
-        
-        if dictio: # if the dictionary is empty, we don't do anything
-            self.type = dictio[Clue.ID_P()]
-            
-            if self.type==SchemaBasedClue.ID():
-                raise NotImplementedError()
-            elif self.type==PredicateBasedClue.ID():
-                mappings = {}
-                for name, URI in dictio[SchemaBasedClue._SCHEMA()]:
-                    stored_name = self._insert_schema(name, URI)
-                    if stored_name is not name:
-                        mappings[name] = stored_name
-                for node_name, uris in dictio[PredicateBasedClue._PREDICATE()].iteritems():
-                    for prefix, endings in uris.iteritems():
-                        actual_prefix = prefix if prefix not in mappings else mappings[prefix]
-                        self.conn.executemany( SQLiteClueStore._INSERT_PREDICATE, [(node_name, actual_prefix, ending) for ending in endings] )
-                        self.conn.commit()
-            elif self.type==ClassBasedClue.ID():
-                raise NotImplementedError()
-    
-    def fromJson2(self, json_str): # using transactions
+    def fromJson(self, json_str): # using transactions
         # Overrides previously stored clues
         self.reset_all()
         
@@ -267,10 +242,10 @@ class SQLiteClueStore(AbstractStore):
                 stored_name = self._insert_schema(name, URI)
                 if stored_name is not name:
                     mappings[name] = stored_name
-            for prefix, endings in dictio[PredicateBasedClue._PREDICATE()].iteritems():
-                actual_prefix = prefix if prefix not in mappings else mappings[prefix]
-                self.conn.executemany( SQLiteClueStore._INSERT_PREDICATE, [(node_name, actual_prefix, ending) for ending in endings] )
-                self.conn.commit()
+            with self.conn:
+                for prefix, endings in dictio[PredicateBasedClue._PREDICATE()].iteritems():
+                    actual_prefix = prefix if prefix not in mappings else mappings[prefix]
+                    self.conn.executemany( SQLiteClueStore._INSERT_PREDICATE, [(node_name, actual_prefix, ending) for ending in endings] )
         elif self.type==ClassBasedClue.ID():
             raise NotImplementedError()
     

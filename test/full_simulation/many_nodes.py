@@ -2,6 +2,9 @@ from SimPy.Simulation import initialize, simulate
 
 from rdflib import URIRef, Namespace, RDF
 
+from testing.utils import TimeRecorder
+from testing.memory_usage import memory
+
 from netuse.results import G
 from netuse.tracers import FileTracer
 from netuse.nodes import NodeGenerator
@@ -30,11 +33,19 @@ def performSimulation(parameters):
     activity = ActivityGenerator(parameters, preloadedGraph)
     activity.generateActivity()
     
-    del preloadedGraph # maybe with this we can save a little memory for the simulation?
+    recorder = TimeRecorder()
+    recorder.start()    
     
     # activate
     cool_down = 500
     simulate(until=parameters.simulateUntil+cool_down)
+    print "Memory consumption: %0.2f GB"%(memory()/(1024*1024*1024))
+    
+    recorder.stop()
+    print recorder
+    
+    for node in nodes.getNodes():
+        node.stop()
     
     G.shutdown()
 
@@ -70,13 +81,13 @@ def main():
     
     p = ParametrizationUtils('memory_integration_test', '/home/tulvur/dev/dataset', None)
     params = Parameters (
-            simulateUntil = 3600000,
+            simulateUntil = 400000,
             strategy = Parametrization.our_solution,
             amountOfQueries = 1000,
             writeFrequency = 10000,
             queries = templates,
-            nodes = p.get_random_nodes(15),
-            numConsumers = 10
+            nodes = p.get_random_nodes(100),
+            numConsumers = 100
          )
     
     performSimulation( p.create_parametrization(params) ) 
