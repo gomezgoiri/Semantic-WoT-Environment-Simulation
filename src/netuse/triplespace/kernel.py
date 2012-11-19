@@ -154,7 +154,7 @@ class QueryFinisher(Process, RequestObserver):
         if attempts==0:
             # somehow record this failure
             print "No clues have been initialized"
-            pass
+            #pass
         else:
             try:
                 if len(selected_nodes)>0:

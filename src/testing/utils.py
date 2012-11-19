@@ -35,7 +35,7 @@ def add_to_test_suite_rec(suite, loader, directory, recursive=True):
 
 class TimeRecorder(object):
     
-    def __init__(self, msg):
+    def __init__(self, msg = None):
         self.message = msg
         self.reset()
     
@@ -49,7 +49,7 @@ class TimeRecorder(object):
         self.time_passed += (time.time() - self.t1)
     
     def __str__(self):
-        return "%0.3f "%self.time_passed + "" if self.message is None else self.message
+        return "%0.3f %s"%(self.time_passed, "" if self.message is None else self.message)
     
     def __repr__(self):
         return self.__str__()
