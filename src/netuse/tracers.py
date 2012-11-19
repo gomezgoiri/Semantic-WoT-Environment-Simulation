@@ -50,7 +50,7 @@ class FileTracer(AbstractTracer):
     
     def __init__(self, filename='/tmp/workfile'):
         self.filename = filename
-        self.flusher = Flusher(self.filename)
+        self.flusher = Flusher()
     
     def start(self):
         self.f = open(self.filename, 'w')
