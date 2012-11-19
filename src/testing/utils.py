@@ -6,6 +6,7 @@ Created on Oct 29, 2012
 
 import os
 import sys
+import time
 import unittest
 
 def create_test_suite_for_directory(base_file, recursive=True):    
@@ -30,3 +31,25 @@ def add_to_test_suite_rec(suite, loader, directory, recursive=True):
                     add_to_test_suite_rec(suite, loader, subdirectory, recursive)
                 except:
                     pass # not valid entry
+
+
+class TimeRecorder(object):
+    
+    def __init__(self, msg):
+        self.message = msg
+        self.reset()
+    
+    def reset(self):
+        self.time_passed = 0
+    
+    def start(self):
+        self.t1 = time.time()
+            
+    def stop(self):
+        self.time_passed += (time.time() - self.t1)
+    
+    def __str__(self):
+        return "%0.3f "%self.time_passed + "" if self.message is None else self.message
+    
+    def __repr__(self):
+        return self.__str__()
