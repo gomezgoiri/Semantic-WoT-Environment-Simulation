@@ -196,9 +196,9 @@ class RemoteConnector(AbstractConnector, RequestObserver):
             # wait until the clues are loaded for the first time
             raise Exception("Wait for the first clue loading.")
         
-        self.recorder.start()
+        #self.recorder.start()
         ret = self.clues.get_query_candidates(template)
-        self.recorder.stop()
+        #self.recorder.stop()
         return ret
 
 
