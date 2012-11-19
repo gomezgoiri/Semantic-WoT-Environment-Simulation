@@ -40,7 +40,7 @@ class Flusher(object):
     
     def force_flush(self):
         t = time()
-        if self.countdown<0 or t - self.last_flush<Flusher.TIME:
+        if self.countdown<0 or (t-self.last_flush)<Flusher.TIME:
             self.countdown = Flusher.WRITES
             self.last_flush = t
             return True # you need to flush
