@@ -17,16 +17,40 @@ class DiagramGenerator:
     
     '''
       {
-        'ours': {
+        'ours': [
+            {
              'total': 120,
              'dev1': 320,
              'dev2': 420,
              ...,
              'devn': 510
-         },
-        'nb': {
-            'total': 320
-        }
+            },
+            ...
+            {
+             'total': 120,
+             'dev1': 320,
+             'dev2': 420,
+             ...,
+             'devn': 510
+            }
+        ],
+        'nb': [
+            {
+             'total': 120,
+             'dev1': 320,
+             'dev2': 420,
+             ...,
+             'devn': 510
+            },
+            ...
+            {
+             'total': 120,
+             'dev1': 320,
+             'dev2': 420,
+             ...,
+             'devn': 510
+            }
+        ]
       }
     '''
     def __init__(self, data):
@@ -62,48 +86,80 @@ class DiagramGenerator:
         plt.xlabel("Strategy")
         plt.ylabel(self.ylabel)
         
+        total_nb = [rep[DiagramGenerator.TOTAL] for rep in data[DiagramGenerator.NB] ]
+        total_ours = [rep[DiagramGenerator.TOTAL] for rep in data[DiagramGenerator.OURS] ]
+        
+        values = (np.average(total_nb), np.average(total_ours))
+        yerr = (np.std(total_nb), np.std(total_ours))
         
         ind = (1,2)  # the x locations for the groups
         width = 0.5       # the width of the bars
         
         ax.bar( ind,
-                (data[DiagramGenerator.NB][DiagramGenerator.TOTAL],
-                 data[DiagramGenerator.OURS][DiagramGenerator.TOTAL]),
-               width, color=self.colors.next())
+                values,
+                width,
+                yerr=yerr,
+                color=self.colors.next())
         plt.xticks([i+width/2 for i in ind ], ('nb', 'ours') )
         
         ax.set_xlim(0.5,3)
         ax.set_ylim(0)
+        
+    def _generate_dictionary_by_device(self, strategy_list):       
+        devices = {}
+        for rep in strategy_list:
+            for device_name, meas in rep.iteritems():
+                if device_name is not DiagramGenerator.TOTAL:
+                    if device_name not in devices:
+                        devices[device_name] = []
+                    devices[device_name].append(meas)
+        return devices
+    
+    def _check_order(self, devices_nb, devices_ours):
+        for nb_dev_names, ours_dev_names in zip(devices_nb.iterkeys(), devices_ours.iterkeys()):
+            if nb_dev_names!=ours_dev_names:
+                raise Exception("Error. Both list should have keys in the same order.")
+            
     
     def generate_subplot_device_comparison(self, ax, data):        
         plt.xlabel("Types of devices")
         plt.ylabel(self.ylabel)
         
-        elements_ours = dict(data[DiagramGenerator.OURS])
-        del elements_ours[DiagramGenerator.TOTAL]
-        elements_nb = dict(data[DiagramGenerator.NB])
-        del elements_nb[DiagramGenerator.TOTAL]
+        devices_nb = self._generate_dictionary_by_device(data[DiagramGenerator.NB])
+        devices_ours = self._generate_dictionary_by_device(data[DiagramGenerator.OURS])
+        self._check_order(devices_nb, devices_ours)
         
-        ind = range(1, len(elements_ours)+1) # the x locations for the groups
+        ind = range(1, len(devices_ours)+1) # the x locations for the groups
         width = 0.3       # the width of the bars
         
-        ax.bar( ind,
-                elements_ours.values(),
-                width, color=self.colors.next(),
+        
+        values = [np.average(measures) for measures in devices_ours.itervalues()]
+        yerr = [np.std(measures) for measures in devices_ours.itervalues()]
+        
+        ax.bar( ind, values, width,
+                yerr=yerr,
+                color=self.colors.next(),
                 label=DiagramGenerator.OURS
-                )
-        ax.bar( [i+width for i in ind],
-                elements_nb.values(),
-                width, color=self.colors.next(),
+        )
+        
+        
+        values = [np.average(measures) for measures in devices_nb.itervalues()]
+        yerr = [np.std(measures) for measures in devices_nb.itervalues()]
+        
+        ax.bar( [i+width for i in ind], values, width,
+                yerr=yerr,
+                color=self.colors.next(),
                 label=DiagramGenerator.NB
-                )
-        plt.xticks( [i+width for i in ind], elements_ours.keys())
+        )
+        
+        
+        plt.xticks( [i+width for i in ind], devices_ours.keys())
         
         handles, labels = ax.get_legend_handles_labels()
         #ax.legend(handles[::-1], labels[::-1]) # reverse the order
         ax.legend(handles, labels, loc="upper left")
         
-        ax.set_xlim(0.5, len(elements_ours)+1)
+        ax.set_xlim(0.5, len(devices_ours)+1)
         ax.set_ylim(0)
     
     def show(self):
@@ -115,15 +171,40 @@ class DiagramGenerator:
 
 def mainTest():
     json_txt = '''{
-        'ours': {
+        'ours': [
+            {
              'total': 120,
              'dev1': 320,
              'dev2': 420,
              'dev3': 510
-         },
-        'nb': {
-            'total': 320
-        }
+            },
+            {
+             'total': 140,
+             'dev1': 120,
+             'dev2': 420,
+             'dev3': 510
+            },
+        ],
+        'nb': [
+            {
+             'total': 360,
+             'dev1': 120,
+             'dev2': 120,
+             'dev3': 120
+            },
+            {
+             'total': 380,
+             'dev1': 140,
+             'dev2': 120,
+             'dev3': 120
+            },
+            {
+             'total': 320,
+             'dev1': 120,
+             'dev2': 120,
+             'dev3': 80
+            },
+        ]
     }
     '''
     json_txt = json_txt.replace(' ','')
@@ -143,4 +224,4 @@ def main():
 
 
 if __name__ == '__main__':   
-    main()
+    mainTest()
