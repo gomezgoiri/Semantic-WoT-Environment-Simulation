@@ -123,7 +123,9 @@ class RawDataProcessor(object):
             self._add_activity_period(temp, trace.server, trace.timestamp-trace.response_time, trace.timestamp)
         return temp
     
-    def _calculate_total_activity_of_nodes(self, activity_per_node):
+    def _calculate_total_activity_per_node(self, traces):
+        activity_per_node = self._calculate_activity_per_node(traces)
+        
         # sort by num_nodes
         results = {}
         for node_name, activity in activity_per_node.iteritems():
@@ -133,21 +135,17 @@ class RawDataProcessor(object):
             results[node_name] = busy_time
         return results
     
-    def _calculate_overall_activity(self, traces):
-        activity_per_node = self._calculate_activity_per_node(traces)
-        total_activity_per_node = self._calculate_total_activity_of_nodes(activity_per_node) # all nodes
-        activity_mean = numpy.mean(total_activity_per_node.values())
-        return activity_mean
-    
     def _load_strat(self, executionSet, strategy, key):
         # Imported here to enable testing other methods without connecting to mongodb
         from netuse.database.results import NetworkTrace
         
-        self.data[key] = {}
+        self.data[key] = []
         for execution in executionSet.executions:
             if execution.parameters.strategy==strategy:
-                activity_per_node = self._calculate_activity_per_node(NetworkTrace.objects(execution=execution.id))
-                self.data[key][DiagramGenerator.TOTAL] = self._calculate_activity_of_nodes(activity_per_node, activity_per_node.iterkeys()) # all nodes
+                repetition_data = {}
+                
+                total_activity_per_node = self._calculate_total_activity_per_node(NetworkTrace.objects(execution=execution.id))
+                repetition_data[DiagramGenerator.TOTAL] = numpy.mean(total_activity_per_node.values())
                 
                 # for each type of device
                 node_names_by_device_type = {}
@@ -158,9 +156,12 @@ class RawDataProcessor(object):
                     
                 
                 for device_type, node_names in node_names_by_device_type.iteritems():
-                    self.data[key][device_type] = self._calculate_activity_of_nodes(activity_per_node, node_names)
+                    subset_activity_per_node = []
+                    for node_name in node_names:
+                        subset_activity_per_node.append( total_activity_per_node[node_name] )
+                    repetition_data[device_type] = numpy.mean(subset_activity_per_node)
                     
-                break
+                self.data[key].append(repetition_data)
 
     def load_all(self):
         # Imported here to enable testing other methods without connecting to mongodb
