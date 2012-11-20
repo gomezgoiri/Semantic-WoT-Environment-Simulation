@@ -1,3 +1,10 @@
+######### PROJECT's ##########
+
+src/netuse/database/__init__.py # database connection info
+
+
+########## PYTHON's ###########
+
 *.py[cod]
 
 # C extensions
