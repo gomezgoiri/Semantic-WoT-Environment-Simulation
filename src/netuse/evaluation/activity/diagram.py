@@ -99,7 +99,8 @@ class DiagramGenerator:
                 values,
                 width,
                 yerr=yerr,
-                color=self.colors.next())
+                color=self.colors.next(),
+                ecolor='black')
         plt.xticks([i+width/2 for i in ind ], ('nb', 'ours') )
         
         ax.set_xlim(0.5,3)
@@ -133,23 +134,25 @@ class DiagramGenerator:
         width = 0.3       # the width of the bars
         
         
-        values = [np.average(measures) for measures in devices_ours.itervalues()]
-        yerr = [np.std(measures) for measures in devices_ours.itervalues()]
+        values = [np.average(measures) for measures in devices_nb.itervalues()]
+        yerr = [np.std(measures) for measures in devices_nb.itervalues()]
         
         ax.bar( ind, values, width,
                 yerr=yerr,
                 color=self.colors.next(),
-                label=DiagramGenerator.OURS
+                ecolor='black',
+                label=DiagramGenerator.NB
         )
         
         
-        values = [np.average(measures) for measures in devices_nb.itervalues()]
-        yerr = [np.std(measures) for measures in devices_nb.itervalues()]
+        values = [np.average(measures) for measures in devices_ours.itervalues()]
+        yerr = [np.std(measures) for measures in devices_ours.itervalues()]
         
         ax.bar( [i+width for i in ind], values, width,
                 yerr=yerr,
                 color=self.colors.next(),
-                label=DiagramGenerator.NB
+                ecolor='black',
+                label=DiagramGenerator.OURS
         )
         
         
@@ -224,4 +227,4 @@ def main():
 
 
 if __name__ == '__main__':   
-    mainTest()
+    main()
