@@ -1,0 +1,134 @@
+
+@prefix _10: <http://aemet.linkeddata.es/resource/WindAmbientProperty/>.
+@prefix _11: <http://aemet.linkeddata.es/resource/HumidityAmbientProperty/>.
+@prefix _12: <http://aemet.linkeddata.es/resource/TemperatureAmbientProperty/>.
+@prefix _13: <http://aemet.linkeddata.es/resource/PressureAmbientProperty/>.
+@prefix _3: <http://aemet.linkeddata.es/resource/Observation/>.
+@prefix _4: <http://purl.oclc.org/NET/ssnx/ssn#>.
+@prefix _5: <http://aemet.linkeddata.es/resource/WeatherStation/>.
+@prefix _6: <http://aemet.linkeddata.es/ontology/>.
+@prefix _7: <http://aemet.linkeddata.es/resource/Interval/>.
+@prefix _8: <http://aemet.linkeddata.es/resource/RadiationAmbientProperty/>.
+@prefix _9: <http://aemet.linkeddata.es/resource/PrecipitationAmbientProperty/>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+
+ _3:at_1315882200000_of_08002_on_HR a _6:Observation;
+     rdfs:label "Observación: 1315882200000 de: 08002 sobre: HR"@es,
+         "Observation at: 1315882200000 from: 08002 about: HR"@en;
+     _6:observedDataQuality "0"^^<http://www.w3.org/2001/XMLSchema#int>;
+     _6:observedInInterval _7:tenMinutes_since_1315882200000;
+     _6:valueOfObservedData "88"^^<http://www.w3.org/2001/XMLSchema#int>;
+     _4:featureOfInterest _6:meteorologicalCondition;
+     _4:observedBy _5:id08002;
+     _4:observedProperty _11:HR. 
+
+ _3:at_1315882200000_of_08002_on_PREC a _6:Observation;
+     rdfs:label "Observación: 1315882200000 de: 08002 sobre: PREC"@es,
+         "Observation at: 1315882200000 from: 08002 about: PREC"@en;
+     _6:observedDataQuality "0"^^<http://www.w3.org/2001/XMLSchema#int>;
+     _6:observedInInterval _7:tenMinutes_since_1315882200000;
+     _6:valueOfObservedData "0"^^<http://www.w3.org/2001/XMLSchema#integer>;
+     _4:featureOfInterest _6:meteorologicalCondition;
+     _4:observedBy _5:id08002;
+     _4:observedProperty _9:PREC. 
+
+ _3:at_1315882200000_of_08002_on_PRES a _6:Observation;
+     rdfs:label "Observación: 1315882200000 de: 08002 sobre: PRES"@es,
+         "Observation at: 1315882200000 from: 08002 about: PRES"@en;
+     _6:observedDataQuality "0"^^<http://www.w3.org/2001/XMLSchema#int>;
+     _6:observedInInterval _7:tenMinutes_since_1315882200000;
+     _6:valueOfObservedData "1006.5"^^<http://www.w3.org/2001/XMLSchema#double>;
+     _4:featureOfInterest _6:meteorologicalCondition;
+     _4:observedBy _5:id08002;
+     _4:observedProperty _13:PRES. 
+
+ _3:at_1315882200000_of_08002_on_PRES_nmar a _6:Observation;
+     rdfs:label "Observación: 1315882200000 de: 08002 sobre: PRES_nmar"@es,
+         "Observation at: 1315882200000 from: 08002 about: PRES_nmar"@en;
+     _6:observedDataQuality "0"^^<http://www.w3.org/2001/XMLSchema#int>;
+     _6:observedInInterval _7:tenMinutes_since_1315882200000;
+     _6:valueOfObservedData "1018.7"^^<http://www.w3.org/2001/XMLSchema#double>;
+     _4:featureOfInterest _6:meteorologicalCondition;
+     _4:observedBy _5:id08002;
+     _4:observedProperty _13:PRES_nmar. 
+
+ _3:at_1315882200000_of_08002_on_RAGLOB a _6:Observation;
+     rdfs:label "Observación: 1315882200000 de: 08002 sobre: RAGLOB"@es,
+         "Observation at: 1315882200000 from: 08002 about: RAGLOB"@en;
+     _6:observedDataQuality "0"^^<http://www.w3.org/2001/XMLSchema#int>;
+     _6:observedInInterval _7:tenMinutes_since_1315882200000;
+     _6:valueOfObservedData "0"^^<http://www.w3.org/2001/XMLSchema#integer>;
+     _4:featureOfInterest _6:meteorologicalCondition;
+     _4:observedBy _5:id08002;
+     _4:observedProperty _8:RAGLOB. 
+
+ _3:at_1315882200000_of_08002_on_TA a _6:Observation;
+     rdfs:label "Observación: 1315882200000 de: 08002 sobre: TA"@es,
+         "Observation at: 1315882200000 from: 08002 about: TA"@en;
+     _6:observedDataQuality "0"^^<http://www.w3.org/2001/XMLSchema#int>;
+     _6:observedInInterval _7:tenMinutes_since_1315882200000;
+     _6:valueOfObservedData "17.3"^^<http://www.w3.org/2001/XMLSchema#double>;
+     _4:featureOfInterest _6:meteorologicalCondition;
+     _4:observedBy _5:id08002;
+     _4:observedProperty _12:TA. 
+
+ _3:at_1315882200000_of_08002_on_VMAX10m a _6:Observation;
+     rdfs:label "Observación: 1315882200000 de: 08002 sobre: VMAX10m"@es,
+         "Observation at: 1315882200000 from: 08002 about: VMAX10m"@en;
+     _6:observedDataQuality "0"^^<http://www.w3.org/2001/XMLSchema#int>;
+     _6:observedInInterval _7:tenMinutes_since_1315882200000;
+     _6:valueOfObservedData "1"^^<http://www.w3.org/2001/XMLSchema#integer>;
+     _4:featureOfInterest _6:meteorologicalCondition;
+     _4:observedBy _5:id08002;
+     _4:observedProperty _10:VMAX10m. 
+
+ _3:at_1315890600000_of_08002_on_DV10m a _6:Observation;
+     rdfs:label "Observación: 1315890600000 de: 08002 sobre: DV10m"@es,
+         "Observation at: 1315890600000 from: 08002 about: DV10m"@en;
+     _6:observedDataQuality "0"^^<http://www.w3.org/2001/XMLSchema#int>;
+     _6:observedInInterval _7:tenMinutes_since_1315890600000;
+     _6:valueOfObservedData "160"^^<http://www.w3.org/2001/XMLSchema#int>;
+     _4:featureOfInterest _6:meteorologicalCondition;
+     _4:observedBy _5:id08002;
+     _4:observedProperty _10:DV10m. 
+
+ _3:at_1315890600000_of_08002_on_RVIENTO a _6:Observation;
+     rdfs:label "Observación: 1315890600000 de: 08002 sobre: RVIENTO"@es,
+         "Observation at: 1315890600000 from: 08002 about: RVIENTO"@en;
+     _6:observedDataQuality "0"^^<http://www.w3.org/2001/XMLSchema#int>;
+     _6:observedInInterval _7:tenMinutes_since_1315890600000;
+     _6:valueOfObservedData "7"^^<http://www.w3.org/2001/XMLSchema#integer>;
+     _4:featureOfInterest _6:meteorologicalCondition;
+     _4:observedBy _5:id08002;
+     _4:observedProperty _10:RVIENTO. 
+
+ _3:at_1315890600000_of_08002_on_TPR a _6:Observation;
+     rdfs:label "Observación: 1315890600000 de: 08002 sobre: TPR"@es,
+         "Observation at: 1315890600000 from: 08002 about: TPR"@en;
+     _6:observedDataQuality "0"^^<http://www.w3.org/2001/XMLSchema#int>;
+     _6:observedInInterval _7:tenMinutes_since_1315890600000;
+     _6:valueOfObservedData "15.4"^^<http://www.w3.org/2001/XMLSchema#double>;
+     _4:featureOfInterest _6:meteorologicalCondition;
+     _4:observedBy _5:id08002;
+     _4:observedProperty _11:TPR. 
+
+ _3:at_1315943400000_of_08002_on_DMAX10m a _6:Observation;
+     rdfs:label "Observación: 1315943400000 de: 08002 sobre: DMAX10m"@es,
+         "Observation at: 1315943400000 from: 08002 about: DMAX10m"@en;
+     _6:observedDataQuality "0"^^<http://www.w3.org/2001/XMLSchema#int>;
+     _6:observedInInterval _7:tenMinutes_since_1315943400000;
+     _6:valueOfObservedData "40"^^<http://www.w3.org/2001/XMLSchema#int>;
+     _4:featureOfInterest _6:meteorologicalCondition;
+     _4:observedBy _5:id08002;
+     _4:observedProperty _10:DMAX10m. 
+
+ _3:at_1315943400000_of_08002_on_VV10m a _6:Observation;
+     rdfs:label "Observación: 1315943400000 de: 08002 sobre: VV10m"@es,
+         "Observation at: 1315943400000 from: 08002 about: VV10m"@en;
+     _6:observedDataQuality "0"^^<http://www.w3.org/2001/XMLSchema#int>;
+     _6:observedInInterval _7:tenMinutes_since_1315943400000;
+     _6:valueOfObservedData "5.8"^^<http://www.w3.org/2001/XMLSchema#double>;
+     _4:featureOfInterest _6:meteorologicalCondition;
+     _4:observedBy _5:id08002;
+     _4:observedProperty _10:VV10m. 

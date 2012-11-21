@@ -58,7 +58,7 @@ class Clue(object):
         #       + rdflib.Graph: where we should use graph.namespace_manager.namespaces()
         #       + rdflib.Graph.Graph: The one used in dataaccess layer, where we use graph.namespaces()
         for pref in graph.namespaces():
-            if not pref[1].startswith('file://'):
+            if not pref[1].startswith('file://') and not pref[1].endswith("http://"): # for instance, with http://aitor.gomezgoiri.net
                 schemas.append(pref)
         return schemas
     

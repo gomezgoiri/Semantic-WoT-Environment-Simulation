@@ -1,0 +1,15 @@
+
+@prefix geo: <http://www.w3.org/2003/01/geo/wgs84_pos#>.
+@prefix ns1: <http://aemet.linkeddata.es/resource/WeatherStation/>.
+@prefix ns2: <http://aemet.linkeddata.es/ontology/>.
+@prefix ns5: <http://aemet.linkeddata.es/resource/Point/>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+
+ ns1:id08002 a ns2:WeatherStation;
+     rdfs:label "Estación 08002"@es,
+         "Station 08002"@en;
+     ns2:indclim "1387E";
+     ns2:indsinop "08002";
+     ns2:stationName "A CORUÑA/ALVEDRO";
+     geo:location ns5:id08002. 

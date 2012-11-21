@@ -1,0 +1,39 @@
+
+@prefix _18: <http://www.ingurumena.ejgv.euskadi.net/r49-n82/es/vima_ai_vigilancia/estaciones.apl%3FCodZona%3D%40KOSTA%26CodEst%3DALGORT%26lenguaje%3>.
+@prefix dc: <http://purl.org/dc/elements/1.1/>.
+@prefix ns1: <http://helheim.deusto.es/bizkaisense/resource/station/>.
+@prefix ns10: <http://sweet.jpl.nasa.gov/2.3/matrAerosol.owl#>.
+@prefix ns11: <http://sweet.jpl.nasa.gov/2.3/propFraction.owl#>.
+@prefix ns12: <http://sweet.jpl.nasa.gov/2.3/propSpeed.owl#>.
+@prefix ns13: <http://sweet.jpl.nasa.gov/2.3/propPressure.owl#>.
+@prefix ns14: <http://www.loa.istc.cnr.it/ontologies/DUL.owl#>.
+@prefix ns15: <http://helheim.deusto.es/bizkaisense/resource/station/ALGORT#>.
+@prefix ns5: <http://sweet.jpl.nasa.gov/2.3/propTemperature.owl#>.
+@prefix ns6: <http://sweet.jpl.nasa.gov/2.3/matrCompound.owl#>.
+@prefix ns7: <http://sweet.jpl.nasa.gov/2.3/stateSpectralBand.owl#>.
+@prefix ns8: <http://sweet.jpl.nasa.gov/2.3/matrElementalMolecule.owl#>.
+@prefix ns9: <http://purl.oclc.org/NET/ssnx/meteo/WM30#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix ssn: <http://purl.oclc.org/NET/ssnx/ssn#>.
+
+ ns1:ALGORT a ssn:Sensor;
+     ssn:observes ns9:WindDirection,
+         ns10:PM10,
+         ns10:PM2point5,
+         ns6:CO,
+         ns6:NO,
+         ns6:NO2,
+         ns6:SO2,
+         ns8:O3,
+         ns11:Humidity,
+         ns13:BarometricPressure,
+         ns12:WindSpeed,
+         ns5:Temperature,
+         ns7:Ultraviolet;
+     dc:description "Algorta (BBIZI2) (ALGORT) @ Getxo (Kostaldea (KOSTA) - BIZKAIA)";
+     dc:identifier "ALGORT";
+     dc:title "Algorta (BBIZI2)";
+     ns14:hasLocation ns15:point;
+     ns14:nearTo <http://www.geonames.org/3109814>;
+     rdfs:seeAlso _18:Dc. 

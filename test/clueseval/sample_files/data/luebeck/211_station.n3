@@ -1,0 +1,24 @@
+
+@prefix dc: <http://dublincore.org/2010/10/11/dcelements.rdf#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix ssn: <http://purl.oclc.org/NET/ssnx/ssn#>.
+
+ <http://sensorreadings.itm.uni-luebeck.de/resource/Sensor/irda/211> a ssn:Sensor;
+     rdfs:label "Sensor #irda/211";
+     ssn:observedProperty "irda";
+     ssn:onPlatform "211"^^<http://www.w3.org/2001/XMLSchema#int>. 
+
+ <http://sensorreadings.itm.uni-luebeck.de/resource/Sensor/radio/211> a ssn:Sensor;
+     rdfs:label "Sensor #radio/211";
+     ssn:observedProperty "radio";
+     ssn:onPlatform "211"^^<http://www.w3.org/2001/XMLSchema#int>. 
+
+ <http://sensorreadings.itm.uni-luebeck.de/resource/Sensor/temp/211> a ssn:Sensor;
+     rdfs:label "Sensor #temp/211";
+     ssn:observedProperty "temp";
+     ssn:onPlatform "211"^^<http://www.w3.org/2001/XMLSchema#int>. 
+
+ <http://sensorreadings.itm.uni-luebeck.de/resource/SensorNode/211> a ssn:Platform;
+     rdfs:label "SensorNode #211";
+     dc:identifier "211"^^<http://www.w3.org/2001/XMLSchema#int>. 

@@ -1,0 +1,61 @@
+@prefix geonames:  <http://www.geonames.org/ontology#> .
+@prefix contact:  <http://www.w3.org/2000/10/swap/pim/contact#> .
+@prefix meta:    <http://example.org/metadata#> .
+@prefix uranai:  <http://kota.s12.xrea.com/vocab/uranai#> .
+@prefix dcterms:  <http://purl.org/dc/terms/> .
+@prefix mvcb:    <http://webns.net/mvcb/> .
+@prefix sioc:    <http://rdfs.org/sioc/ns#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix prvTypes:  <http://purl.org/net/provenance/types#> .
+@prefix dbpedia:  <http://localhost:8080/resource/> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix swrc:    <http://swrc.ontoware.org/ontology#> .
+@prefix dc:      <http://purl.org/dc/elements/1.1/> .
+@prefix prv:     <http://purl.org/net/provenance/ns#> .
+@prefix geo:     <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix foaf:    <http://xmlns.com/foaf/0.1/> .
+@prefix yago:    <http://localhost:8080/class/yago/> .
+@prefix units:   <http://dbpedia.org/units/> .
+@prefix p:       <http://localhost:8080/property/> .
+@prefix bibo:    <http://purl.org/ontology/bibo/> .
+@prefix owl:     <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix rel:     <http://purl.org/vocab/relationship/> .
+@prefix skos:    <http://www.w3.org/2004/02/skos/core#> .
+
+<http://www.morelab.deusto.es/data/aitor-almeida?output=n3>
+      rdfs:label "RDF description of Aitor Almeida" ;
+      foaf:primaryTopic <http://www.morelab.deusto.es/resource/aitor-almeida> .
+
+<http://www.morelab.deusto.es/resource/aitor-almeida>
+      a       foaf:Person ;
+      uranai:bloodtype "A-" ;
+      dcterms:created "2011-11-16" ;
+      dcterms:modified "2011-11-19" ;
+      rel:worksWith <http://paginaspersonales.deusto.es/josuka/foaf.rdf> , <http://www.morelab.deusto.es/resource/pablo-orduna> , <http://www.morelab.deusto.es/resource/pcuriel> , <http://www.morelab.deusto.es/resource/ivan-pretel> , <http://www.morelab.deusto.es/resource/aitor-gomez-goiri> , <http://www.morelab.deusto.es/resource/dipina> , <http://paginaspersonales.deusto.es/alrayon/resources/foaf.rdf> , <http://www.morelab.deusto.es/resource/koldo-zabaleta> , <http://www.morelab.deusto.es/resource/mikel-emaldi> , <http://www.morelab.deusto.es/resource/eduardo-castillejo> , <http://www.morelab.deusto.es/resource/xabier-laiseca> , <http://www.morelab.deusto.es/resource/david-ausin> , <http://www.morelab.deusto.es/resource/unai-aguilera> , <http://www.morelab.deusto.es/resource/dbujan> , <http://www.morelab.deusto.es/resource/bernhard-klein> , <http://www.morelab.deusto.es/resource/fcastanedo> , <http://www.morelab.deusto.es/resource/ana-belen-lago> ;
+      mvcb:errorReportsTo "mailto:aitor.almeida@deusto.es" ;
+      contact:nearestAirport
+              <http://airports.dataincubator.org/airports/LEBB.rdf> ;
+      =       <http://www.bibsonomy.org/uri/author/Aitor+Almeida> , <http://scholar.google.com/citations?user=NH_s4gwAAAAJ> , <http://dblp.l3s.de/d2r/resource/authors/Aitor_Almeida> ;
+      owl:supervisor <http://www.morelab.deusto.es/resource/dipina> ;
+      foaf:account <http://www.morelab.deusto.es/resource/aitor-almeida%23linkedin> , <http://www.morelab.deusto.es/resource/aitor-almeida%23sourceforge> , <http://www.morelab.deusto.es/resource/aitor-almeida%23slideshare> , <http://www.morelab.deusto.es/resource/aitor-almeida%23googlecode> ;
+      foaf:based_near <http://sws.geonames.org/3128026/about.rdf> ;
+      foaf:depiction <http://paginaspersonales.deusto.es/aitor.almeida/images/almeida.jpg> ;
+      foaf:family_name "Almeida" ;
+      foaf:firstName "Aitor" ;
+      foaf:gender "male" ;
+      foaf:givenname "Aitor" ;
+      foaf:homepage <http://paginaspersonales.deusto.es/aitor.almeida/> ;
+      foaf:interest <http://dbpedia.org/resource/Fuzzy_Logic> , <http://dbpedia.org/resource/Data_mining> , <http://dbpedia.org/resource/Machine_Learning> , <http://dbpedia.org/resource/Artificial_intelligence> , <http://dbpedia.org/resource/Pervasive_Computing> , <http://www.w3.org/2001/sw/> , <http://dbpedia.org/resource/Ubiquitous_Computing> ;
+      foaf:knows <http://www.morelab.deusto.es/resource/xabier-eguiluz> , <http://www.morelab.deusto.es/resource/pcuriel> , <http://www.morelab.deusto.es/resource/ivan-pretel> , <http://www.morelab.deusto.es/resource/dipina> , <http://www.morelab.deusto.es/resource/jon-etxebarria> , <http://www.morelab.deusto.es/resource/jmlopez> , <http://www.morelab.deusto.es/resource/mikel-emaldi> , <http://www.morelab.deusto.es/resource/david-ausin> , <http://www.morelab.deusto.es/resource/bernhard-klein> , <http://www.morelab.deusto.es/resource/dbujan> , <http://www.morelab.deusto.es/resource/ana-belen-lago> , <http://littera.deusto.es/prof/abaitua/foaf.rdf> , <http://paginaspersonales.deusto.es/josuka/foaf.rdf> , <http://www.morelab.deusto.es/resource/pablo-orduna> , <http://www.morelab.deusto.es/resource/aitor-gomez-goiri> , <http://paginaspersonales.deusto.es/alrayon/resources/foaf.rdf> , <http://www.morelab.deusto.es/resource/koldo-zabaleta> , <http://www.morelab.deusto.es/resource/eduardo-castillejo> , <http://www.morelab.deusto.es/resource/xabier-laiseca> , <http://www.morelab.deusto.es/resource/iraide-ruiz> , <http://www.morelab.deusto.es/resource/janire-larranaga> , <http://www.morelab.deusto.es/resource/szilard-kados> , <http://www.morelab.deusto.es/resource/jonathan-garibay> , <http://www.morelab.deusto.es/resource/unai-aguilera> , <http://www.morelab.deusto.es/resource/fcastanedo> ;
+      foaf:made <http://sourceforge.net/projects/emi2lets/> , <http://code.google.com/p/imhotep/> ;
+      foaf:maker <http://www.morelab.deusto.es/resource/aitor-almeida> ;
+      foaf:mbox "mailto:aitor.almeida@deusto.es" ;
+      foaf:name "Aitor Almeida" ;
+      foaf:nick "Almeida, A." , "A. Almeida" , "Escondrillas, A. A." , "Aitor Almeida Escondrillas" ;
+      foaf:phone "tel: 34 944139003 Ext. 2928" ;
+      foaf:schoolHomepage <http://www.deusto.es/> ;
+      foaf:surname "Almeida" ;
+      foaf:title "Mr" ;
+      foaf:workplaceHomepage
+              <http://www.morelab.deusto.es/> .

@@ -1,0 +1,170 @@
+
+@prefix _10: <http://sweet.jpl.nasa.gov/2.3/matrElementalMolecule.owl#>.
+@prefix _11: <http://helheim.deusto.es/bizkaisense/resource/station/ALGORT/Presion/01012008/00/>.
+@prefix _12: <http://sweet.jpl.nasa.gov/2.3/propPressure.owl#>.
+@prefix _13: <http://helheim.deusto.es/bizkaisense/resource/station/ALGORT/NO2/01012008/00/>.
+@prefix _14: <http://www.loa-cnr.it/ontologies/DUL.owl#>.
+@prefix _15: <http://helheim.deusto.es/bizkaisense/ucum-extended.owl#>.
+@prefix _16: <http://helheim.deusto.es/bizkaisense/resource/station/ALGORT/PM25/01052009/00/>.
+@prefix _17: <http://helheim.deusto.es/bizkaisense/resource/station/ALGORT/PM10/01012008/00/>.
+@prefix _18: <http://sweet.jpl.nasa.gov/2.3/matrCompound.owl#>.
+@prefix _19: <http://purl.oclc.org/NET/muo/ucum/unit/plane-angle/>.
+@prefix _20: <http://helheim.deusto.es/bizkaisense/resource/station/ALGORT/Humedad/01052009/00/>.
+@prefix _21: <http://helheim.deusto.es/bizkaisense/resource/station/ALGORT/UVRad/01012010/00/>.
+@prefix _22: <http://helheim.deusto.es/bizkaisense/resource/station/ALGORT/NO/01052009/00/>.
+@prefix _23: <http://helheim.deusto.es/bizkaisense/resource/station/ALGORT/SO2/01012008/00/>.
+@prefix _24: <http://sweet.jpl.nasa.gov/2.3/stateSpectralBand.owl#>.
+@prefix _25: <http://sweet.jpl.nasa.gov/2.3/propFraction.owl#>.
+@prefix _26: <http://purl.oclc.org/NET/muo/ucum/unit/fraction/>.
+@prefix _27: <http://sweet.jpl.nasa.gov/2.3/matrAerosol.owl#>.
+@prefix _3: <http://purl.oclc.org/NET/ssnx/ssn#>.
+@prefix _4: <http://helheim.deusto.es/bizkaisense/resource/station/>.
+@prefix _5: <http://purl.org/dc/elements/1.1/>.
+@prefix _6: <http://helheim.deusto.es/bizkaisense/resource/station/ALGORT/DirV/01052009/00/>.
+@prefix _7: <http://purl.oclc.org/NET/ssnx/meteo/WM30#>.
+@prefix _8: <http://helheim.deusto.es/bizkaisense/resource/station/ALGORT/CO/01052009/00/>.
+@prefix _9: <http://helheim.deusto.es/bizkaisense/resource/station/ALGORT/O3/01012008/00/>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+
+ <http://helheim.deusto.es/bizkaisense/resource/station/ALGORT/CO/01052009/00> a _3:Observation;
+     _3:observationResult _8:sensoroutput;
+     _3:observedBy _4:ALGORT;
+     _3:observedProperty _18:CO;
+     _5:date "2009-05-01T00:00:00". 
+
+ <http://helheim.deusto.es/bizkaisense/resource/station/ALGORT/DirV/01052009/00> a _3:Observation;
+     _3:observationResult _6:sensoroutput;
+     _3:observedBy _4:ALGORT;
+     _3:observedProperty _7:WindDirection;
+     _5:date "2009-05-01T00:00:00". 
+
+ <http://helheim.deusto.es/bizkaisense/resource/station/ALGORT/Humedad/01052009/00> a _3:Observation;
+     _3:observationResult _20:sensoroutput;
+     _3:observedBy _4:ALGORT;
+     _3:observedProperty _25:Humidity;
+     _5:date "2009-05-01T00:00:00". 
+
+ <http://helheim.deusto.es/bizkaisense/resource/station/ALGORT/NO/01052009/00> a _3:Observation;
+     _3:observationResult _22:sensoroutput;
+     _3:observedBy _4:ALGORT;
+     _3:observedProperty _18:NO;
+     _5:date "2009-05-01T00:00:00". 
+
+ <http://helheim.deusto.es/bizkaisense/resource/station/ALGORT/NO2/01012008/00> a _3:Observation;
+     _3:observationResult _13:sensoroutput;
+     _3:observedBy _4:ALGORT;
+     _3:observedProperty _18:NO2;
+     _5:date "2008-01-01T00:00:00". 
+
+ <http://helheim.deusto.es/bizkaisense/resource/station/ALGORT/O3/01012008/00> a _3:Observation;
+     _3:observationResult _9:sensoroutput;
+     _3:observedBy _4:ALGORT;
+     _3:observedProperty _10:O3;
+     _5:date "2008-01-01T00:00:00". 
+
+ <http://helheim.deusto.es/bizkaisense/resource/station/ALGORT/PM10/01012008/00> a _3:Observation;
+     _3:observationResult _17:sensoroutput;
+     _3:observedBy _4:ALGORT;
+     _3:observedProperty _27:PM10;
+     _5:date "2008-01-01T00:00:00". 
+
+ <http://helheim.deusto.es/bizkaisense/resource/station/ALGORT/PM25/01052009/00> a _3:Observation;
+     _3:observationResult _16:sensoroutput;
+     _3:observedBy _4:ALGORT;
+     _3:observedProperty _27:PM2point5;
+     _5:date "2009-05-01T00:00:00". 
+
+ <http://helheim.deusto.es/bizkaisense/resource/station/ALGORT/Presion/01012008/00> a _3:Observation;
+     _3:observationResult _11:sensoroutput;
+     _3:observedBy _4:ALGORT;
+     _3:observedProperty _12:BarometricPressure;
+     _5:date "2008-01-01T00:00:00". 
+
+ <http://helheim.deusto.es/bizkaisense/resource/station/ALGORT/SO2/01012008/00> a _3:Observation;
+     _3:observationResult _23:sensoroutput;
+     _3:observedBy _4:ALGORT;
+     _3:observedProperty _18:SO2;
+     _5:date "2008-01-01T00:00:00". 
+
+ <http://helheim.deusto.es/bizkaisense/resource/station/ALGORT/UVRad/01012010/00> a _3:Observation;
+     _3:observationResult _21:sensoroutput;
+     _3:observedBy _4:ALGORT;
+     _3:observedProperty _24:Ultraviolet;
+     _5:date "2010-01-01T00:00:00". 
+
+ _8:outputvalue a _3:ObservationValue;
+     _14:hasDataValue "66"^^<http://www.w3.org/2001/XMLSchema#integer>;
+     _14:isClassifiedBy _15:microgram-per-cubic-meter. 
+
+ _8:sensoroutput a _3:SensorOutput;
+     _3:hasValue _8:outputvalue. 
+
+ _6:outputvalue a _3:ObservationValue;
+     _14:hasDataValue "293"^^<http://www.w3.org/2001/XMLSchema#integer>;
+     _14:isClassifiedBy _19:degree. 
+
+ _6:sensoroutput a _3:SensorOutput;
+     _3:hasValue _6:outputvalue. 
+
+ _20:outputvalue a _3:ObservationValue;
+     _14:hasDataValue "80"^^<http://www.w3.org/2001/XMLSchema#integer>;
+     _14:isClassifiedBy _26:percent. 
+
+ _20:sensoroutput a _3:SensorOutput;
+     _3:hasValue _20:outputvalue. 
+
+ _22:outputvalue a _3:ObservationValue;
+     _14:hasDataValue "2"^^<http://www.w3.org/2001/XMLSchema#integer>;
+     _14:isClassifiedBy _15:microgram-per-cubic-meter. 
+
+ _22:sensoroutput a _3:SensorOutput;
+     _3:hasValue _22:outputvalue. 
+
+ _13:outputvalue a _3:ObservationValue;
+     _14:hasDataValue "49"^^<http://www.w3.org/2001/XMLSchema#integer>;
+     _14:isClassifiedBy _15:microgram-per-cubic-meter. 
+
+ _13:sensoroutput a _3:SensorOutput;
+     _3:hasValue _13:outputvalue. 
+
+ _9:outputvalue a _3:ObservationValue;
+     _14:hasDataValue "9"^^<http://www.w3.org/2001/XMLSchema#integer>;
+     _14:isClassifiedBy _15:microgram-per-cubic-meter. 
+
+ _9:sensoroutput a _3:SensorOutput;
+     _3:hasValue _9:outputvalue. 
+
+ _17:outputvalue a _3:ObservationValue;
+     _14:hasDataValue "120"^^<http://www.w3.org/2001/XMLSchema#integer>;
+     _14:isClassifiedBy _15:microgram-per-cubic-meter. 
+
+ _17:sensoroutput a _3:SensorOutput;
+     _3:hasValue _17:outputvalue. 
+
+ _16:outputvalue a _3:ObservationValue;
+     _14:hasDataValue "29"^^<http://www.w3.org/2001/XMLSchema#integer>;
+     _14:isClassifiedBy _15:microgram-per-cubic-meter. 
+
+ _16:sensoroutput a _3:SensorOutput;
+     _3:hasValue _16:outputvalue. 
+
+ _11:outputvalue a _3:ObservationValue;
+     _14:hasDataValue "1017.09997559"^^<http://www.w3.org/2001/XMLSchema#double>;
+     _14:isClassifiedBy _15:millibar. 
+
+ _11:sensoroutput a _3:SensorOutput;
+     _3:hasValue _11:outputvalue. 
+
+ _23:outputvalue a _3:ObservationValue;
+     _14:hasDataValue "5"^^<http://www.w3.org/2001/XMLSchema#integer>;
+     _14:isClassifiedBy _15:microgram-per-cubic-meter. 
+
+ _23:sensoroutput a _3:SensorOutput;
+     _3:hasValue _23:outputvalue. 
+
+ _21:outputvalue a _3:ObservationValue;
+     _14:hasDataValue "1.39999997616"^^<http://www.w3.org/2001/XMLSchema#double>;
+     _14:isClassifiedBy _15:milliwatt-per-meter-squared. 
+
+ _21:sensoroutput a _3:SensorOutput;
+     _3:hasValue _21:outputvalue. 
