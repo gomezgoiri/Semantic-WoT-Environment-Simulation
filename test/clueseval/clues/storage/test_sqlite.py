@@ -217,6 +217,11 @@ class TestClueAggregation(unittest.TestCase):
         candidates = self.clue_store.get_query_candidates( (None, namespaces[SSN_SCHEMA]["observedBy"], None) )
         self.assertEquals(2, len(candidates))
         self.assertItemsEqual( ('node0', 'node1'), candidates)
+        
+    def test_get_query_candidates_with_none_predicate(self):
+        candidates = self.clue_store.get_query_candidates( (None, None, None) )
+        self.assertEquals(2, len(candidates))
+        self.assertItemsEqual( ('node0', 'node1'), candidates)
     
     def test_persistence(self):
         clue_store2 = SQLiteClueStore(database_name=self.clue_store.db_file)

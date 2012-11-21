@@ -276,7 +276,6 @@ class SQLiteClueStore(AbstractStore):
         
         return prefixes
     
-        
     def _get_nodes_with_predicate(self, prefix, uri_ending):
         cur = self.conn.execute(SQLiteClueStore._SELECT_PREDICATE + " where prefix='%s' and ending='%s'"%(prefix, uri_ending))
         
@@ -288,13 +287,28 @@ class SQLiteClueStore(AbstractStore):
         
         return nodes
     
+            
+    def _get_all_nodes(self):
+        cur = self.conn.execute("select distinct(node) from %s"%(SQLiteClueStore.PREDICATES_TABLE))
+        
+        nodes = set()
+        row = cur.fetchone()
+        while row is not None:
+            nodes.add(row[0])
+            row = cur.fetchone()
+        
+        return nodes
+    
     # return the nodes which may have relevant data for a given query
     def get_query_candidates(self, template):
-        candidates = set()
-        prefixes = self._get_prefixes_for(template[1])
-        
-        for name, uri in prefixes: # usually just 1 prefix matching, but just in case...
-            uri_ending = template[1][len(uri):]
-            candidates |= self._get_nodes_with_predicate(name, uri_ending)
-        
-        return candidates
+        if template[1] is not None:
+            candidates = set()
+            prefixes = self._get_prefixes_for(template[1])
+            
+            for name, uri in prefixes: # usually just 1 prefix matching, but just in case...
+                uri_ending = template[1][len(uri):]
+                candidates |= self._get_nodes_with_predicate(name, uri_ending)
+            
+            return candidates
+        else:
+            return self._get_all_nodes()
