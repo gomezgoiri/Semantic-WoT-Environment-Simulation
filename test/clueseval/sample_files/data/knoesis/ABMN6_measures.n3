@@ -1,0 +1,47 @@
+
+@prefix _3: <http://knoesis.wright.edu/ssw/>.
+@prefix _4: <http://knoesis.wright.edu/ssw/ont/sensor-observation.owl#>.
+@prefix _5: <http://knoesis.wright.edu/ssw/ont/weather.owl#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+
+ _3:Observation_AirTemperature_ABMN6_2004_8_9_13_25_00 a _5:TemperatureObservation;
+     _4:observedProperty _5:_AirTemperature;
+     _4:procedure _3:System_ABMN6;
+     _4:result _3:MeasureData_AirTemperature_ABMN6_2004_8_9_13_25_00;
+     _4:samplingTime _3:Instant_2004_8_9_13_25_00. 
+
+ _3:Observation_DewPoint_ABMN6_2004_8_9_18_25_00 a _5:TemperatureObservation;
+     _4:observedProperty _5:_DewPoint;
+     _4:procedure _3:System_ABMN6;
+     _4:result _3:MeasureData_DewPoint_ABMN6_2004_8_9_18_25_00;
+     _4:samplingTime _3:Instant_2004_8_9_18_25_00. 
+
+ _3:Observation_PrecipitationAccumulated_ABMN6_2004_8_9_3_25_00 a _5:RainfallObservation;
+     _4:observedProperty _5:_PrecipitationAccumulated;
+     _4:procedure _3:System_ABMN6;
+     _4:result _3:MeasureData_PrecipitationAccumulated_ABMN6_2004_8_9_3_25_00;
+     _4:samplingTime _3:Instant_2004_8_9_3_25_00. 
+
+ _3:Observation_RelativeHumidity_ABMN6_2004_8_9_12_25_00 a _5:RelativeHumidityObservation;
+     _4:observedProperty _5:_RelativeHumidity;
+     _4:procedure _3:System_ABMN6;
+     _4:result _3:MeasureData_RelativeHumidity_ABMN6_2004_8_9_12_25_00;
+     _4:samplingTime _3:Instant_2004_8_9_12_25_00. 
+
+ _3:Observation_WindDirection_ABMN6_2004_8_9_8_25_00 a _5:WindDirectionObservation;
+     _4:observedProperty _5:_WindDirection;
+     _4:procedure _3:System_ABMN6;
+     _4:result _3:MeasureData_WindDirection_ABMN6_2004_8_9_8_25_00;
+     _4:samplingTime _3:Instant_2004_8_9_8_25_00. 
+
+ _3:Observation_WindGust_ABMN6_2004_8_9_5_25_00 a _5:WindSpeedObservation;
+     _4:observedProperty _5:_WindGust;
+     _4:procedure _3:System_ABMN6;
+     _4:result _3:MeasureData_WindGust_ABMN6_2004_8_9_5_25_00;
+     _4:samplingTime _3:Instant_2004_8_9_5_25_00. 
+
+ _3:Observation_WindSpeed_ABMN6_2004_8_9_3_25_00 a _5:WindSpeedObservation;
+     _4:observedProperty _5:_WindSpeed;
+     _4:procedure _3:System_ABMN6;
+     _4:result _3:MeasureData_WindSpeed_ABMN6_2004_8_9_3_25_00;
+     _4:samplingTime _3:Instant_2004_8_9_3_25_00. 

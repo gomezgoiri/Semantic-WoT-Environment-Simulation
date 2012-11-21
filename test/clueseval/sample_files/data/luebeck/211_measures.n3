@@ -1,0 +1,21 @@
+
+@prefix _3: <http://www.w3.org/2006/time#>.
+@prefix _4: <http://purl.oclc.org/NET/ssnx/ssn#>.
+@prefix _5: <http://dublincore.org/2010/10/11/dcelements.rdf#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+
+ <http://sensorreadings.itm.uni-luebeck.de/resource/SensorData/4527000> a _4:Observation;
+     rdfs:label "SensorData #4527000";
+     _5:identifier "4527000"^^<http://www.w3.org/2001/XMLSchema#int>;
+     _4:ObservationValue "39.0";
+     _4:observationResultTime "2011-03-08T17:07:41"^^<http://www.w3.org/2001/XMLSchema#dateTime>;
+     _4:observationSamplingTime "2011-03-08T17:07:41"^^<http://www.w3.org/2001/XMLSchema#dateTime>;
+     _4:observedBy "211"^^<http://www.w3.org/2001/XMLSchema#int>;
+     _4:observedProperty "celsius";
+     _3:day "8"^^<http://www.w3.org/2001/XMLSchema#int>;
+     _3:hour "17"^^<http://www.w3.org/2001/XMLSchema#int>;
+     _3:minute "7"^^<http://www.w3.org/2001/XMLSchema#int>;
+     _3:month "3"^^<http://www.w3.org/2001/XMLSchema#int>;
+     _3:second "41"^^<http://www.w3.org/2001/XMLSchema#int>;
+     _3:year "2011"^^<http://www.w3.org/2001/XMLSchema#int>. 

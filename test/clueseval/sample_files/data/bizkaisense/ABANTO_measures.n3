@@ -1,0 +1,97 @@
+
+@prefix _10: <http://helheim.deusto.es/bizkaisense/resource/station/ABANTO/NO2/01012011/00/>.
+@prefix _11: <http://helheim.deusto.es/bizkaisense/resource/station/ABANTO/NO/01012011/00/>.
+@prefix _12: <http://helheim.deusto.es/bizkaisense/resource/station/ABANTO/DirV/01012011/00/>.
+@prefix _13: <http://www.loa-cnr.it/ontologies/DUL.owl#>.
+@prefix _14: <http://helheim.deusto.es/bizkaisense/ucum-extended.owl#>.
+@prefix _15: <http://helheim.deusto.es/bizkaisense/resource/station/ABANTO/Humedad/01012011/00/>.
+@prefix _16: <http://purl.oclc.org/NET/muo/ucum/unit/fraction/>.
+@prefix _17: <http://sweet.jpl.nasa.gov/2.3/propFraction.owl#>.
+@prefix _18: <http://purl.oclc.org/NET/muo/ucum/unit/plane-angle/>.
+@prefix _19: <http://purl.oclc.org/NET/ssnx/meteo/WM30#>.
+@prefix _3: <http://purl.org/dc/elements/1.1/>.
+@prefix _4: <http://purl.oclc.org/NET/ssnx/ssn#>.
+@prefix _5: <http://sweet.jpl.nasa.gov/2.3/matrElementalMolecule.owl#>.
+@prefix _6: <http://helheim.deusto.es/bizkaisense/resource/station/>.
+@prefix _7: <http://helheim.deusto.es/bizkaisense/resource/station/ABANTO/O3/01012011/00/>.
+@prefix _8: <http://sweet.jpl.nasa.gov/2.3/matrCompound.owl#>.
+@prefix _9: <http://helheim.deusto.es/bizkaisense/resource/station/ABANTO/SO2/01012010/00/>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+
+ <http://helheim.deusto.es/bizkaisense/resource/station/ABANTO/DirV/01012011/00> a _4:Observation;
+     _4:observationResult _12:sensoroutput;
+     _4:observedBy _6:ABANTO;
+     _4:observedProperty _19:WindDirection;
+     _3:date "2011-01-01T00:00:00". 
+
+ <http://helheim.deusto.es/bizkaisense/resource/station/ABANTO/Humedad/01012011/00> a _4:Observation;
+     _4:observationResult _15:sensoroutput;
+     _4:observedBy _6:ABANTO;
+     _4:observedProperty _17:Humidity;
+     _3:date "2011-01-01T00:00:00". 
+
+ <http://helheim.deusto.es/bizkaisense/resource/station/ABANTO/NO/01012011/00> a _4:Observation;
+     _4:observationResult _11:sensoroutput;
+     _4:observedBy _6:ABANTO;
+     _4:observedProperty _8:NO;
+     _3:date "2011-01-01T00:00:00". 
+
+ <http://helheim.deusto.es/bizkaisense/resource/station/ABANTO/NO2/01012011/00> a _4:Observation;
+     _4:observationResult _10:sensoroutput;
+     _4:observedBy _6:ABANTO;
+     _4:observedProperty _8:NO2;
+     _3:date "2011-01-01T00:00:00". 
+
+ <http://helheim.deusto.es/bizkaisense/resource/station/ABANTO/O3/01012011/00> a _4:Observation;
+     _4:observationResult _7:sensoroutput;
+     _4:observedBy _6:ABANTO;
+     _4:observedProperty _5:O3;
+     _3:date "2011-01-01T00:00:00". 
+
+ <http://helheim.deusto.es/bizkaisense/resource/station/ABANTO/SO2/01012010/00> a _4:Observation;
+     _4:observationResult _9:sensoroutput;
+     _4:observedBy _6:ABANTO;
+     _4:observedProperty _8:SO2;
+     _3:date "2010-01-01T00:00:00". 
+
+ _12:outputvalue a _4:ObservationValue;
+     _13:hasDataValue "303"^^<http://www.w3.org/2001/XMLSchema#integer>;
+     _13:isClassifiedBy _18:degree. 
+
+ _12:sensoroutput a _4:SensorOutput;
+     _4:hasValue _12:outputvalue. 
+
+ _15:outputvalue a _4:ObservationValue;
+     _13:hasDataValue "97"^^<http://www.w3.org/2001/XMLSchema#integer>;
+     _13:isClassifiedBy _16:percent. 
+
+ _15:sensoroutput a _4:SensorOutput;
+     _4:hasValue _15:outputvalue. 
+
+ _11:outputvalue a _4:ObservationValue;
+     _13:hasDataValue "5"^^<http://www.w3.org/2001/XMLSchema#integer>;
+     _13:isClassifiedBy _14:microgram-per-cubic-meter. 
+
+ _11:sensoroutput a _4:SensorOutput;
+     _4:hasValue _11:outputvalue. 
+
+ _10:outputvalue a _4:ObservationValue;
+     _13:hasDataValue "5"^^<http://www.w3.org/2001/XMLSchema#integer>;
+     _13:isClassifiedBy _14:microgram-per-cubic-meter. 
+
+ _10:sensoroutput a _4:SensorOutput;
+     _4:hasValue _10:outputvalue. 
+
+ _7:outputvalue a _4:ObservationValue;
+     _13:hasDataValue "27"^^<http://www.w3.org/2001/XMLSchema#integer>;
+     _13:isClassifiedBy _14:microgram-per-cubic-meter. 
+
+ _7:sensoroutput a _4:SensorOutput;
+     _4:hasValue _7:outputvalue. 
+
+ _9:outputvalue a _4:ObservationValue;
+     _13:hasDataValue "3"^^<http://www.w3.org/2001/XMLSchema#integer>;
+     _13:isClassifiedBy _14:microgram-per-cubic-meter. 
+
+ _9:sensoroutput a _4:SensorOutput;
+     _4:hasValue _9:outputvalue. 

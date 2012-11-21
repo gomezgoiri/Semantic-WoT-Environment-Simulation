@@ -1,0 +1,32 @@
+
+@prefix _8: <http://mesowest.utah.edu/cgi-bin/droman/meso_base.cgi?stn=>.
+@prefix geo: <http://www.w3.org/2003/01/geo/wgs84_pos#>.
+@prefix ns1: <http://knoesis.wright.edu/ssw/>.
+@prefix ns3: <http://knoesis.wright.edu/ssw/ont/sensor-observation.owl#>.
+@prefix ns4: <http://knoesis.wright.edu/ssw/ont/weather.owl#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+
+ ns1:System_ABMN6 a ns3:System;
+     ns3:ID "ABMN6";
+     ns3:hasLocatedNearRel ns1:LocatedNearRelABMN6;
+     ns3:hasSourceURI _8:ABMN6;
+     ns3:parameter ns4:_AirTemperature,
+         ns4:_DewPoint,
+         ns4:_PeakWindDirection,
+         ns4:_PeakWindSpeed,
+         ns4:_PrecipitationAccumulated,
+         ns4:_RelativeHumidity,
+         ns4:_WindDirection,
+         ns4:_WindGust,
+         ns4:_WindSpeed;
+     ns3:processLocation ns1:point_ABMN6. 
+
+ ns1:LocatedNearRelABMN6 a ns3:LocatedNearRel;
+     ns3:distance "1.35020005703"^^<http://www.w3.org/2001/XMLSchema#double>;
+     ns3:hasLocation <http://sws.geonames.org/5136903/>;
+     ns3:uom ns4:miles. 
+
+ ns1:point_ABMN6 a geo:Point;
+     geo:alt "620"^^<http://www.w3.org/2001/XMLSchema#integer>;
+     geo:lat "43.1130981445"^^<http://www.w3.org/2001/XMLSchema#double>;
+     geo:long "-78.4041976929"^^<http://www.w3.org/2001/XMLSchema#double>. 

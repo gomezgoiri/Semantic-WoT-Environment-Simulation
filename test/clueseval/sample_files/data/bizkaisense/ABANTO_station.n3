@@ -1,0 +1,33 @@
+
+@prefix _16: <http://www.ingurumena.ejgv.euskadi.net/r49-n82/es/vima_ai_vigilancia/estaciones.apl%3FCodZona%3D%40BJNVN%26CodEst%3DABANTO%26lenguaje%3>.
+@prefix dc: <http://purl.org/dc/elements/1.1/>.
+@prefix ns1: <http://helheim.deusto.es/bizkaisense/resource/station/>.
+@prefix ns10: <http://sweet.jpl.nasa.gov/2.3/matrElementalMolecule.owl#>.
+@prefix ns11: <http://purl.oclc.org/NET/ssnx/meteo/WM30#>.
+@prefix ns12: <http://www.loa.istc.cnr.it/ontologies/DUL.owl#>.
+@prefix ns13: <http://helheim.deusto.es/bizkaisense/resource/station/ABANTO#>.
+@prefix ns5: <http://sweet.jpl.nasa.gov/2.3/matrAerosol.owl#>.
+@prefix ns6: <http://sweet.jpl.nasa.gov/2.3/propFraction.owl#>.
+@prefix ns7: <http://sweet.jpl.nasa.gov/2.3/propSpeed.owl#>.
+@prefix ns8: <http://sweet.jpl.nasa.gov/2.3/matrCompound.owl#>.
+@prefix ns9: <http://sweet.jpl.nasa.gov/2.3/propTemperature.owl#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix ssn: <http://purl.oclc.org/NET/ssnx/ssn#>.
+
+ ns1:ABANTO a ssn:Sensor;
+     ssn:observes ns11:WindDirection,
+         ns5:PM10,
+         ns8:NO,
+         ns8:NO2,
+         ns8:SO2,
+         ns10:O3,
+         ns6:Humidity,
+         ns7:WindSpeed,
+         ns9:Temperature;
+     dc:description "Abanto (ABANTO) @ Abanto-Zierbena (Bajo Nervión/Nerbioi behera (BJNVN) - BIZKAIA)";
+     dc:identifier "ABANTO";
+     dc:title "Abanto";
+     ns12:hasLocation ns13:point;
+     ns12:nearTo <http://www.geonames.org/3121721>;
+     rdfs:seeAlso _16:Dc. 

@@ -1,0 +1,63 @@
+@prefix geonames:  <http://www.geonames.org/ontology#> .
+@prefix contact:  <http://www.w3.org/2000/10/swap/pim/contact#> .
+@prefix meta:    <http://example.org/metadata#> .
+@prefix uranai:  <http://kota.s12.xrea.com/vocab/uranai#> .
+@prefix dcterms:  <http://purl.org/dc/terms/> .
+@prefix mvcb:    <http://webns.net/mvcb/> .
+@prefix sioc:    <http://rdfs.org/sioc/ns#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix prvTypes:  <http://purl.org/net/provenance/types#> .
+@prefix dbpedia:  <http://localhost:8080/resource/> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix swrc:    <http://swrc.ontoware.org/ontology#> .
+@prefix dc:      <http://purl.org/dc/elements/1.1/> .
+@prefix prv:     <http://purl.org/net/provenance/ns#> .
+@prefix geo:     <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix foaf:    <http://xmlns.com/foaf/0.1/> .
+@prefix yago:    <http://localhost:8080/class/yago/> .
+@prefix units:   <http://dbpedia.org/units/> .
+@prefix p:       <http://localhost:8080/property/> .
+@prefix bibo:    <http://purl.org/ontology/bibo/> .
+@prefix owl:     <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix rel:     <http://purl.org/vocab/relationship/> .
+@prefix skos:    <http://www.w3.org/2004/02/skos/core#> .
+
+<http://www.morelab.deusto.es/resource/aitor-gomez-goiri>
+      a       foaf:Person , <http://purl.org/vocab/aiiso-roles/schema#Researcher> , <http://purl.org/vocab/aiiso-roles/schema#PHD_Candidate> , <http://purl.org/vocab/aiiso-roles/schema#Lecturer> ;
+      rdfs:comment "Document with Friend-of-a-Friend description of Aitor Gómez-Goiri" ;
+      rdfs:sameAs <http://dblp.l3s.de/d2r/resource/authors/Aitor_Gómez-Goiri> ;
+      rdfs:seeAlso <http://www.morelab.deusto.es/resource/aitor-gomez-goiri> ;
+      uranai:bloodtype "O " ;
+      dc:description "Aitor Gómez Goiri is a Research Assistant at the MoreLab Research Group who is also currently working as an Assistant Professor at University of Deusto. He finished his studies of Computer Engineering and Industrial Organization in 2008 and MSc in Software Development in 2010 at the University of Deusto. Currently he is a PhD student." ;
+      dcterms:created "2011-11-17" ;
+      dcterms:license <http://creativecommons.org/licenses/by-sa/3.0/> ;
+      dcterms:modified "2011-11-17" ;
+      rel:apprenticeTo <http://www.morelab.deusto.es/resource/dipina> ;
+      <http://swrc.ontoware.org/ontology-07#supervisor>
+              <http://www.morelab.deusto.es/resource/dipina> ;
+      contact:nearestAirport
+              <http://airports.dataincubator.org/airports/LEBB.rdf> , <http://sws.geonames.org/6299328/about.rdf> ;
+      =       <http://scholar.google.com/citations?user=z8bozPMAAAAJ> , <http://dblp.l3s.de/d2r/resource/authors/Aitor_Gómez-Goiri> , <http://data.bibbase.org/author/aitor-gomez-goiri> ;
+      foaf:account <http://www.morelab.deusto.es/resource/aitor-gomez-goiri%23sourceforge> , <http://www.morelab.deusto.es/resource/aitor-gomez-goiri%23twitter> , <http://www.morelab.deusto.es/resource/aitor-gomez-goiri%23slideshare> , <http://www.morelab.deusto.es/resource/aitor-gomez-goiri%23linkedin> , <http://www.morelab.deusto.es/resource/aitor-gomez-goiri%23googlecode> ;
+      foaf:based_near <http://dbpedia.org/resource/Bilbao> ;
+      foaf:depiction <http://aitor.gomezgoiri.net/profile.jpg> ;
+      foaf:family_name "Gómez-Goiri" ;
+      foaf:givenname "Aitor" ;
+      foaf:homepage <http://aitor.gomezgoiri.net> ;
+      foaf:knows <http://paginaspersonales.deusto.es/josuka/foaf.rdf> , <http://www.morelab.deusto.es/resource/xabier-eguiluz> , <http://www.morelab.deusto.es/resource/pablo-orduna> , <http://www.morelab.deusto.es/resource/:david-ausin> , <http://www.morelab.deusto.es/resource/pcuriel> , <http://www.morelab.deusto.es/resource/ivan-pretel> , <http://www.morelab.deusto.es/resource/dipina> , <http://www.morelab.deusto.es/resource/jon-etxebarria> , <http://www.morelab.deusto.es/resource/jmlopez> , <http://www.morelab.deusto.es/resource/koldo-zabaleta> , <http://www.morelab.deusto.es/resource/mikel-emaldi> , <http://www.morelab.deusto.es/resource/eduardo-castillejo> , <http://www.morelab.deusto.es/resource/aitor-almeida> , <http://www.morelab.deusto.es/resource/xabier-laiseca> , <http://www.morelab.deusto.es/resource/david-ausin> , <http://www.morelab.deusto.es/resource/iraide-ruiz> , <http://www.morelab.deusto.es/resource/janire-larranaga> , <http://www.morelab.deusto.es/resource/szilard-kados> , <http://www.morelab.deusto.es/resource/bernhard-klein> , <http://www.morelab.deusto.es/resource/dbujan> , <http://www.morelab.deusto.es/resource/unai-aguilera> , <http://www.morelab.deusto.es/resource/jonathan-garibay> , <http://www.morelab.deusto.es/resource/fcastanedo> , <http://www.morelab.deusto.es/resource/ana-belen-lago> ;
+      foaf:made <http://code.google.com/p/otsopack/> ;
+      foaf:maker <http://www.morelab.deusto.es/resource/aitor-gomez-goiri> ;
+      foaf:name "Aitor Gómez-Goiri" ;
+      foaf:nick "Aitor GÃ³mez-Goiri" , "Aitor Gómez-Goiri" , "Goiri, A.G." , "Gómez-Goiri, A." , "Gómez Goiri, A." ;
+      foaf:phone "34944139000" ;
+      foaf:schoolHomepage <http://www.ingenieria.deusto.es/> ;
+      foaf:surname "Gómez-Goiri" ;
+      foaf:title "Mr" , "Sr" ;
+      foaf:topic_interest <http://dbpedia.org/resource/Ubiquitous_computing> , <http://dbpedia.org/resource/Semantic_Web> , <http://dbpedia.org/resource/Tuple_space> , <http://dbpedia.org/resource/Mobile_computing> , <http://dbpedia.org/resource/Internet_of_Things> ;
+      foaf:workplaceHomepage
+              <http://www.morelab.deusto.es/> .
+
+<http://www.morelab.deusto.es/data/aitor-gomez-goiri?output=n3>
+      rdfs:label "RDF description of Aitor Gómez-Goiri" ;
+      foaf:primaryTopic <http://www.morelab.deusto.es/resource/aitor-gomez-goiri> .

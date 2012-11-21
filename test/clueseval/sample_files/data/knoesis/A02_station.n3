@@ -1,0 +1,27 @@
+
+@prefix _8: <http://mesowest.utah.edu/cgi-bin/droman/meso_base.cgi?stn=>.
+@prefix geo: <http://www.w3.org/2003/01/geo/wgs84_pos#>.
+@prefix ns1: <http://knoesis.wright.edu/ssw/>.
+@prefix ns3: <http://knoesis.wright.edu/ssw/ont/sensor-observation.owl#>.
+@prefix ns4: <http://knoesis.wright.edu/ssw/ont/weather.owl#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+
+ ns1:System_A02 a ns3:System;
+     ns3:ID "A02";
+     ns3:hasLocatedNearRel ns1:LocatedNearRelA02;
+     ns3:hasSourceURI _8:A02;
+     ns3:parameter ns4:_AirTemperature,
+         ns4:_WindDirection,
+         ns4:_WindGust,
+         ns4:_WindSpeed;
+     ns3:processLocation ns1:point_A02. 
+
+ ns1:LocatedNearRelA02 a ns3:LocatedNearRel;
+     ns3:distance "0.662400007248"^^<http://www.w3.org/2001/XMLSchema#double>;
+     ns3:hasLocation <http://sws.geonames.org/5509132/>;
+     ns3:uom ns4:miles. 
+
+ ns1:point_A02 a geo:Point;
+     geo:alt "4435"^^<http://www.w3.org/2001/XMLSchema#integer>;
+     geo:lat "37.1427993774"^^<http://www.w3.org/2001/XMLSchema#double>;
+     geo:long "-116.111701965"^^<http://www.w3.org/2001/XMLSchema#double>. 

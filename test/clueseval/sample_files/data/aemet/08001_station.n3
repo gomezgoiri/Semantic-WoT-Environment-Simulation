@@ -1,0 +1,19 @@
+
+@prefix _8: <http://dbpedia.org/resource/A_Coru%C3%>.
+@prefix _9: <http://geo.linkeddata.es/resource/Provincia/A%20Coru%C3%>.
+@prefix geo: <http://www.w3.org/2003/01/geo/wgs84_pos#>.
+@prefix ns1: <http://aemet.linkeddata.es/resource/WeatherStation/>.
+@prefix ns2: <http://aemet.linkeddata.es/ontology/>.
+@prefix ns5: <http://aemet.linkeddata.es/resource/Point/>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+
+ ns1:id08001 a ns2:WeatherStation;
+     rdfs:label "Estación 08001"@es,
+         "Station 08001"@en;
+     ns2:indclim "1387";
+     ns2:indsinop "08001";
+     ns2:locatedIn _8:B1a,
+         _9:B1a;
+     ns2:stationName "A CORUÑA";
+     geo:location ns5:id08001. 

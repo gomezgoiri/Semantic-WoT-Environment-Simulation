@@ -62,7 +62,7 @@ class TestStats(unittest.TestCase):
                 self.assertFalse( clue.isCandidate(template), msg="%s not expected to be a candidate for template %s"%(name, template) )
     
     def test_isCandidate(self):
-        clues = self._load_clues('../../../files')
+        clues = self._load_clues('../sample_files')
         
         SSN = Namespace('http://purl.oclc.org/NET/ssnx/ssn#')
         SSN_WEATHER = Namespace('http://knoesis.wright.edu/ssw/ont/weather.owl#')
@@ -81,11 +81,11 @@ class TestStats(unittest.TestCase):
           (None, DC.identifier, None),
         )
                 
-        self._assert_candidates( ('knoesis/4UT01','bizkaisense/7CAMPA','knoesis/A01','knoesis/A02','knoesis/A03','bizkaisense/ABANTO','knoesis/ABMN6','knoesis/ACOC1','knoesis/ACON5'), templates[0], clues ) # too general predicate, flood all
-        self._assert_candidates( ('knoesis/4UT01','knoesis/A01','knoesis/A02','knoesis/A03','knoesis/ABMN6','knoesis/ACOC1','knoesis/ACON5'), templates[1], clues )
-        self._assert_candidates( ('bizkaisense/7CAMPA','bizkaisense/ABANTO'), templates[2], clues ) # knoesis tienen una observerProperty de otra ontologia distinta
-        self._assert_candidates( ('knoesis/4UT01','bizkaisense/7CAMPA','knoesis/A01','knoesis/A02','knoesis/A03','bizkaisense/ABANTO','knoesis/ABMN6','knoesis/ACOC1','knoesis/ACON5'), templates[3], clues ) # No clue, flood all
-        self._assert_candidates( ('bizkaisense/7CAMPA','bizkaisense/ABANTO'), templates[4], clues )
+        self._assert_candidates( ('knoesis/A02','knoesis/ABMN6','bizkaisense/ALGORT','bizkaisense/ABANTO','aemet/08001','aemet/08002','luebeck/211','luebeck/300','morelab/aitor-almeida','morelab/aitor-gomez-goiri'), templates[0], clues ) # too general predicate, flood all
+        self._assert_candidates( ('knoesis/A02','knoesis/ABMN6'), templates[1], clues )
+        self._assert_candidates( ('bizkaisense/ALGORT','bizkaisense/ABANTO','aemet/08001','aemet/08002','luebeck/211','luebeck/300'), templates[2], clues ) # knoesis tienen una observerProperty de otra ontologia distinta
+        self._assert_candidates( ('knoesis/A02','knoesis/ABMN6','bizkaisense/ALGORT','bizkaisense/ABANTO','aemet/08001','aemet/08002', 'luebeck/211','luebeck/300','morelab/aitor-almeida','morelab/aitor-gomez-goiri'), templates[3], clues ) # No clue, flood all
+        self._assert_candidates( ('bizkaisense/ALGORT','bizkaisense/ABANTO'), templates[4], clues )
         # self._assert_candidates( ('4UT01','7CAMPA','A01','A02','A03','ABANTO','ABMN6','ACOC1','ACON5'), templates[0], clues )
 
 if __name__ == '__main__':

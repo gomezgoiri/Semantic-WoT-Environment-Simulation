@@ -25,32 +25,6 @@ class SchemaBasedClueTestCase(unittest.TestCase):
             self.assertTrue(u in clue2.schemas)
     
     # Method from parent_clue
-    def test_filterBizkaisenseSchemas(self):
-        schemas = ( ('_1', URIRef('http://helheim.deusto.es/emaldi/rules/')),
-                    ('_8', URIRef('http://helheim.deusto.es/bizkaisense/resource/station/')),
-                    ('_17', URIRef('http://helheim.deusto.es/bizkaisense/resource/station/ALGORT/CO/01052009/00#')),
-                    ('_20', URIRef('http://helheim.deusto.es/bizkaisense/resource/station/ALGORT/DirV/01052009/00#')),
-                    ('_15', URIRef('http://helheim.deusto.es/bizkaisense/resource/station/ALGORT/Humedad/01052009/00#')),
-                    ('_12', URIRef('http://helheim.deusto.es/bizkaisense/resource/station/ALGORT/NO/01052009/00#')),
-                    ('_21', URIRef('http://helheim.deusto.es/bizkaisense/resource/station/ALGORT/NO2/01012008/00#')),
-                    ('_9', URIRef('http://helheim.deusto.es/bizkaisense/resource/station/ALGORT/O3/01012008/00#')),
-                    ('_10', URIRef('http://helheim.deusto.es/bizkaisense/resource/station/ALGORT/PM10/01012008/00#')),
-                    ('_31', URIRef('http://helheim.deusto.es/bizkaisense/resource/station/ALGORT/PM25/01052009/00#')),
-                    ('_23', URIRef('http://helheim.deusto.es/bizkaisense/resource/station/ALGORT/Presion/01012008/00#')),
-                    ('_18', URIRef('http://helheim.deusto.es/bizkaisense/resource/station/ALGORT/SO2/01012008/00#')),
-                    ('_16', URIRef('http://helheim.deusto.es/bizkaisense/resource/station/ALGORT/Temp/01102010/00#')),
-                    ('_14', URIRef('http://helheim.deusto.es/bizkaisense/resource/station/ALGORT/UVRad/01012010/00#')),
-                    ('_26', URIRef('http://helheim.deusto.es/bizkaisense/resource/station/ALGORT/VelV/01102010/00#'))
-                  )
-        
-        schemas2 = self.clue.filterBizkaisenseSchemas( list(schemas) )
-        
-        self.assertEquals( 3, len(schemas2) )
-        self.assertTrue( schemas[0] in schemas2 )
-        self.assertTrue( schemas[1] in schemas2 )
-        self.assertTrue( ('ALGORT', URIRef('http://helheim.deusto.es/bizkaisense/resource/station/ALGORT/')) in schemas2 )
-    
-    # Method from parent_clue
     def test_extractNamespaces_from_normal_graph(self):
         graph = Graph().parse(StringIO("<http://www.deusto.es/fakesubject> <http://www.deusto.es/fakepredicate> <http://www.deusto.es/fakeobject> .\n"), format="nt")
         #graph.bind("deusto", "http://www.deusto.es/", override=True)
@@ -113,7 +87,7 @@ class SchemaBasedClueTestCase(unittest.TestCase):
                 self.assertFalse( clue.isCandidate(template), msg="%s not expected to be a candidate for template %s"%(name, template) )
     
     def test_isCandidate(self):
-        clues = self._load_clues('../../../files')
+        clues = self._load_clues('../sample_files')
         
         SSN = Namespace('http://purl.oclc.org/NET/ssnx/ssn#')
         SSN_WEATHER = Namespace('http://knoesis.wright.edu/ssw/ont/weather.owl#')
@@ -132,11 +106,14 @@ class SchemaBasedClueTestCase(unittest.TestCase):
           (None, DC.identifier, None),
         )
                 
-        self._assert_candidates( ('knoesis/4UT01','knoesis/A01','knoesis/A02','knoesis/A03','knoesis/ABMN6','knoesis/ACOC1','knoesis/ACON5'), templates[0], clues )
-        self._assert_candidates( ('knoesis/4UT01','knoesis/A01','knoesis/A02','knoesis/A03','knoesis/ABMN6','knoesis/ACOC1','knoesis/ACON5'), templates[1], clues )
-        self._assert_candidates( ('bizkaisense/7CAMPA','bizkaisense/ABANTO'), templates[2], clues ) # parece que los de knoesis no usan SSN como tal, solo su sensor-obvervation.owl (que sera alguna version previa)
-        self._assert_candidates( ('bizkaisense/ABANTO'), templates[3], clues )
-        self._assert_candidates( ('bizkaisense/7CAMPA','bizkaisense/ABANTO'), templates[4], clues )
+        self._assert_candidates( ('knoesis/A02','knoesis/ABMN6'), templates[0], clues ) # TODO if one of the predicates a well-known one, take into account other elements of the template (such as object in this case)
+        # Parece que los de knoesis no usan SSN como tal, solo su sensor-obvervation.owl (que sera alguna version previa)
+        self._assert_candidates( ('knoesis/A02','knoesis/ABMN6','aemet/08001','aemet/08002','luebeck/300'), templates[1], clues )
+        # El caso de Luebeck es aun mas curioso, no todas las plataformas tienen definido el geo.
+        self._assert_candidates( ('bizkaisense/ALGORT','bizkaisense/ABANTO','aemet/08001','aemet/08002','luebeck/211','luebeck/300'), templates[2], clues )
+        self._assert_candidates( ('bizkaisense/ALGORT','bizkaisense/ABANTO'), templates[3], clues )
+        # Almeida does not offer a description of him resource
+        self._assert_candidates( ('bizkaisense/ALGORT','bizkaisense/ABANTO','morelab/aitor-gomez-goiri'), templates[4], clues )
         # self._assert_candidates( ('4UT01','7CAMPA','A01','A02','A03','ABANTO','ABMN6','ACOC1','ACON5'), templates[0], clues )
 
 if __name__ == '__main__':

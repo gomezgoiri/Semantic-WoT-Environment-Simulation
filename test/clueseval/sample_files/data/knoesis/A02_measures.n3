@@ -1,0 +1,29 @@
+
+@prefix _3: <http://knoesis.wright.edu/ssw/>.
+@prefix _4: <http://knoesis.wright.edu/ssw/ont/weather.owl#>.
+@prefix _5: <http://knoesis.wright.edu/ssw/ont/sensor-observation.owl#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+
+ _3:Observation_AirTemperature_A02_2004_8_9_10_15_00 a _4:TemperatureObservation;
+     _5:observedProperty _4:_AirTemperature;
+     _5:procedure _3:System_A02;
+     _5:result _3:MeasureData_AirTemperature_A02_2004_8_9_10_15_00;
+     _5:samplingTime _3:Instant_2004_8_9_10_15_00. 
+
+ _3:Observation_WindDirection_A02_2004_8_9_15_30_00 a _4:WindDirectionObservation;
+     _5:observedProperty _4:_WindDirection;
+     _5:procedure _3:System_A02;
+     _5:result _3:MeasureData_WindDirection_A02_2004_8_9_15_30_00;
+     _5:samplingTime _3:Instant_2004_8_9_15_30_00. 
+
+ _3:Observation_WindGust_A02_2004_8_9_5_00_00 a _4:WindSpeedObservation;
+     _5:observedProperty _4:_WindGust;
+     _5:procedure _3:System_A02;
+     _5:result _3:MeasureData_WindGust_A02_2004_8_9_5_00_00;
+     _5:samplingTime _3:Instant_2004_8_9_5_00_00. 
+
+ _3:Observation_WindSpeed_A02_2004_8_9_21_00_00 a _4:WindSpeedObservation;
+     _5:observedProperty _4:_WindSpeed;
+     _5:procedure _3:System_A02;
+     _5:result _3:MeasureData_WindSpeed_A02_2004_8_9_21_00_00;
+     _5:samplingTime _3:Instant_2004_8_9_21_00_00. 

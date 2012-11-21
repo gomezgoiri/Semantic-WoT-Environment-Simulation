@@ -1,0 +1,36 @@
+
+@prefix _3: <http://purl.oclc.org/NET/ssnx/ssn#>.
+@prefix _4: <http://www.w3.org/2006/time#>.
+@prefix _5: <http://dublincore.org/2010/10/11/dcelements.rdf#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+
+ <http://sensorreadings.itm.uni-luebeck.de/resource/SensorData/3673609> a _3:Observation;
+     rdfs:label "SensorData #3673609";
+     _5:identifier "3673609"^^<http://www.w3.org/2001/XMLSchema#int>;
+     _3:ObservationValue "323";
+     _3:observationResultTime "2011-03-03T10:57:54"^^<http://www.w3.org/2001/XMLSchema#dateTime>;
+     _3:observationSamplingTime "2011-03-03T10:57:54"^^<http://www.w3.org/2001/XMLSchema#dateTime>;
+     _3:observedBy "300"^^<http://www.w3.org/2001/XMLSchema#int>;
+     _3:observedProperty "lux";
+     _4:day "3"^^<http://www.w3.org/2001/XMLSchema#int>;
+     _4:hour "10"^^<http://www.w3.org/2001/XMLSchema#int>;
+     _4:minute "57"^^<http://www.w3.org/2001/XMLSchema#int>;
+     _4:month "3"^^<http://www.w3.org/2001/XMLSchema#int>;
+     _4:second "54"^^<http://www.w3.org/2001/XMLSchema#int>;
+     _4:year "2011"^^<http://www.w3.org/2001/XMLSchema#int>. 
+
+ <http://sensorreadings.itm.uni-luebeck.de/resource/SensorData/3673616> a _3:Observation;
+     rdfs:label "SensorData #3673616";
+     _5:identifier "3673616"^^<http://www.w3.org/2001/XMLSchema#int>;
+     _3:ObservationValue "28.4";
+     _3:observationResultTime "2011-03-03T10:57:54"^^<http://www.w3.org/2001/XMLSchema#dateTime>;
+     _3:observationSamplingTime "2011-03-03T10:57:54"^^<http://www.w3.org/2001/XMLSchema#dateTime>;
+     _3:observedBy "300"^^<http://www.w3.org/2001/XMLSchema#int>;
+     _3:observedProperty "celsius";
+     _4:day "3"^^<http://www.w3.org/2001/XMLSchema#int>;
+     _4:hour "10"^^<http://www.w3.org/2001/XMLSchema#int>;
+     _4:minute "57"^^<http://www.w3.org/2001/XMLSchema#int>;
+     _4:month "3"^^<http://www.w3.org/2001/XMLSchema#int>;
+     _4:second "54"^^<http://www.w3.org/2001/XMLSchema#int>;
+     _4:year "2011"^^<http://www.w3.org/2001/XMLSchema#int>. 
