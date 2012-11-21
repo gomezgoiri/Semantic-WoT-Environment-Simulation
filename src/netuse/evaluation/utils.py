@@ -22,14 +22,27 @@ class Parameters():
         self.nodeTypes = nodeTypes
     
     def fill_blank_values(self, default_values): # default_values is an instance of Parameters also, with some default values )
-        if self.simulateUntil is None: self.simulateUntil = default_values.simulateUntil
-        if self.strategy is None: self.strategy = default_values.strategy
-        if self.amountOfQueries is None: self.amountOfQueries = default_values.amountOfQueries
-        if self.writeFrequency is None: self.writeFrequency = default_values.writeFrequency
-        if self.queries is None: self.queries = default_values.queries
-        if self.nodes is None: self.nodes = default_values.nodes
-        if self.numConsumers is None: self.numConsumers = default_values.numConsumers
-        if self.nodeTypes is None: self.nodeTypes = default_values.nodeTypes
+        filled_copy = Parameters(
+                            simulateUntil = self.simulateUntil, 
+                            strategy = self.strategy, 
+                            amountOfQueries = self.amountOfQueries,
+                            writeFrequency = self.writeFrequency,
+                            queries = self.queries,
+                            nodes = self.nodes,
+                            numConsumers = self.numConsumers,
+                            nodeTypes = self.nodeTypes,
+                        )
+        
+        if filled_copy.simulateUntil is None: filled_copy.simulateUntil = default_values.simulateUntil
+        if filled_copy.strategy is None: filled_copy.strategy = default_values.strategy
+        if filled_copy.amountOfQueries is None: filled_copy.amountOfQueries = default_values.amountOfQueries
+        if filled_copy.writeFrequency is None: filled_copy.writeFrequency = default_values.writeFrequency
+        if filled_copy.queries is None: filled_copy.queries = default_values.queries
+        if filled_copy.nodes is None: filled_copy.nodes = default_values.nodes
+        if filled_copy.numConsumers is None: filled_copy.numConsumers = default_values.numConsumers
+        if filled_copy.nodeTypes is None: filled_copy.nodeTypes = default_values.nodeTypes
+        
+        return filled_copy
 
 
 class ParametrizationUtils():
@@ -80,11 +93,11 @@ class ParametrizationUtils():
                 nodes = self.get_random_nodes(nsize) # different nodes for different repetition
                 
                 for var_params in rest_variable_parameters:
-                    var_params.nodes = nodes
-                    var_params.fill_blank_values(self.default_parameters)
+                    filled_params = var_params.fill_blank_values(self.default_parameters)
+                    filled_params.nodes = nodes
                     
                     try:
-                        params = self.create_parametrization(var_params)
+                        params = self.create_parametrization(filled_params)
                         params.save()
                         
                         execution = Execution(parameters=params)
