@@ -10,7 +10,7 @@ from netuse.database.parametrization import Parametrization
 from commons.utils import SemanticFilesLoader
 
 class Parameters():
-    def __init__(self, simulateUntil=60000, strategy=None, amountOfQueries=1, writeFrequency=60000,
+    def __init__(self, simulateUntil=None, strategy=None, amountOfQueries=None, writeFrequency=None,
                  queries=None, nodes=None, numConsumers=None, nodeTypes=None):
         self.simulateUntil = simulateUntil
         self.strategy = strategy

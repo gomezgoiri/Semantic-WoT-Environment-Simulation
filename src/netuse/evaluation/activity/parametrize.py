@@ -56,7 +56,7 @@ def main():
                          queries = templates,
                          nodeTypes = nodeTypes
                      )
-    p = ParametrizationUtils('energy_consumption', G.dataset_path, default_params, repetitions=1)
+    p = ParametrizationUtils('energy_consumption', G.dataset_path, default_params, repetitions=5)
     
     
     # Prepare variable independent parameters

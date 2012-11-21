@@ -153,12 +153,14 @@ class RawDataProcessor(object):
                     if nodeType not in node_names_by_device_type:
                         node_names_by_device_type[nodeType] = []
                     node_names_by_device_type[nodeType].append(nodeName)
-                    
                 
                 for device_type, node_names in node_names_by_device_type.iteritems():
                     subset_activity_per_node = []
                     for node_name in node_names:
-                        subset_activity_per_node.append( total_activity_per_node[node_name] )
+                        if node_name in total_activity_per_node:
+                            subset_activity_per_node.append( total_activity_per_node[node_name] )
+                        else:
+                            print "Node %s has no activity in the execution %s ."%(node_name, execution.id)
                     repetition_data[device_type] = numpy.mean(subset_activity_per_node)
                     
                 self.data[key].append(repetition_data)
