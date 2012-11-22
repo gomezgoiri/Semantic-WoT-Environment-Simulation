@@ -20,10 +20,10 @@ class DiagramGenerator:
     
     '''
       {
-        'ours_1': { 'num_nodes': [1,10,50,100,200], 'requests': [100,120,400,320,500] },
-        'ours_10': { 'num_nodes': [10,50,100,200], 'requests': [220,500,420,600] },
-        'ours_100': { 'num_nodes': [100,200], 'requests': [520,700] },
-        'nb': { 'num_nodes': [1,10,50,100,200], 'requests': [300,420,600,720,900] }
+        'ours_1': { 'num_nodes': [1,10,50,100,200], 'requests': [[105,100,85],[140,120,130],[376,400,406],[338,320,355],[495,500,505]] },
+        'ours_10': { 'num_nodes': [10,50,100,200], 'requests': [[223,220,221],[507,500,510],[430,420,420],[580,600,660]] },
+        'ours_100': { 'num_nodes': [100,200], 'requests': [[480,500,520],[640,700,740]] },
+        'nb': { 'num_nodes': [1,10,50,100,200], 'requests': [[320,300,340],[420,400,380],[540,600,630],[690,720,710],[880,900,912]] }
       }
     '''
     def __init__(self, title, data):
@@ -49,6 +49,14 @@ class DiagramGenerator:
         ax = fig.add_subplot(1,1,1)
         self.generate_subplot(ax, data, self.title)
     
+    def get_mean_and_std_dev(self, values):
+        means = []
+        std_devs = []
+        for repetitions in values:
+            means.append( np.average(repetitions) )
+            std_devs.append( np.std(repetitions) )
+        return means, std_devs
+    
     def generate_subplot(self, ax, data, title=None):        
         plt.xlabel(self.xlabel)
         plt.ylabel(self.ylabel)
@@ -58,21 +66,33 @@ class DiagramGenerator:
         shapes = cycle(self.linesShapes)
         colors = cycle(self.linesColors)
         
-        ax.plot( data[DiagramGenerator.OURS_1C][DiagramGenerator.NUM_NODES],
-                 data[DiagramGenerator.OURS_1C][DiagramGenerator.REQUESTS],
-                 shapes.next(), color=colors.next(), label='ours_1c')
+        color = colors.next()
+        means, std_devs = self.get_mean_and_std_dev(data[DiagramGenerator.OURS_1C][DiagramGenerator.REQUESTS])
+        ax.errorbar( data[DiagramGenerator.OURS_1C][DiagramGenerator.NUM_NODES],
+                     means, fmt=shapes.next(), color=color,
+                     yerr=std_devs, ecolor=color,
+                     label='ours_1c')
         
-        ax.plot( data[DiagramGenerator.OURS_10C][DiagramGenerator.NUM_NODES],
-                 data[DiagramGenerator.OURS_10C][DiagramGenerator.REQUESTS],
-                 shapes.next(), color=colors.next(), label='ours_10c')
+        color = colors.next()
+        means, std_devs = self.get_mean_and_std_dev(data[DiagramGenerator.OURS_10C][DiagramGenerator.REQUESTS])
+        ax.errorbar( data[DiagramGenerator.OURS_10C][DiagramGenerator.NUM_NODES],
+                     means, fmt=shapes.next(), color=color,
+                     yerr=std_devs, ecolor=color,
+                     label='ours_10c')
         
-        ax.plot( data[DiagramGenerator.OURS_100C][DiagramGenerator.NUM_NODES],
-                 data[DiagramGenerator.OURS_100C][DiagramGenerator.REQUESTS],
-                 shapes.next(), color=colors.next(), label='ours_100c')
+        color = colors.next()
+        means, std_devs = self.get_mean_and_std_dev(data[DiagramGenerator.OURS_100C][DiagramGenerator.REQUESTS])
+        ax.errorbar( data[DiagramGenerator.OURS_100C][DiagramGenerator.NUM_NODES],
+                     means, fmt=shapes.next(), color=color,
+                     yerr=std_devs, ecolor=color,
+                     label='ours_100c')
         
-        ax.plot( data[DiagramGenerator.NB][DiagramGenerator.NUM_NODES],
-                 data[DiagramGenerator.NB][DiagramGenerator.REQUESTS],
-                 shapes.next(), color=colors.next(), label='nb')
+        color = colors.next()
+        means, std_devs = self.get_mean_and_std_dev(data[DiagramGenerator.NB][DiagramGenerator.REQUESTS])
+        ax.errorbar( data[DiagramGenerator.NB][DiagramGenerator.NUM_NODES],
+                     means, fmt=shapes.next(), color=color,
+                     yerr=std_devs, ecolor=color,
+                     label='nb')
         
         ax.set_xlim(0)
         ax.set_ylim(0)
@@ -88,29 +108,30 @@ class DiagramGenerator:
         plt.savefig(filename, bbox_inches=0)
 
 
-def main():
-#    json = '''
-#          {
-#    'ours_1': { 'num_nodes': [1,10,50,100,200], 'requests': [100,120,400,320,500] },
-#    'ours_10': { 'num_nodes': [10,50,100,200], 'requests': [220,500,420,600] },
-#    'ours_100': { 'num_nodes': [100,200], 'requests': [520,700] },
-#    'nb': { 'num_nodes': [1,10,50,100,200], 'requests': [300,420,600,720,900] }
-#          }
-#        '''
-#    json = json.replace(' ','')
-#    json = json.replace('\n','')
-#    json = json.replace('\t','')
+def mainTest():
+    json_txt = '''
+      {
+        'ours_1': { 'num_nodes': [1,10,50,100,200], 'requests': [[105,100,85],[140,120,130],[376,400,406],[338,320,355],[495,500,505]] },
+        'ours_10': { 'num_nodes': [10,50,100,200], 'requests': [[223,220,221],[507,500,510],[430,420,420],[580,600,660]] },
+        'ours_100': { 'num_nodes': [100,200], 'requests': [[480,500,520],[640,700,740]] },
+        'nb': { 'num_nodes': [1,10,50,100,200], 'requests': [[320,300,340],[420,400,380],[540,600,630],[690,720,710],[880,900,912]] }
+      }
+        '''
+    json_txt = json_txt.replace(' ','')
+    json_txt = json_txt.replace('\n','')
+    json_txt = json_txt.replace('\t','')
     
+    d = DiagramGenerator("Network usage by strategies", eval(json_txt))
+    d.save('/tmp/test_diagram.pdf')
+
+def main():    
     f = open('/tmp/requests_by_strategies.json', 'r')
     json_txt = f.read()
     f.close()
     
-    d = DiagramGenerator("Network usage", eval(json_txt))
+    d = DiagramGenerator("Network usage by strategies", eval(json_txt))
     d.save('/tmp/requests_by_strategies.pdf')
-        
-    #d.show()
-    #raw_input("Press ENTER to exit")
 
 
 if __name__ == '__main__':   
-    main()
+    mainTest()
