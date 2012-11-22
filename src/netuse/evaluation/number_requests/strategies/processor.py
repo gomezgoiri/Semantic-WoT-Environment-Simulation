@@ -16,16 +16,18 @@ class RawDataProcessor(object):
         self.data = {}
         
     def _load(self, executionSet, name, strategy, additionalFilter=None):
-        nodes_and_requests = [] # tuples of 2 elements: number of nodes in the simulation and requests
+        requests_by_node = {} # tuples of 2 elements: number of nodes in the simulation and requests
         for execution in executionSet.executions:
             if execution.parameters.strategy==strategy:
                 if additionalFilter==None or additionalFilter(execution.parameters):
                     num_nodes = len(execution.parameters.nodes) # in the reference of mongoengine, they defend this method
                     num_requests = NetworkTrace.objects(execution=execution.id).count()
-                    nodes_and_requests.append((num_nodes, num_requests))
+                    if num_nodes not in requests_by_node:
+                        requests_by_node[num_nodes] = []
+                    requests_by_node[num_nodes].append(num_requests)
         
         # sort by num_nodes
-        sort = sorted(nodes_and_requests)
+        sort = sorted(requests_by_node.items())
         
         self.data[name] = {}
         self.data[name][DiagramGenerator.NUM_NODES] = [e[0] for e in sort]
