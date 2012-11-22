@@ -25,7 +25,7 @@ class RawDataProcessor(object):
                 num_requests = NetworkTrace.objects(execution=execution.id, path__contains="/whitepage/clues/").count()
                 if num_nodes not in requests_by_node:
                     requests_by_node[num_nodes] = []
-                requests_by_node[num_nodes].append((num_nodes, num_requests))
+                requests_by_node[num_nodes].append(num_requests)
         
         # sort by num_nodes
         sort = sorted(requests_by_node.items())
@@ -43,7 +43,7 @@ class RawDataProcessor(object):
                 num_requests = NetworkTrace.objects(execution=execution.id, path__exact="/whitepage/clues").count()
                 if num_nodes not in requests_by_node:
                     requests_by_node[num_nodes] = []
-                requests_by_node[num_nodes].append((num_nodes, num_requests))
+                requests_by_node[num_nodes].append(num_requests)
         
         # sort by num_nodes
         sort = sorted(requests_by_node.items())
@@ -61,7 +61,7 @@ class RawDataProcessor(object):
                 num_requests = NetworkTrace.objects(execution=execution.id, path__startswith="/spaces/").count()
                 if num_nodes not in requests_by_node:
                     requests_by_node[num_nodes] = []
-                requests_by_node[num_nodes].append((num_nodes, num_requests))
+                requests_by_node[num_nodes].append(num_requests)
         
         # sort by num_nodes
         sort = sorted(requests_by_node.items())
