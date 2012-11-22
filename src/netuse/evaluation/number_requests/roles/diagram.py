@@ -19,9 +19,9 @@ class DiagramGenerator:
     
     '''
       {
-        'prov-WP': { 'num_nodes': [1,10,50,100,200], 'requests': [100,120,400,320,500] },
-        'cons-WP': { 'num_nodes': [10,50,100,200], 'requests': [220,500,420,600] },
-        'cons-prov': { 'num_nodes': [100,200], 'requests': [520,700] }
+        'prov-WP': { 'num_nodes': [1,10,50,100,200], 'requests': [[105,100,85],[140,120,130],[376,400,406],[338,320,355],[495,500,505]] },
+        'cons-WP': { 'num_nodes': [10,50,100,200], 'requests': [[223,220,221],[507,500,510],[430,420,420],[580,600,660]] },
+        'cons-prov': { 'num_nodes': [100,200], 'requests': [[480,500,520],[640,700,740]] }
       }
     '''
     def __init__(self, title, data):
@@ -46,6 +46,14 @@ class DiagramGenerator:
                 
         ax = fig.add_subplot(1,1,1)
         self.generate_subplot(ax, data, self.title)
+        
+    def get_mean_and_std_dev(self, values):
+        means = []
+        std_devs = []
+        for repetitions in values:
+            means.append( np.average(repetitions) )
+            std_devs.append( np.std(repetitions) )
+        return means, std_devs
     
     def generate_subplot(self, ax, data, title=None):        
         plt.xlabel(self.xlabel)
@@ -56,17 +64,26 @@ class DiagramGenerator:
         shapes = cycle(self.linesShapes)
         colors = cycle(self.linesColors)
         
-        ax.plot( data[DiagramGenerator.PROV_WP][DiagramGenerator.NUM_NODES],
-                 data[DiagramGenerator.PROV_WP][DiagramGenerator.REQUESTS],
-                 shapes.next(), color=colors.next(), label=DiagramGenerator.PROV_WP)
+        color = colors.next()
+        means, std_devs = self.get_mean_and_std_dev( data[DiagramGenerator.PROV_WP][DiagramGenerator.REQUESTS] )
+        ax.errorbar( data[DiagramGenerator.PROV_WP][DiagramGenerator.NUM_NODES],
+                 means, fmt=shapes.next(), color=color,
+                 yerr=std_devs, ecolor=color,
+                 label=DiagramGenerator.PROV_WP)
         
-        ax.plot( data[DiagramGenerator.CONS_WP][DiagramGenerator.NUM_NODES],
-                 data[DiagramGenerator.CONS_WP][DiagramGenerator.REQUESTS],
-                 shapes.next(), color=colors.next(), label=DiagramGenerator.CONS_WP)
+        color = colors.next()
+        means, std_devs = self.get_mean_and_std_dev( data[DiagramGenerator.CONS_WP][DiagramGenerator.REQUESTS] )
+        ax.errorbar( data[DiagramGenerator.CONS_WP][DiagramGenerator.NUM_NODES],
+                 means, fmt=shapes.next(), color=color,
+                 yerr=std_devs, ecolor=color,
+                 label=DiagramGenerator.CONS_WP)
         
-        ax.plot( data[DiagramGenerator.CONS_PROV][DiagramGenerator.NUM_NODES],
-                 data[DiagramGenerator.CONS_PROV][DiagramGenerator.REQUESTS],
-                 shapes.next(), color=colors.next(), label=DiagramGenerator.CONS_PROV)
+        color = colors.next()
+        means, std_devs = self.get_mean_and_std_dev( data[DiagramGenerator.CONS_PROV][DiagramGenerator.REQUESTS] )
+        ax.errorbar( data[DiagramGenerator.CONS_PROV][DiagramGenerator.NUM_NODES],
+                     means, fmt=shapes.next(), color=color,
+                     yerr=std_devs, ecolor=color,
+                     label=DiagramGenerator.CONS_PROV)
         
         ax.set_xlim(0)
         ax.set_ylim(0)
@@ -84,9 +101,9 @@ class DiagramGenerator:
 def mainTest():
     json_txt = '''
       {
-        'prov-WP': { 'num_nodes': [1,10,50,100,200], 'requests': [100,120,400,320,500] },
-        'cons-WP': { 'num_nodes': [10,50,100,200], 'requests': [220,500,420,600] },
-        'cons-prov': { 'num_nodes': [100,200], 'requests': [520,700] }
+        'prov-WP': { 'num_nodes': [1,10,50,100,200], 'requests': [[105,100,85],[140,120,130],[376,400,406],[338,320,355],[495,500,505]] },
+        'cons-WP': { 'num_nodes': [10,50,100,200], 'requests': [[223,220,221],[507,500,510],[430,420,420],[580,600,660]] },
+        'cons-prov': { 'num_nodes': [100,200], 'requests': [[480,500,520],[640,700,740]] }
       }
         '''
     json_txt = json_txt.replace(' ','')
@@ -106,4 +123,4 @@ def main():
 
 
 if __name__ == '__main__':   
-    main()
+    mainTest()
