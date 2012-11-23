@@ -26,28 +26,7 @@ class Version:
         self.generation = generation
         self.version = version
         
-    def __lt__(self, other):
+    def __cmp__(self, other):
         if self.generation is other.generation:
-            return self.version < other.version
-        return self.generation < other.generation
-    
-    def __le__(self, other):
-        if self.generation is other.generation:
-            return self.version <= other.version
-        return self.generation <= other.generation
-    
-    def __eq__(self, other):
-        return self.generation==other.generation and self.version==other.version
-    
-    def __ne__(self, other):
-        return not self.__eq__(other)
-    
-    def __gt__(self, other):
-        if self.generation is other.generation:
-            return self.version > other.version
-        return self.generation > other.generation
-    
-    def __ge__(self, other):
-        if self.generation is other.generation:
-            return self.version >= other.version
-        return self.generation >= other.generation
+            return self.version - other.version
+        return self.generation - other.generation
