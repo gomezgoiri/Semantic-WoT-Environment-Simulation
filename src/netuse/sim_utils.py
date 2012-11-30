@@ -45,8 +45,8 @@ def schedule(f):
 
 class ScheduledFunction(Process):
     
-    def __init__(self, objct, method, args, kwargs):
-        super(ScheduledFunction, self).__init__()
+    def __init__(self, objct, method, args, kwargs, sim=None):
+        super(ScheduledFunction, self).__init__(sim=sim)
         self.result = ResultContainer()
         self.objct = objct
         self.method = (method, )

@@ -13,8 +13,8 @@ from netuse.triplespace.network.client import RequestInstance, RequestManager, R
 
 
 class Timer(Process):
-    def __init__(self, waitUntil=10000.0, name="timer"):
-        Process.__init__(self, name=name)
+    def __init__(self, waitUntil=10000.0, name="timer", sim=None):
+        Process.__init__(self, name=name, sim=sim)
         self.__timeout = waitUntil
         self.event = SimEvent(name="timer_event")
         self.ended = False
@@ -24,13 +24,14 @@ class Timer(Process):
         self.ended = True
         self.event.signal()
 
+
 class Provider(Process, SimpleDiscoveryObserver):
     
     RETRY_ON_FAILURE = 10000 # 10 secs
     UPDATE_TIME = 3600000 # 1h
     
-    def __init__(self, dataaccess, discovery):
-        Process.__init__(self)
+    def __init__(self, dataaccess, discovery, sim=None):
+        Process.__init__(self, sim=sim)
         
         self.discovery = discovery
         self.discovery.add_changes_observers(self)

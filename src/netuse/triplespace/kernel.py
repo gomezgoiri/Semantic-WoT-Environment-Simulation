@@ -128,8 +128,8 @@ class OurSolution(TripleSpace):
 
 class QueryFinisher(Process, RequestObserver):
     
-    def __init__(self, consumer, discovery, fromSpaceToURL, fromTemplateToURLtemplate):
-        Process.__init__(self)
+    def __init__(self, consumer, discovery, fromSpaceToURL, fromTemplateToURLtemplate, sim=None):
+        Process.__init__(self, sim=sim)
         self.consumer = consumer
         self.discovery = discovery
         self.fromSpaceToURL = fromSpaceToURL
