@@ -19,7 +19,7 @@ XSDBASE_URI_QUOTED = 'http%3A%2F%2Fwww.w3.org%2F2001%2FXMLSchema%23'
 
 class ConcreteTS(TripleSpace):
     def __init__(self):
-        TripleSpace.__init__(self, None)
+        super(ConcreteTS, self).__init__(None)
         
     def write(self, startAt):
         pass

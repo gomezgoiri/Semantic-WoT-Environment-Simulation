@@ -4,7 +4,7 @@ Created on Sep 10, 2012
 @author: tulvur
 '''
 
-from SimPy.Simulation import *
+from SimPy.Simulation import Process, SimEvent, hold, waitevent
 import weakref
 from abc import ABCMeta, abstractmethod
 from netuse.sim_utils import Timer
@@ -13,8 +13,8 @@ from netuse.results import G
 
 
 class ProcessCanceler(Process):
-    def __init__(self, victimProcess):
-        Process.__init__(self)
+    def __init__(self, victimProcess, sim=None):
+        super(ProcessCanceler, self).__init__(sim=sim)
         self.victimProcess = victimProcess
         
     def cancel_process(self):
@@ -26,30 +26,34 @@ class RequestManager(object):
     
     @staticmethod
     def launchNormalRequest(request):
-        r = ScheduledRequest(request, at=now())
+        simulation = request.sim
+        r = ScheduledRequest(request, at=simulation.now(), simulation=simulation)
         r.start() # observers should have been added to the request itself prior to this call
         return r
     
     @staticmethod
     def launchDelayedRequest(request, wait_for):
-        r = DelayedRequest(request, wait_for)
+        r = DelayedRequest(request, wait_for, simulation=request.sim)
         r.start() # observers should have been added to the request itself prior to this call
         return r
     
     @staticmethod
     def launchScheduledRequest(request, at):
-        r = ScheduledRequest(request, at)
+        r = ScheduledRequest(request, at, simulation=request.sim)
         r.start() # observers should have been added to the request itself prior to this call
         return r
-        
+    
     @staticmethod
     def cancelRequest(request): # should be a delayed or scheduled request
         pc = ProcessCanceler(request.getProcess())
-        activate(pc, pc.cancel_process())
+        request.sim.activate(pc, pc.cancel_process())
 
 
 class AbstractRequest(object):
     __metaclass__ = ABCMeta
+    
+    def __init__(self, simulation=None):
+        self.simulation = simulation
     
     @abstractmethod
     def getProcess(self):
@@ -61,30 +65,30 @@ class AbstractRequest(object):
 
 
 class DelayedRequestLauncher(Process):    
-    def __init__(self, request, wait_for=0):
-        Process.__init__(self)
+    def __init__(self, request, wait_for=0, sim=None):
+        super(DelayedRequestLauncher, self).__init__(sim=sim)
         self.wait_for = wait_for
         self.request = request
     
     def start(self):
         yield hold, self, self.wait_for
-        activate(self.request, self.request.startup())
+        self.sim.activate(self.request, self.request.startup())
 
 class DelayedRequest(AbstractRequest):
-    def __init__(self, request, wait_for):
-        AbstractRequest.__init__(self)
-        self.launcher = DelayedRequestLauncher(request, wait_for=wait_for)
+    def __init__(self, request, wait_for, simulation=None):
+        super(DelayedRequest, self).__init__(simulation)
+        self.launcher = DelayedRequestLauncher(request, wait_for=wait_for, sim=simulation)
     
     def getProcess(self):
         return self.launcher
     
     def start(self):
-        activate(self.launcher, self.launcher.start())
+        self.simulation.activate(self.launcher, self.launcher.start())
 
 
 class ScheduledRequest(AbstractRequest):    
-    def __init__(self, request, at):
-        AbstractRequest.__init__(self)
+    def __init__(self, request, at, simulation=None):
+        super(ScheduledRequest, self).__init__(simulation)
         self.at = at
         self.request = request
     
@@ -92,7 +96,7 @@ class ScheduledRequest(AbstractRequest):
         return self.request
     
     def start(self):
-        activate(self.request, self.request.startup(), at=self.at)
+        self.simulation.activate(self.request, self.request.startup(), at=self.at)
 
 
 class RequestObserver(object):    
@@ -109,7 +113,7 @@ class RequestInstance(Process):
     ReqIdGenerator = 0
     
     def __init__(self, actionNode, destinationNodes, url, data=None, waitUntil=10000.0, name="request", sim=None):
-        Process.__init__(self, name=name, sim=sim)
+        super(RequestInstance, self).__init__(name=name, sim=sim)
         self.name += " (from=%s, url=%s)"%(actionNode.name, url)
         self.__actionNode = weakref.proxy(actionNode) #weakref.ref(actionNode)
         self.__destinationNodes = weakref.WeakSet(destinationNodes) # tuple with all the nodes to be requested
@@ -126,7 +130,7 @@ class RequestInstance(Process):
         self.__observers = weakref.WeakSet()
         
     def startup(self):
-        t_init = now()
+        t_init = self.sim.now()
         
         for node in self.__destinationNodes:
             # already removed from the list prior to calling to this method, but just in case...
@@ -137,7 +141,7 @@ class RequestInstance(Process):
                 request = HttpRequest(reqId, self.__url, data=self.__data)
                 self.nodeNamesByReqId[reqId] = node.name
                 
-                self.requestInit[reqId] = now()
+                self.requestInit[reqId] = self.sim.now()
                 node.queueRequest(self, request)
                 #if self.__data!=None:
                 #    G.executionData.requests['data-exchanged'] += len(self.__data)
@@ -145,14 +149,14 @@ class RequestInstance(Process):
                 raise Exception("A request to the same node is impossible! ")
         
         self.timer = Timer(self.__timeout, waitUntil=G.timeout_after, sim=self.sim)
-        activate(self.timer, self.timer.wait(), self.__maxWaitingTime)
+        self.sim.activate(self.timer, self.timer.wait(), self.__maxWaitingTime)
         while not self.allReceived() or self.timer.ended:
             yield waitevent, self, (self.__timeout, self.__newResponseReceived,)
         
         
         if not self.allReceived(): # timeout reached
             #print "Response not received!"
-            response_time = now() - t_init
+            response_time = self.sim.now() - t_init
             
             for node_name in self.get_unanswered_nodes():
                 G.traceRequest(t_init,
@@ -194,7 +198,7 @@ class RequestInstance(Process):
         # timeouts have been already taken into account in the 'timeout' counter
         if not self.timer.ended:
             t_init = self.requestInit[response.getid()]
-            response_time = now() - t_init
+            response_time = self.sim.now() - t_init
             G.traceRequest(t_init,
                            self.__actionNode.name,
                            self.get_destination_node_name(response.getid()),

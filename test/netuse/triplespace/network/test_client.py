@@ -5,7 +5,7 @@ from netuse.triplespace.network.client import RequestManager
 class FakeRequestInstance(Process):
     
     def __init__(self, sim=None):
-        Process.__init__(self, sim=sim)
+        super(FakeRequestInstance, self).__init__(sim=sim)
         self.when = None
     
     def startup(self):

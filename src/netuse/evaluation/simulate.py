@@ -41,7 +41,7 @@ def performSimulation(execution, preloadedGraph={}):
 class SimulationPerformer(Process):
     
     def __init__(self, name=None, queue=None):
-        Process.__init__(self, name=name)
+        super(SimulationPerformer, self).__init__(name=name)
         self.execution_ids = queue
     
     def mark_execution(self, execution):

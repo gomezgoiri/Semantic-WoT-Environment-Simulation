@@ -5,21 +5,39 @@ Created on Sep 17, 2012
 '''
 import json
 from abc import ABCMeta, abstractmethod
-from SimPy.Simulation import now
 from clueseval.clues.storage.sqlite import SQLiteClueStore
 from clueseval.clues.storage.memory import MemoryClueStore
-from netuse.results import G
 from netuse.triplespace.network.url_utils import URLUtils
 from netuse.triplespace.our_solution.consumer.time_update import UpdateTimesManager
 from netuse.triplespace.our_solution.whitepage.selection import WhitepageSelector, WhitepageSelectionManager, SelectionProcessObserver
 from netuse.triplespace.network.client import RequestInstance, RequestManager, RequestObserver
 
 
+class ConsumerFactory(object):
+    
+    def __init__(self, simulation, discovery):
+        self.simulation = simulation
+        self.discovery = discovery
+    
+    def _canManageClues(self, my_drecord):
+        my_drecord = self.discovery.me.discovery_record
+        # really naive condition
+        # TODO enhance and take into account selection module
+        return WhitepageSelector._to_bytes(*my_drecord.memory) > WhitepageSelector._to_bytes(*WhitepageSelector.MEMORY_LIMIT)            
+    
+    def createConsumer(self):
+        if self._canManageClues():
+            return Consumer(self.discovery)
+        else:
+            return ConsumerLite(self.discovery)
+
+
 class AbstractConsumer(SelectionProcessObserver):
     
     __metaclass__ = ABCMeta
     
-    def __init__(self, discovery):
+    def __init__(self, simulation, discovery):
+        self.simulation = simulation
         self.discovery = discovery
         self.connector = None
         self.wp_node_name = None
@@ -37,7 +55,7 @@ class AbstractConsumer(SelectionProcessObserver):
         if wp is None:
             if not self.ongoing_selection:
                 self.ongoing_selection = True
-                wsm = WhitepageSelectionManager(self.discovery)
+                wsm = WhitepageSelectionManager(self.simulation, self.discovery)
                 wsm.set_observer(self)
                 wsm.choose_whitepage()
         else:
@@ -55,22 +73,6 @@ class AbstractConsumer(SelectionProcessObserver):
         if self.connector is not None:
             self.connector.stop()
 
-
-class ConsumerFactory(object):
-    
-    @staticmethod
-    def canManageClues(my_drecord):
-        # really naive condition
-        # TODO enhance and take into account selection module
-        return WhitepageSelector._to_bytes(*my_drecord.memory) > WhitepageSelector._to_bytes(*WhitepageSelector.MEMORY_LIMIT)            
-    
-    @staticmethod
-    def createConsumer(discovery):
-        if ConsumerFactory.canManageClues(discovery.me.discovery_record):
-            return Consumer(discovery)
-        else:
-            return ConsumerLite(discovery)
-
 class Consumer(AbstractConsumer):
     def _update_connector(self, wp):
         if self.wp_node_name is None or self.wp_node_name!=wp.name:
@@ -81,7 +83,7 @@ class Consumer(AbstractConsumer):
             if wp==self.discovery.me:                
                 self.connector = LocalConnector(self.discovery)
             else:
-                self.connector = RemoteConnector(self.discovery.me, wp)
+                self.connector = RemoteConnector(self.discovery.me, wp, simulation=self.simulation)
             self.connector.start()
 
 class ConsumerLite(AbstractConsumer):
@@ -94,7 +96,7 @@ class ConsumerLite(AbstractConsumer):
             if wp==self.discovery.me:
                 raise Exception("A lite consumer cannot be whitepage, check the selection algorithm.")
             else:
-                self.connector = RemoteLiteConnector(self.discovery.me, wp)
+                self.connector = RemoteLiteConnector(self.discovery.me, wp, simulation=self.simulation)
             self.connector.start()
 
 
@@ -123,10 +125,11 @@ class LocalConnector(AbstractConnector):
 
 class RemoteConnector(AbstractConnector, RequestObserver):
     
-    def __init__(self, me_as_node, whitepage_node):
+    def __init__(self, me_as_node, whitepage_node, simulation):
         self.me_as_node = me_as_node
         self.whitepage_node = whitepage_node
         self.updateTimeManager = UpdateTimesManager()
+        self.simulation = simulation
         
         # Aspecto discutido en issue #1
         # self.clues = SQLiteClueStore(database_path=G.temporary_path)
@@ -147,10 +150,15 @@ class RemoteConnector(AbstractConnector, RequestObserver):
     
     def _schedule_future_update(self):
         up_time = self.updateTimeManager.get_updatetime()
-        self.scheduled_request = RequestManager.launchScheduledRequest(self._get_update_request(), now()+up_time)
+        self.scheduled_request = RequestManager.launchScheduledRequest(
+                                    self._get_update_request(),
+                                    self.simulation.now() + up_time )
     
     def _get_update_request(self):
-        req = RequestInstance(self.me_as_node, [self.whitepage_node], '/whitepage/clues')
+        req = RequestInstance( self.me_as_node,
+                               [self.whitepage_node],
+                               '/whitepage/clues',
+                               sim = self.simulation )
         req.addObserver(self)
         return req
     
@@ -169,12 +177,12 @@ class RemoteConnector(AbstractConnector, RequestObserver):
         self._check_if_next_update_changes() # next clue update!
     
     def _check_if_next_update_changes(self):
-        if self.scheduled_request.at <= now(): # if last update already done...
+        if self.scheduled_request.at <= self.simulation.now(): # if last update already done...
             # ...schedule the next one
             self._schedule_future_update()
         else: # one request already scheduled, other may override it
             
-            possible_next = now() + self.updateTimeManager.get_updatetime()
+            possible_next = self.simulation.now() + self.updateTimeManager.get_updatetime()
             
             # if we  have a candidate to update our next update with an earlier update...
             if possible_next < self.scheduled_request.at:
@@ -186,7 +194,8 @@ class RemoteConnector(AbstractConnector, RequestObserver):
     
     def get_query_candidates(self, template, previously_unsolved=False):
         if not previously_unsolved:
-            self.updateTimeManager.add_updatetime(now()) # add a timestamp of now to get the update frequency
+            # add a timestamp of "now" to get the updated frequency
+            self.updateTimeManager.add_updatetime( self.simulation.now() )
             self._check_if_next_update_changes()
         if not self.first_load_in_store:
             # wait until the clues are loaded for the first time
@@ -197,13 +206,17 @@ class RemoteConnector(AbstractConnector, RequestObserver):
 
 class RemoteLiteConnector(AbstractConnector, RequestObserver):
     
-    def __init__(self, me_as_node, whitepage_node):
+    def __init__(self, me_as_node, whitepage_node, simulation):
         self.me_as_node = me_as_node
         self.whitepage_node = whitepage_node
+        self.simulation = simulation
         self.responses = {}
     
     def _get_candidates_from_wp_request(self, templateURL):
-        req = RequestInstance(self.me_as_node, [self.whitepage_node], '/whitepage/clues/query/%s'%(templateURL))
+        req = RequestInstance( self.me_as_node,
+                               [self.whitepage_node],
+                               '/whitepage/clues/query/%s'%(templateURL),
+                               sim = self.simulation )
         req.addObserver(self)
         return req
     

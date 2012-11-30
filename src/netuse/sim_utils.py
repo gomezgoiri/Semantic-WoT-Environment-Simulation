@@ -78,7 +78,7 @@ class ResultContainer(object):
 class OwnArgumentParser(ArgumentParser):
     
     def __init__(self, description="Default description"):
-        ArgumentParser.__init__(self, description=description)
+        super(OwnArgumentParser, self).__init__(description=description)
         from netuse.results import G
         self.add_argument('-ds','--data-set', default=G.dataset_path, dest='dataset_path',
                     help='Specify the folder containing the dataset to perform the simulation.')
@@ -92,7 +92,7 @@ class OwnArgumentParser(ArgumentParser):
         
 class Timer(Process):
     def __init__(self, waitUntil=10000.0, name="timer", sim=None):
-        Process.__init__(self, name=name, sim=sim)
+        super(Timer, self).__init__(name=name, sim=sim)
         self.__timeout = waitUntil
         self.event = SimEvent(name="timer_event")
         self.ended = False

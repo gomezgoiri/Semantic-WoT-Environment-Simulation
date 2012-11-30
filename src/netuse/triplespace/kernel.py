@@ -5,7 +5,7 @@ Created on Dec 12, 2011
 '''
 from abc import abstractmethod, ABCMeta
 from netuse.sim_utils import schedule
-from SimPy.Simulation import now, Process, activate, hold
+from SimPy.Simulation import Process, hold
 
 from netuse.nodes import NodeGenerator
 from netuse.triplespace.our_solution.whitepage.whitepage import Whitepage
@@ -18,17 +18,20 @@ from netuse.triplespace.network.client import RequestManager, RequestInstance, R
 
 
 class TripleSpace(object):
-    
     __metaclass__ = ABCMeta
     
-    def __init__(self, discovery):
-        self.handler = CustomSimulationHandler(self)
-        self.dataaccess = DataAccess() # join not implemented yet
-        self.network = None
+    def __init__(self, simulation, discovery):
+        self.simulation = simulation
         self.discovery = discovery
+        
         self.__logRequests = False
         self.reasoningCapacity = False # TODO refactor (it should be get from Device
         
+        self.handler = CustomSimulationHandler(self)
+        self.dataaccess = DataAccess() # join not implemented yet
+        self.network = None
+    
+    
     @abstractmethod
     def write(self, triples):
         pass
@@ -42,8 +45,8 @@ class TripleSpace(object):
 
 
 class NegativeBroadcasting(TripleSpace):
-    def __init__(self, discovery):
-        TripleSpace.__init__(self, discovery)
+    def __init__(self, discovery, simulation=None):
+        super(NegativeBroadcasting, self).__init__(simulation, discovery)
     
     @schedule
     def write(self, triples):
@@ -57,40 +60,42 @@ class NegativeBroadcasting(TripleSpace):
         req = RequestInstance(self.discovery.me,
                               self.discovery.rest,
                               '/' + URLUtils.serialize_space_to_URL() + "query/" + URLUtils.serialize_wildcard_to_URL(template),
-                              name="queryAt"+str(now()))
+                              name = "queryAt"+str(self.simulation.now()),
+                              sim = self.simulation )
         RequestManager.launchNormalRequest(req)
         
 
 class Centralized(TripleSpace):
     def __init__(self, me, server=None, simulation=None):
-        TripleSpace.__init__(self, me)
+        super(Centralized, self).__init__(simulation, None)
         self.server = server
     
     @schedule
-    def write(self, triples, simulation=None):
+    def write(self, triples):
         if self.server is not None:
             req = RequestInstance(self.me, (self.server,),
                                   '/' + URLUtils.serialize_space_to_URL() + "graphs/",
-                                  data=triples.serialize(format='n3'),
-                                  name="writeAt"+str(now()))
+                                  data = triples.serialize(format='n3'),
+                                  name = "writeAt"+str(self.simulation.now()),
+                                  sim = self.simulation )
             RequestManager.launchNormalRequest(req)
     
     @schedule
     def query(self, template):
         req = RequestInstance(self.me, (self.server,),
                               '/' + URLUtils.serialize_space_to_URL() + "query/" + URLUtils.serialize_wildcard_to_URL(template),
-                              name="queryAt"+str(now()))
+                              name = "queryAt"+str(self.simulation.now()),
+                              sim = self.simulation )
         
         RequestManager.launchNormalRequest(req)
 
 
 class OurSolution(TripleSpace):
     def __init__(self, discovery, simulation=None): # ontologyGraph, which may be already expanded or not
-        TripleSpace.__init__(self, discovery)
+        super(OurSolution, self).__init__(simulation, discovery)
         self.provider = None
         self.consumer = None
         self.whitepage = None # just the whitepage will have this attribute to !=None
-        self.__simulation = simulation
         
     def be_whitepage(self):
         self.whitepage = Whitepage()
@@ -101,24 +106,29 @@ class OurSolution(TripleSpace):
     def write(self, triples):
         self.dataaccess.write(triples)
         
-        if self.provider==None:
-            self.provider = Provider(self.dataaccess, self.discovery, self.__simulation)
-            activate(self.provider, self.provider.update_clues_on_whitepage())
+        if self.provider is None:
+            self.provider = Provider( self.dataaccess, self.discovery, sim = self.simulation )
+            self.simulation.activate( self.provider, self.provider.update_clues_on_whitepage() )
             
         # if clues have been updated, let the provider module now
         self.provider.refresh_clue()
     
     @schedule
     def query(self, template):
-        if self.consumer==None:
-            self.consumer = ConsumerFactory.createConsumer(self.discovery) # change the discovery registry to set "sac" property
+        if self.consumer is None:
+            factory = ConsumerFactory(self.simulation, self.discovery)
+            self.consumer = factory.createConsumer() # change the discovery registry to set "sac" property
         
         # remote queries
-        qf = QueryFinisher(self.consumer, self.discovery, URLUtils.serialize_space_to_URL(), URLUtils.serialize_wildcard_to_URL(template), sim=self.__simulation)
+        qf = QueryFinisher(self.consumer,
+                           self.discovery,
+                           URLUtils.serialize_space_to_URL(),
+                           URLUtils.serialize_wildcard_to_URL(template),
+                           sim = self.simulation)
         # when I've tried to do it in the same class (qf = self), some of the activation weren't really activated
         # may be because a method of the same object cannot be used at the same simulation time?
         # In this case, when they overlap, the activation of _finish_query_waiting may be ignored when they overlap in time
-        activate(qf, qf._finish_query_waiting(template)) # to wait for whitepages
+        self.simulation.activate(qf, qf._finish_query_waiting(template)) # to wait for whitepages
 
     def stop(self):
         if self.provider is not None:
@@ -130,14 +140,14 @@ class OurSolution(TripleSpace):
 class QueryFinisher(Process, RequestObserver):
     
     def __init__(self, consumer, discovery, fromSpaceToURL, fromTemplateToURLtemplate, sim=None):
-        Process.__init__(self, sim=sim)
+        super(QueryFinisher, self).__init__(sim=sim)
         self.consumer = consumer
         self.discovery = discovery
         self.fromSpaceToURL = fromSpaceToURL
         self.fromTemplateToURLtemplate = fromTemplateToURLtemplate
     
     def _finish_query_waiting(self, template):
-        # local query
+        # TODO local query
         
         selected_nodes = None
         previously_unsolved = True
@@ -166,7 +176,8 @@ class QueryFinisher(Process, RequestObserver):
                     
                     req = RequestInstance(self.discovery.me, destNodes,
                                           '/' + self.fromSpaceToURL + "query/" + self.fromTemplateToURLtemplate,
-                                          name="queryAt"+str(self.sim.now()))
+                                          name = "queryAt"+str(self.sim.now()),
+                                          sim = self.sim )
                     RequestManager.launchNormalRequest(req)
             except:
                 import traceback

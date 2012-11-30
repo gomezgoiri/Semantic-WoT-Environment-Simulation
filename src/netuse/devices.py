@@ -83,55 +83,52 @@ class XBee(DeviceType):
     TYPE_ID = 'xbee'
     
     def __init__(self):
-        DeviceType.__init__(self,
-                            ram_memory='8MB',
-                            storage_capacity='1MB',
-                            waitingTime = [[1,77,1],
-                             [5,392,8],
-                             [10,775,8]],
-                            canQueue=False,
-                            canReason=False,
-                            hasBattery=False)
+        super(XBee, self).__init__( ram_memory='8MB',
+                                    storage_capacity='1MB',
+                                    waitingTime = [[1,77,1],
+                                                   [5,392,8],
+                                                   [10,775,8]],
+                                   canQueue=False,
+                                   canReason=False,
+                                   hasBattery=False )
 
 class FoxG20(DeviceType):
     TYPE_ID = 'foxg20'
     
     def __init__(self):
-        DeviceType.__init__(self,
-                            ram_memory='64MB',
-                            storage_capacity='1GB',
-                            waitingTime = [[1,17,0],
-                             [5,97,16],
-                             [10,174,28],
-                             [15,282,43],
-                             [20,375,30],
-                             [25,460,30],
-                             [30,540,35],
-                             [35,632,29]],
-                            canQueue=False,
-                            canReason=True,
-                            hasBattery=True)
+        super(FoxG20, self).__init__( ram_memory='64MB',
+                                      storage_capacity='1GB',
+                                      waitingTime = [[1,17,0],
+                                                     [5,97,16],
+                                                     [10,174,28],
+                                                     [15,282,43],
+                                                     [20,375,30],
+                                                     [25,460,30],
+                                                     [30,540,35],
+                                                     [35,632,29]],
+                                     canQueue=False,
+                                     canReason=True,
+                                     hasBattery=True )
 
  
 class SamsungGalaxyTab(DeviceType):
     TYPE_ID = 'galaxy_tab'
 
     def __init__(self):
-        DeviceType.__init__(self,
-                            ram_memory='512MB',
-                            storage_capacity='8GB',
-                            waitingTime = [[1,223,349],
-                             [5,256,76],
-                             [10,372,171],
-                             [15,497,191],
-                             [20,661,444],
-                             [25,748,288],
-                             [30,929,805],
-                             [35,1029,672]],
-                            canQueue=True,
-                            canReason=True,
-                            hasBattery=True)
-        
+        super(SamsungGalaxyTab, self).__init__( ram_memory='512MB',
+                                                storage_capacity='8GB',
+                                                waitingTime = [[1,223,349],
+                                                               [5,256,76],
+                                                               [10,372,171],
+                                                               [15,497,191],
+                                                               [20,661,444],
+                                                               [25,748,288],
+                                                               [30,929,805],
+                                                               [35,1029,672]],
+                                               canQueue=True,
+                                               canReason=True,
+                                               hasBattery=True )
+
 # I don't remember which example did we use in senami2012,
 # but from 50 to 500 new measures in a new benchmarking have been noted down.
 # 5 executions of each test have been perfomed because in each execution the average decreases. 
@@ -140,45 +137,43 @@ class RegularComputer(DeviceType):
     TYPE_ID = 'computer'
     
     def __init__(self):
-        DeviceType.__init__(self,
-                            ram_memory='4GB',
-                            storage_capacity='32GB',
-                            waitingTime = [[1,13,0],
-                             [5,7,3],
-                             [10,8,4],
-                             [15,5,2],
-                             [20,5,3],
-                             [25,5,4],
-                             [30,6,4],
-                             [35,5,2],
-                             [50,42,62],
-                             [100,39,75],
-                             [150,120,156],
-                             [200,169,160],
-                             [250,291,252],
-                             [300,431,373],
-                             [500,769,621]],
-                            canQueue=True,
-                            canReason=True,
-                            hasBattery=False)
+        super(RegularComputer, self).__init__( ram_memory='4GB',
+                                               storage_capacity='32GB',
+                                               waitingTime = [[1,13,0],
+                                                              [5,7,3],
+                                                              [10,8,4],
+                                                              [15,5,2],
+                                                              [20,5,3],
+                                                              [25,5,4],
+                                                              [30,6,4],
+                                                              [35,5,2],
+                                                              [50,42,62],
+                                                              [100,39,75],
+                                                              [150,120,156],
+                                                              [200,169,160],
+                                                              [250,291,252],
+                                                              [300,431,373],
+                                                              [500,769,621]],
+                                              canQueue=True,
+                                              canReason=True,
+                                              hasBattery=False )
 
 
 class Server(DeviceType): # real data from helheim.deusto.es
     TYPE_ID = 'server'
     
     def __init__(self):
-        DeviceType.__init__(self,
-                            ram_memory='16GB',
-                            storage_capacity='4TB',
-                            waitingTime = [[1,13,0],
-                             [5,7,3],
-                             [10,8,4],
-                             [15,5,2],
-                             [20,5,3],
-                             [25,5,4],
-                             [30,6,4],
-                             [35,5,2],
-                             [500,769,621]],
-                            canQueue=True,
-                            canReason=True,
-                            hasBattery=False)
+        super(Server, self).__init__( ram_memory='16GB',
+                                      storage_capacity='4TB',
+                                      waitingTime = [[1,13,0],
+                                                     [5,7,3],
+                                                     [10,8,4],
+                                                     [15,5,2],
+                                                     [20,5,3],
+                                                     [25,5,4],
+                                                     [30,6,4],
+                                                     [35,5,2],
+                                                     [500,769,621]],
+                                     canQueue=True,
+                                     canReason=True,
+                                     hasBattery=False )

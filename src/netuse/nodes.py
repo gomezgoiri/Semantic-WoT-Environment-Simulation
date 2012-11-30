@@ -34,7 +34,7 @@ class NodeGenerator:
 class ConcurrentThread(Process):
         
     def __init__(self, node, deviceType=None, name="thread", sim=None):
-        Process.__init__(self, name=name, sim=sim)
+        super(ConcurrentThread, self).__init__(name=name, sim=sim)
         self.__node = weakref.proxy(node)
         self.__device = deviceType
     
@@ -72,7 +72,7 @@ class Node(Process):
         return self.__device.canReason
     
     def __init__(self, name="node", device=None, joined_since=1, sac=False, battery_lifetime=1, sim=None):
-        Process.__init__(self, name=name, sim=sim)
+        super(Node, self).__init__(name=name, sim=sim)
         self._ts = None
         self.__device = device if device!=None else RegularComputer() # device type 
         

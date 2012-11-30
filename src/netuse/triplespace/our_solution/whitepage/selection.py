@@ -158,7 +158,8 @@ class SelectionProcessObserver(object):
 
 class WhitepageSelectionManager(RequestObserver):
     
-    def __init__(self, discovery):
+    def __init__(self, simulation, discovery):
+        self.simulation = simulation
         self.discovery = discovery
         self.refused = []
         self.observer = None
@@ -177,7 +178,10 @@ class WhitepageSelectionManager(RequestObserver):
             RequestManager.launchNormalRequest(self._get_choose_request())
     
     def _get_choose_request(self):
-        req = RequestInstance(self.discovery.me, [self.last_choosen], '/whitepage/choose', data='') # it has data => POST
+        req = RequestInstance( self.discovery.me,
+                               [self.last_choosen],
+                               '/whitepage/choose', data = '',
+                               sim = self.simulation ) # it has data => POST
         req.addObserver(self)
         return req
     

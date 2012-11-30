@@ -5,7 +5,7 @@ Created on Sep 17, 2012
 '''
 
 from abc import ABCMeta, abstractmethod
-from SimPy.Simulation import Process, SimEvent, activate, waitevent
+from SimPy.Simulation import Process, SimEvent, waitevent
 from netuse.sim_utils import Timer
 from clueseval.clues.node_attached import ClueWithNode
 from netuse.triplespace.network.discovery import SimpleDiscoveryObserver
@@ -19,7 +19,7 @@ class Provider(Process, SimpleDiscoveryObserver):
     UPDATE_TIME = 3600000 # 1h
     
     def __init__(self, dataaccess, discovery, sim=None):
-        Process.__init__(self, sim=sim)
+        super(Provider, self).__init__(sim=sim)
         
         self.discovery = discovery
         self.discovery.add_changes_observers(self)
@@ -40,7 +40,7 @@ class Provider(Process, SimpleDiscoveryObserver):
             if self.connector!=None:
                 self.connector.send_clue(self.clue_manager.get_clue())
             self.timer = Timer(Provider.UPDATE_TIME, sim=self.sim)
-            activate(self.timer, self.timer.wait())
+            self.sim.activate(self.timer, self.timer.wait())
             yield waitevent, self, (self.timer.event, self.externalCondition, self.clueChanged, self.stopProvider)
     
     def __update_connector_if_needed(self):
@@ -51,7 +51,7 @@ class Provider(Process, SimpleDiscoveryObserver):
                 if wp==self.discovery.me:
                     self.connector = LocalConnector(self.discovery)
                 else:
-                    self.connector = RemoteConnector(self.discovery.me, wp)
+                    self.connector = RemoteConnector(self.discovery.me, wp, self.sim)
                     
     def refresh_clue(self):
         refreshed = self.clue_manager.refresh()
@@ -90,16 +90,21 @@ class LocalConnector(AbstractConnector):
 
 class RemoteConnector(AbstractConnector, RequestObserver):
     
-    def __init__(self, me_as_node, whitepage_node):
+    def __init__(self, me_as_node, whitepage_node, simulation):
         self.me_as_node = me_as_node
         self.whitepage_node = whitepage_node
+        self.simulation = simulation
     
     def send_clue(self, clue):
         RequestManager.launchNormalRequest(self._get_update_request(clue))
     
     def _get_update_request(self, clue):
         c = ClueWithNode(self.me_as_node.name, clue)
-        req = RequestInstance(self.me_as_node, [self.whitepage_node], '/whitepage/clues/'+self.me_as_node.name, data=c.toJson())
+        req = RequestInstance( self.me_as_node,
+                               [self.whitepage_node],
+                               '/whitepage/clues/' + self.me_as_node.name,
+                               data = c.toJson(),
+                               sim = self.simulation )
         req.addObserver(self)
         return req
     
