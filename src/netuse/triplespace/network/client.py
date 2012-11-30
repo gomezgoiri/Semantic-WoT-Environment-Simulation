@@ -14,7 +14,7 @@ from netuse.results import G
 
 class ProcessCanceler(Process):
     def __init__(self, victimProcess, sim=None):
-        super(ProcessCanceler, self).__init__(sim=sim)
+        super(ProcessCanceler, self).__init__(sim=sim, name="Canceler")
         self.victimProcess = victimProcess
         
     def cancel_process(self):
@@ -45,8 +45,9 @@ class RequestManager(object):
     
     @staticmethod
     def cancelRequest(request): # should be a delayed or scheduled request
-        pc = ProcessCanceler(request.getProcess())
-        request.sim.activate(pc, pc.cancel_process())
+        simulation = request.simulation
+        pc = ProcessCanceler(request.getProcess(), sim=simulation)
+        simulation.activate(pc, pc.cancel_process())
 
 
 class AbstractRequest(object):
