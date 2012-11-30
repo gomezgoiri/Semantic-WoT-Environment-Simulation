@@ -5,7 +5,7 @@ Created on Sep 18, 2011
 '''
 from argparse import ArgumentParser
 from functools import wraps
-from SimPy.Simulation import Process, activate, hold, now
+from SimPy.Simulation import Process, hold
 
 # def funcion(*args, **kwargs):
 #    print args
@@ -29,10 +29,10 @@ def schedule(f):
     Starts the decorated method at "starts_at" during the simulation process.
     '''
     @wraps(f)
-    def wrapped(self, starts_at, *args, **kwargs):
+    def wrapped(self, starts_at, simulation=None, *args, **kwargs):
         # waits until starts_at and changes then calls the method
-        sf = ScheduledFunction(self, f, args, kwargs)
-        activate(sf, sf.do_after_waiting(), at=starts_at)
+        sf = ScheduledFunction(self, f, args, kwargs, sim=simulation)
+        simulation.activate(sf, sf.do_after_waiting(), at=starts_at)
         
         #return f(self, *args, **kwargs)
         # If we care about the results, we should:
