@@ -33,11 +33,11 @@ class NodeGenerator(object):
 
 class ConcurrentThread(Process):
         
-    def __init__(self, node, connections, device, name="thread", sim):
+    def __init__(self, node, device, connections, sim, name="thread"):
         super(ConcurrentThread, self).__init__(name=name, sim=sim)
         self.__node = weakref.proxy(node)
-        self.__connections = connections
         self.__device = device
+        self.__connections = connections
     
     def executeTask(self, handler, req):
         if self.__connections.is_overloaded():
@@ -47,7 +47,7 @@ class ConcurrentThread(Process):
             
             # do sth
             # complete the simulation with timeNeeded
-            yield hold, self, self.__device.getTimeNeededToAnswer( self.__connections.get_current_requests() )
+            yield hold, self, self.__device.get_time_needed_to_answer( self.__connections.get_current_requests() )
             
             yield release, self, self.__connections
             self.__node.addResponse(handler.handle(req))
@@ -55,13 +55,14 @@ class ConcurrentThread(Process):
 
 class Connections(Resource):
     
-    def __init__(self, maximum_concurrent_connections_able_to_handle, sim, name="connections"):
-        super(Connections, self).__init__( maximum_concurrent_connections_able_to_handle,
+    def __init__(self, device, sim, name="connections"):
+        super(Connections, self).__init__( device.get_maximum_concurrent_requests() ,
                                            name=name,
                                            sim=sim )
+        self.canQueue = device.canQueue
     
     def get_current_requests(self):
-        return self.capacity - self.__resources.n
+        return self.capacity - self.n
     
     def is_overloaded(self):
         return not self.canQueue and self.n<=0
@@ -90,8 +91,7 @@ class Node(Process):
         super(Node, self).__init__(name=name, sim=sim)
         self._ts = None
         self.__device = device if device!=None else RegularComputer() # device type 
-        self.__connections = Connections( self.__device.get_maximum_concurrent_requests(),
-                                          sim=sim, name="%s's connections"%(name) )
+        self.__connections = Connections( self.__device, sim = sim, name = "%s's connections"%(name) )
         
         self.discovery_record = DiscoveryRecord(memory = device.ram_memory,
                                                 storage = device.storage_capacity,
@@ -111,7 +111,8 @@ class Node(Process):
                 # reqIdGenerator was not intended to be used to generate a name for CurrentThread, but I've reused :-P
                 thMngr = ConcurrentThread( self,
                                            self.__device,
-                                           name = "%s_th%d"%(self.name, str(self.__reqIdGenerator)),
+                                           self.__connections,
+                                           name = "%s_th%d"%(self.name, self.__reqIdGenerator),
                                            sim = self.sim)
                 self.sim.activate(thMngr, thMngr.executeTask(self.ts.handler, self.__httpIn.pop()))
         
