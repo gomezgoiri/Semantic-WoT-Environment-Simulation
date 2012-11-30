@@ -75,15 +75,16 @@ class Node(Process):
         self._ts = None
         self.__device = device if device!=None else RegularComputer() # device type 
         
-        self.discovery_record = DiscoveryRecord(memory = device.ram_memory,
-                                                storage = device.storage_capacity,
+        self.discovery_record = DiscoveryRecord(memory = self.__device.ram_memory,
+                                                storage = self.__device.storage_capacity,
                                                 joined_since = joined_since,
                                                 sac = sac,
-                                                battery_lifetime = battery_lifetime if device.hasBattery else DiscoveryRecord.INFINITE_BATTERY)
+                                                battery_lifetime = battery_lifetime if self.__device.hasBattery else DiscoveryRecord.INFINITE_BATTERY)
         
         self.__httpIn = []
         self.__reqIdGenerator = 0
         self.__waitingRequesters_and_InitTime = {} # TODO the "InitTime" is not longer used in this class
+        self.down = False # is node down, unreachable, etc.?
     
     def processRequests(self):
         while 1:
