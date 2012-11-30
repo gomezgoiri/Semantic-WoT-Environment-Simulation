@@ -7,6 +7,7 @@ Created on Sep 10, 2012
 from SimPy.Simulation import *
 import weakref
 from abc import ABCMeta, abstractmethod
+from netuse.sim_utils import Timer
 from netuse.triplespace.network.httpelements import HttpRequest
 from netuse.results import G
 
@@ -107,8 +108,8 @@ class RequestInstance(Process):
     
     ReqIdGenerator = 0
     
-    def __init__(self, actionNode, destinationNodes, url, data=None, waitUntil=10000.0, name="request"):
-        Process.__init__(self, name=name)
+    def __init__(self, actionNode, destinationNodes, url, data=None, waitUntil=10000.0, name="request", sim=None):
+        Process.__init__(self, name=name, sim=sim)
         self.name += " (from=%s, url=%s)"%(actionNode.name, url)
         self.__actionNode = weakref.proxy(actionNode) #weakref.ref(actionNode)
         self.__destinationNodes = weakref.WeakSet(destinationNodes) # tuple with all the nodes to be requested
@@ -143,7 +144,7 @@ class RequestInstance(Process):
             else:
                 raise Exception("A request to the same node is impossible! ")
         
-        self.timer = Timer(self.__timeout, waitUntil=G.timeout_after)
+        self.timer = Timer(self.__timeout, waitUntil=G.timeout_after, sim=self.sim)
         activate(self.timer, self.timer.wait(), self.__maxWaitingTime)
         while not self.allReceived() or self.timer.ended:
             yield waitevent, self, (self.__timeout, self.__newResponseReceived,)
@@ -226,16 +227,3 @@ class RequestInstance(Process):
     
     def addObserver(self, observer):
         self.__observers.add(observer)
-
-
-class Timer(Process):
-    def __init__(self, event, waitUntil=10000.0, name="timer"):
-        Process.__init__(self, name=name)
-        self.__timeout = waitUntil
-        self.__event = event
-        self.ended = False
-        
-    def wait(self):
-        yield hold, self, self.__timeout
-        self.ended = True
-        self.__event.signal()

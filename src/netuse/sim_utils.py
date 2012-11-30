@@ -5,7 +5,7 @@ Created on Sep 18, 2011
 '''
 from argparse import ArgumentParser
 from functools import wraps
-from SimPy.Simulation import Process, hold
+from SimPy.Simulation import Process, SimEvent, hold
 
 # def funcion(*args, **kwargs):
 #    print args
@@ -75,7 +75,6 @@ class ResultContainer(object):
         return self.__has_result
 
 
-
 class OwnArgumentParser(ArgumentParser):
     
     def __init__(self, description="Default description"):
@@ -89,3 +88,16 @@ class OwnArgumentParser(ArgumentParser):
         args = super(OwnArgumentParser, self).parse_args()
         G.dataset_path = args.dataset_path
         return args
+
+        
+class Timer(Process):
+    def __init__(self, waitUntil=10000.0, name="timer", sim=None):
+        Process.__init__(self, name=name, sim=sim)
+        self.__timeout = waitUntil
+        self.event = SimEvent(name="timer_event")
+        self.ended = False
+        
+    def wait(self):
+        yield hold, self, self.__timeout
+        self.ended = True
+        self.event.signal()

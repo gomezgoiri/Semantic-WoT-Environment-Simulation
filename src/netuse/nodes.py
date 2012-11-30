@@ -10,14 +10,15 @@ from netuse.triplespace.network.discovery import DiscoveryRecord
 
 class NodeGenerator:
     
-    def __init__(self, params):
+    def __init__(self, params, simulation=None):
         self.__params = params
+        self.__simulation = simulation
         NodeGenerator.Nodes = {}
         self.__totalRequests = -1
     
     def generateNodes(self):
         for nodeName, nodeType in zip(self.__params.nodes, self.__params.nodeTypes):
-            node = Node(nodeName, DeviceType.create(nodeType))
+            node = Node(nodeName, DeviceType.create(nodeType), sim=self.__simulation)
             NodeGenerator.Nodes[nodeName] = node
             activate(node,node.processRequests())
     
@@ -91,7 +92,7 @@ class Node(Process):
                 yield passivate, self
             else:
                 # reqIdGenerator was not intended to be used to generate a name for CurrentThread, but I've reused :-P
-                thMngr = ConcurrentThread(self, self.__device, name=self.name+"_th"+str(self.__reqIdGenerator))
+                thMngr = ConcurrentThread(self, self.__device, name=self.name+"_th"+str(self.__reqIdGenerator), sim=self.sim)
                 activate(thMngr, thMngr.executeTask(self.ts.handler, self.__httpIn.pop()))
         
     def addResponse(self, response):        

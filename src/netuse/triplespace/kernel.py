@@ -62,12 +62,12 @@ class NegativeBroadcasting(TripleSpace):
         
 
 class Centralized(TripleSpace):
-    def __init__(self, me, server=None):
+    def __init__(self, me, server=None, simulation=None):
         TripleSpace.__init__(self, me)
         self.server = server
     
     @schedule
-    def write(self, triples):
+    def write(self, triples, simulation=None):
         if self.server is not None:
             req = RequestInstance(self.me, (self.server,),
                                   '/' + URLUtils.serialize_space_to_URL() + "graphs/",
@@ -85,11 +85,12 @@ class Centralized(TripleSpace):
 
 
 class OurSolution(TripleSpace):
-    def __init__(self, discovery): # ontologyGraph, which may be already expanded or not
+    def __init__(self, discovery, simulation=None): # ontologyGraph, which may be already expanded or not
         TripleSpace.__init__(self, discovery)
         self.provider = None
         self.consumer = None
         self.whitepage = None # just the whitepage will have this attribute to !=None
+        self.__simulation = simulation
         
     def be_whitepage(self):
         self.whitepage = Whitepage()
@@ -113,7 +114,7 @@ class OurSolution(TripleSpace):
             self.consumer = ConsumerFactory.createConsumer(self.discovery) # change the discovery registry to set "sac" property
         
         # remote queries
-        qf = QueryFinisher(self.consumer, self.discovery, URLUtils.serialize_space_to_URL(), URLUtils.serialize_wildcard_to_URL(template))
+        qf = QueryFinisher(self.consumer, self.discovery, URLUtils.serialize_space_to_URL(), URLUtils.serialize_wildcard_to_URL(template), sim=self.__simulation)
         # when I've tried to do it in the same class (qf = self), some of the activation weren't really activated
         # may be because a method of the same object cannot be used at the same simulation time?
         # In this case, when they overlap, the activation of _finish_query_waiting may be ignored when they overlap in time
@@ -165,7 +166,7 @@ class QueryFinisher(Process, RequestObserver):
                     
                     req = RequestInstance(self.discovery.me, destNodes,
                                           '/' + self.fromSpaceToURL + "query/" + self.fromTemplateToURLtemplate,
-                                          name="queryAt"+str(now()))
+                                          name="queryAt"+str(self.sim.now()))
                     RequestManager.launchNormalRequest(req)
             except:
                 import traceback

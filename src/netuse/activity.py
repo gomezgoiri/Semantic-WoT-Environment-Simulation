@@ -16,11 +16,12 @@ from netuse.results import G
 
 class ActivityGenerator():
     
-    def __init__(self, params, baseGraphs):
+    def __init__(self, params, baseGraphs, simulation=None):
         self.FAKE_GRAPH = Graph().parse(StringIO("<http://www.deusto.es/fakesubject> <http://www.deusto.es/fakepredicate> <http://www.deusto.es/fakeobject> .\n"), format="nt")
         self.FAKE_GRAPH.bind("deusto", "http://www.deusto.es/", override=True)
         self.__params = params
         self.__baseGraphs = baseGraphs
+        self.__simulation = simulation
         self.__discovery_factory = DiscoveryFactory(NodeGenerator.getNodes())
     
     def generateActivity(self):
@@ -42,7 +43,7 @@ class ActivityGenerator():
     def configureOurSolution(self):
         for n in NodeGenerator.getNodes():
             discov = self.__discovery_factory.create_simple_discovery(n)
-            n.ts = OurSolution(discov) #, self.__baseGraphs['ontology'])
+            n.ts = OurSolution(discov, self.__simulation) #, self.__baseGraphs['ontology'])
             n.ts.reasoningCapacity = n.canReason
     
     def configureCentralizedActivity(self):
@@ -69,7 +70,7 @@ class ActivityGenerator():
                         last = self.FAKE_GRAPH
                         
                     #print "%s writes at %s"%(actionNode, startsWriting+writesAt)
-                    actionNode.ts.write(starts_at=startsWriting+writesAt, triples=last)
+                    actionNode.ts.write(starts_at=startsWriting+writesAt, simulation=self.__simulation, triples=last)
         
     
     def generateSimulationQueries(self, numConsumers):
@@ -83,4 +84,4 @@ class ActivityGenerator():
                 
                 requester = consumerNodes.next()
                 #print "%s requests at %s"%(requester,startAt)
-                requester.ts.query(starts_at=startAt, template=template)
+                requester.ts.query(starts_at=startAt, simulation=self.__simulation, template=template)

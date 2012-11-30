@@ -5,24 +5,12 @@ Created on Sep 17, 2012
 '''
 
 from abc import ABCMeta, abstractmethod
-from SimPy.Simulation import Process, SimEvent, activate, hold, waitevent
+from SimPy.Simulation import Process, SimEvent, activate, waitevent
+from netuse.sim_utils import Timer
 from clueseval.clues.node_attached import ClueWithNode
 from netuse.triplespace.network.discovery import SimpleDiscoveryObserver
 from netuse.triplespace.our_solution.provider.simple_clue_management import ClueManager
 from netuse.triplespace.network.client import RequestInstance, RequestManager, RequestObserver
-
-
-class Timer(Process):
-    def __init__(self, waitUntil=10000.0, name="timer", sim=None):
-        Process.__init__(self, name=name, sim=sim)
-        self.__timeout = waitUntil
-        self.event = SimEvent(name="timer_event")
-        self.ended = False
-        
-    def wait(self):
-        yield hold, self, self.__timeout
-        self.ended = True
-        self.event.signal()
 
 
 class Provider(Process, SimpleDiscoveryObserver):
@@ -51,7 +39,7 @@ class Provider(Process, SimpleDiscoveryObserver):
             self.__update_connector_if_needed()
             if self.connector!=None:
                 self.connector.send_clue(self.clue_manager.get_clue())
-            self.timer = Timer(Provider.UPDATE_TIME)
+            self.timer = Timer(Provider.UPDATE_TIME, sim=self.sim)
             activate(self.timer, self.timer.wait())
             yield waitevent, self, (self.timer.event, self.externalCondition, self.clueChanged, self.stopProvider)
     
