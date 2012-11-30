@@ -27,7 +27,7 @@ class ClueWithNode(Clue):
     
     def __init__(self, node=None, clue=None):
         '''The name (or IP) of the node containing the clue.'''
-        Clue.__init__(self)
+        super(ClueWithNode, self).__init__()
         self.node = node
         self.clue = clue
         

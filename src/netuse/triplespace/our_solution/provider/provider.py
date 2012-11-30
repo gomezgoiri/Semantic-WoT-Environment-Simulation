@@ -5,32 +5,21 @@ Created on Sep 17, 2012
 '''
 
 from abc import ABCMeta, abstractmethod
-from SimPy.Simulation import Process, SimEvent, activate, hold, waitevent
+from SimPy.Simulation import Process, SimEvent, waitevent
+from netuse.sim_utils import Timer
 from clueseval.clues.node_attached import ClueWithNode
 from netuse.triplespace.network.discovery import SimpleDiscoveryObserver
 from netuse.triplespace.our_solution.provider.simple_clue_management import ClueManager
 from netuse.triplespace.network.client import RequestInstance, RequestManager, RequestObserver
 
 
-class Timer(Process):
-    def __init__(self, waitUntil=10000.0, name="timer"):
-        Process.__init__(self, name=name)
-        self.__timeout = waitUntil
-        self.event = SimEvent(name="timer_event")
-        self.ended = False
-        
-    def wait(self):
-        yield hold, self, self.__timeout
-        self.ended = True
-        self.event.signal()
-
 class Provider(Process, SimpleDiscoveryObserver):
     
     RETRY_ON_FAILURE = 10000 # 10 secs
     UPDATE_TIME = 3600000 # 1h
     
-    def __init__(self, dataaccess, discovery):
-        Process.__init__(self)
+    def __init__(self, dataaccess, discovery, sim=None):
+        super(Provider, self).__init__(sim=sim)
         
         self.discovery = discovery
         self.discovery.add_changes_observers(self)
@@ -40,9 +29,9 @@ class Provider(Process, SimpleDiscoveryObserver):
         self.wp_node_name = None
         self.connector = None
         
-        self.externalCondition = SimEvent(name="external_condition_on_%s"%(self.name))
-        self.clueChanged = SimEvent(name="clue_change_on_%s"%(self.name))
-        self.stopProvider = SimEvent(name="stop_provider_%s"%(self.name))
+        self.externalCondition = SimEvent(name="external_condition_on_%s"%(self.name), sim=sim)
+        self.clueChanged = SimEvent(name="clue_change_on_%s"%(self.name), sim=sim)
+        self.stopProvider = SimEvent(name="stop_provider_%s"%(self.name), sim=sim)
         self.timer = None
     
     def update_clues_on_whitepage(self):
@@ -50,8 +39,8 @@ class Provider(Process, SimpleDiscoveryObserver):
             self.__update_connector_if_needed()
             if self.connector!=None:
                 self.connector.send_clue(self.clue_manager.get_clue())
-            self.timer = Timer(Provider.UPDATE_TIME)
-            activate(self.timer, self.timer.wait())
+            self.timer = Timer(Provider.UPDATE_TIME, sim=self.sim)
+            self.sim.activate(self.timer, self.timer.wait())
             yield waitevent, self, (self.timer.event, self.externalCondition, self.clueChanged, self.stopProvider)
     
     def __update_connector_if_needed(self):
@@ -62,7 +51,7 @@ class Provider(Process, SimpleDiscoveryObserver):
                 if wp==self.discovery.me:
                     self.connector = LocalConnector(self.discovery)
                 else:
-                    self.connector = RemoteConnector(self.discovery.me, wp)
+                    self.connector = RemoteConnector(self.discovery.me, wp, self.sim)
                     
     def refresh_clue(self):
         refreshed = self.clue_manager.refresh()
@@ -101,16 +90,21 @@ class LocalConnector(AbstractConnector):
 
 class RemoteConnector(AbstractConnector, RequestObserver):
     
-    def __init__(self, me_as_node, whitepage_node):
+    def __init__(self, me_as_node, whitepage_node, simulation):
         self.me_as_node = me_as_node
         self.whitepage_node = whitepage_node
+        self.simulation = simulation
     
     def send_clue(self, clue):
         RequestManager.launchNormalRequest(self._get_update_request(clue))
     
     def _get_update_request(self, clue):
         c = ClueWithNode(self.me_as_node.name, clue)
-        req = RequestInstance(self.me_as_node, [self.whitepage_node], '/whitepage/clues/'+self.me_as_node.name, data=c.toJson())
+        req = RequestInstance( self.me_as_node,
+                               [self.whitepage_node],
+                               '/whitepage/clues/' + self.me_as_node.name,
+                               data = c.toJson(),
+                               sim = self.simulation )
         req.addObserver(self)
         return req
     

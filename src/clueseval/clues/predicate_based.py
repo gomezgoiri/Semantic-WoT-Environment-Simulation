@@ -23,7 +23,7 @@ class PredicateBasedClue(Clue):
         return 1
     
     def __init__(self):
-        Clue.__init__(self)
+        super(PredicateBasedClue, self).__init__()
         self._schemas = set()
         self._predicates = set()
     

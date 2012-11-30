@@ -25,9 +25,9 @@ class SchemaBasedClue(Clue):
         return 0
     
     def __init__(self):
-        Clue.__init__(self)
+        super(SchemaBasedClue, self).__init__()
         self._schemas = set()
-        
+    
     @property
     def schemas(self):
         return self._schemas

@@ -30,7 +30,7 @@ class ClassBasedClue(Clue):
         return 2
     
     def __init__(self, tbox):
-        Clue.__init__(self)
+        super(ClassBasedClue, self).__init__()
         self._schemas = set()
         self._classes = set()
         self.tbox = tbox

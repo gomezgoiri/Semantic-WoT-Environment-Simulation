@@ -5,7 +5,7 @@ Created on Sep 18, 2011
 '''
 from argparse import ArgumentParser
 from functools import wraps
-from SimPy.Simulation import Process, activate, hold, now
+from SimPy.Simulation import Process, SimEvent, hold
 
 # def funcion(*args, **kwargs):
 #    print args
@@ -29,10 +29,10 @@ def schedule(f):
     Starts the decorated method at "starts_at" during the simulation process.
     '''
     @wraps(f)
-    def wrapped(self, starts_at, *args, **kwargs):
+    def wrapped(self, starts_at, simulation=None, *args, **kwargs):
         # waits until starts_at and changes then calls the method
-        sf = ScheduledFunction(self, f, args, kwargs)
-        activate(sf, sf.do_after_waiting(), at=starts_at)
+        sf = ScheduledFunction(self, f, args, kwargs, sim=simulation)
+        simulation.activate(sf, sf.do_after_waiting(), at=starts_at)
         
         #return f(self, *args, **kwargs)
         # If we care about the results, we should:
@@ -45,8 +45,8 @@ def schedule(f):
 
 class ScheduledFunction(Process):
     
-    def __init__(self, objct, method, args, kwargs):
-        super(ScheduledFunction, self).__init__()
+    def __init__(self, objct, method, args, kwargs, sim=None):
+        super(ScheduledFunction, self).__init__(sim=sim)
         self.result = ResultContainer()
         self.objct = objct
         self.method = (method, )
@@ -75,11 +75,10 @@ class ResultContainer(object):
         return self.__has_result
 
 
-
 class OwnArgumentParser(ArgumentParser):
     
     def __init__(self, description="Default description"):
-        ArgumentParser.__init__(self, description=description)
+        super(OwnArgumentParser, self).__init__(description=description)
         from netuse.results import G
         self.add_argument('-ds','--data-set', default=G.dataset_path, dest='dataset_path',
                     help='Specify the folder containing the dataset to perform the simulation.')
@@ -89,3 +88,16 @@ class OwnArgumentParser(ArgumentParser):
         args = super(OwnArgumentParser, self).parse_args()
         G.dataset_path = args.dataset_path
         return args
+
+        
+class Timer(Process):
+    def __init__(self, waitUntil=10000.0, name="timer", sim=None):
+        super(Timer, self).__init__(name=name, sim=sim)
+        self.__timeout = waitUntil
+        self.event = SimEvent(name="timer_event", sim=sim)
+        self.ended = False
+        
+    def wait(self):
+        yield hold, self, self.__timeout
+        self.ended = True
+        self.event.signal()

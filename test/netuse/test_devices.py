@@ -27,7 +27,7 @@ class TestDeviceType(unittest.TestCase):
         return device
     
     @patch('netuse.results.G.Rnd', rndMock) # new global unrandomized variable 
-    def test_getTimeNeededToAnswer(self):        
+    def test_get_time_needed_to_answer(self):        
         dev = self.getMockedDevice(XBee())
         
         #self.assertEquals(779.0, dev.getTimeNeededToAnswer())
@@ -48,9 +48,7 @@ class TestDeviceType(unittest.TestCase):
         self.assertTimeNeeded(dev,9,0,(698.4,8.0))
         
     def assertTimeNeeded(self, device, capacity, free_resources, expectParameters):
-        device._DeviceType__resources.capacity = capacity
-        device._DeviceType__resources.n = free_resources
-        device.getTimeNeededToAnswer()
+        device.get_time_needed_to_answer(capacity - free_resources)
         rndMock.normalvariate.assert_called_with(expectParameters[0], expectParameters[1]) # for 10 concurrent requests
 
 if __name__ == '__main__':    

@@ -1,11 +1,10 @@
-from SimPy.Simulation import initialize, simulate
-
 from rdflib import URIRef, Namespace, RDF
 
 from testing.utils import TimeRecorder
 from testing.memory_usage import memory
 
 from netuse.results import G
+from netuse.evaluation.simulate import BasicModel
 from netuse.tracers import FileTracer
 from netuse.nodes import NodeGenerator
 from netuse.activity import ActivityGenerator
@@ -16,38 +15,39 @@ from netuse.evaluation.utils import ParametrizationUtils, Parameters
 # This script generates a simulation and records its trace in a file.
 # Used to check the functionalities under really simple simulation conditions.
 
-def performSimulation(parameters):
-    preloadedGraph = {}
-    sfl = SemanticFilesLoader(G.dataset_path)
-    sfl.loadGraphsJustOnce(parameters.nodes, preloadedGraph)
+
+class TraceAndLoadFilesModel(BasicModel):
+        
+    def initialize(self):
+        G.setNewExecution(None, tracer=FileTracer('/tmp/trace.txt'))
+        super(TraceAndLoadFilesModel, self).initialize()
     
-    # To log SimPy's events:
-    #trace.tchange(outfile=open(r"/tmp/simulation.log","w"))
-    
-    initialize()
-    G.setNewExecution(None, tracer=FileTracer('/tmp/trace.txt'))
-    
-    nodes = NodeGenerator(parameters)
-    nodes.generateNodes()
-    
-    activity = ActivityGenerator(parameters, preloadedGraph)
-    activity.generateActivity()
-    
-    recorder = TimeRecorder()
-    recorder.start()    
-    
-    # activate
-    cool_down = 500
-    simulate(until=parameters.simulateUntil+cool_down)
-    print "Memory consumption: %0.2f GB"%(memory()/(1024*1024*1024))
-    
-    recorder.stop()
-    print recorder
-    
-    for node in nodes.getNodes():
-        node.stop()
-    
-    G.shutdown()
+    def runModel(self):
+        preloadedGraph = {}
+        sfl = SemanticFilesLoader(G.dataset_path)
+        sfl.loadGraphsJustOnce(self.parameters.nodes, preloadedGraph)
+        
+        # To log SimPy's events:
+        #trace.tchange(outfile=open(r"/tmp/simulation.log","w"))
+        
+        self.initialize()
+        
+        nodes = NodeGenerator(self.parameters, simulation=self)
+        nodes.generateNodes()
+        self.stoppables.extend( nodes.getNodes() )
+        
+        activity = ActivityGenerator(self.parameters, preloadedGraph, simulation=self)
+        activity.generateActivity()
+        
+        recorder = TimeRecorder()
+        recorder.start()
+        
+        self.simulate( until=self.parameters.simulateUntil )
+        print "Memory consumption: %0.2f GB"%(memory()/(1024*1024*1024))
+        
+        recorder.stop()
+        print recorder
+
 
 def main():
     from netuse.sim_utils import OwnArgumentParser
@@ -90,7 +90,8 @@ def main():
             numConsumers = 100
          )
     
-    performSimulation( p.create_parametrization(params) ) 
+    model = TraceAndLoadFilesModel( p.create_parametrization(params) )
+    model.runModel()
 
 
 if __name__ == '__main__':
