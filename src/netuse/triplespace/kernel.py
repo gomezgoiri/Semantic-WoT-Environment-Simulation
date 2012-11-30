@@ -102,7 +102,7 @@ class OurSolution(TripleSpace):
         self.dataaccess.write(triples)
         
         if self.provider==None:
-            self.provider = Provider(self.dataaccess, self.discovery)
+            self.provider = Provider(self.dataaccess, self.discovery, self.__simulation)
             activate(self.provider, self.provider.update_clues_on_whitepage())
             
         # if clues have been updated, let the provider module now
