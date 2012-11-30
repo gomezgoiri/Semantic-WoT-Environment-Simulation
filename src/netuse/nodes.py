@@ -3,12 +3,12 @@ Created on Nov 26, 2011
 
 @author: tulvur
 '''
-from SimPy.Simulation import Process, activate, passivate, reactivate, hold, release, request, now
+from SimPy.Simulation import Process, Resource, passivate, hold, release, request
 import weakref
 from devices import DeviceType, RegularComputer
 from netuse.triplespace.network.discovery import DiscoveryRecord
 
-class NodeGenerator:
+class NodeGenerator(object):
     
     def __init__(self, params, simulation=None):
         self.__params = params
@@ -20,7 +20,7 @@ class NodeGenerator:
         for nodeName, nodeType in zip(self.__params.nodes, self.__params.nodeTypes):
             node = Node(nodeName, DeviceType.create(nodeType), sim=self.__simulation)
             NodeGenerator.Nodes[nodeName] = node
-            activate(node,node.processRequests())
+            self.__simulation.activate(node,node.processRequests())
     
     @staticmethod
     def getNodes():
@@ -33,23 +33,38 @@ class NodeGenerator:
 
 class ConcurrentThread(Process):
         
-    def __init__(self, node, deviceType=None, name="thread", sim=None):
+    def __init__(self, node, connections, device, name="thread", sim):
         super(ConcurrentThread, self).__init__(name=name, sim=sim)
         self.__node = weakref.proxy(node)
-        self.__device = deviceType
+        self.__connections = connections
+        self.__device = device
     
     def executeTask(self, handler, req):
-        if self.__device.isOverloaded():
+        if self.__connections.is_overloaded():
             self.__node.addResponse(handler.handle(req))
         else:
-            yield request,self,self.__device.getResources()
+            yield request, self, self.__connections
             
             # do sth
             # complete the simulation with timeNeeded
-            yield hold, self, self.__device.getTimeNeededToAnswer()
+            yield hold, self, self.__device.getTimeNeededToAnswer( self.__connections.get_current_requests() )
             
-            yield release,self,self.__device.getResources()
+            yield release, self, self.__connections
             self.__node.addResponse(handler.handle(req))
+
+
+class Connections(Resource):
+    
+    def __init__(self, maximum_concurrent_connections_able_to_handle, sim, name="connections"):
+        super(Connections, self).__init__( maximum_concurrent_connections_able_to_handle,
+                                           name=name,
+                                           sim=sim )
+    
+    def get_current_requests(self):
+        return self.capacity - self.__resources.n
+    
+    def is_overloaded(self):
+        return not self.canQueue and self.n<=0
 
 
 class Node(Process):
@@ -75,6 +90,8 @@ class Node(Process):
         super(Node, self).__init__(name=name, sim=sim)
         self._ts = None
         self.__device = device if device!=None else RegularComputer() # device type 
+        self.__connections = Connections( self.__device.get_maximum_concurrent_requests(),
+                                          sim=sim, name="%s's connections"%(name) )
         
         self.discovery_record = DiscoveryRecord(memory = device.ram_memory,
                                                 storage = device.storage_capacity,
@@ -92,8 +109,11 @@ class Node(Process):
                 yield passivate, self
             else:
                 # reqIdGenerator was not intended to be used to generate a name for CurrentThread, but I've reused :-P
-                thMngr = ConcurrentThread(self, self.__device, name=self.name+"_th"+str(self.__reqIdGenerator), sim=self.sim)
-                activate(thMngr, thMngr.executeTask(self.ts.handler, self.__httpIn.pop()))
+                thMngr = ConcurrentThread( self,
+                                           self.__device,
+                                           name = "%s_th%d"%(self.name, str(self.__reqIdGenerator)),
+                                           sim = self.sim)
+                self.sim.activate(thMngr, thMngr.executeTask(self.ts.handler, self.__httpIn.pop()))
         
     def addResponse(self, response):        
         requester, _ = self.__waitingRequesters_and_InitTime[response.getid()]
@@ -103,8 +123,8 @@ class Node(Process):
     
     def queueRequest(self, requester, req):        
         self.__httpIn.append(req)
-        self.__waitingRequesters_and_InitTime[req.getid()] = (requester, now())
-        reactivate(self) # starts answering
+        self.__waitingRequesters_and_InitTime[req.getid()] = (requester, self.sim.now())
+        self.sim.reactivate(self) # starts answering
 
     def stop(self):
         self._ts.stop()

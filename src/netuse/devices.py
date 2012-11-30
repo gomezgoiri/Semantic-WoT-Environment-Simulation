@@ -3,12 +3,11 @@ Created on Nov 28, 2011
 
 @author: tulvur
 '''
-from SimPy.Simulation import Resource
 from netuse.results import G
 
 # In the future other Device dependent methods can be implemented such as: reasoning
 # That's why I've created a Hierarchy instead of just having some variables with the 2D arrays which represent each node
-class DeviceType():
+class DeviceType(object):
     
     # Waiting time measure in FoxG20
     # Concurrent request, Mean, Std dev
@@ -18,9 +17,6 @@ class DeviceType():
                  waitingTime=None,
                  canQueue=True, canReason=True, hasBattery=True):
         self.__wait = waitingTime
-        if waitingTime!=None:
-            last = len(self.__wait)-1
-            self.__resources = Resource(self.__wait[last][0], name="Concurrent requests this node can answer")
         
         # physical characteristics
         self.ram_memory = ram_memory
@@ -48,35 +44,25 @@ class DeviceType():
         else:
             raise Exception('Invalid device type:', device_type)
     
-    def getTimeNeededToAnswer(self):
-        numConcurrentRequests = self.getCurrentConcurrentRequests()
-        
-        if numConcurrentRequests==1:
+    def get_time_needed_to_answer(self, num_concurrent_requests):        
+        if num_concurrent_requests==1:
             curr = self.__wait[0]
             responseTime = G.Rnd.normalvariate(curr[1],curr[2])
         else:
             for i in range(1,len(self.__wait)):
                 prev = self.__wait[i-1]
                 curr = self.__wait[i]
-                if numConcurrentRequests<=curr[0]:
-                    factor = (numConcurrentRequests-prev[0]) / float(curr[0]-prev[0])
+                if num_concurrent_requests<=curr[0]:
+                    factor = (num_concurrent_requests-prev[0]) / float(curr[0]-prev[0])
                     avg = round( (curr[1] - prev[1]) * factor + prev[1], 2) # for testing purposes
                     dev = round( (curr[2] - prev[2]) * factor + prev[2], 2) # for testing purposes
                     responseTime = G.Rnd.normalvariate(avg,dev)
                     break
         return responseTime if responseTime>0 else 0.1
     
-    def getMaxConcurrentRequests(self):
-        return self.__resources.capacity
-    
-    def getCurrentConcurrentRequests(self):
-        return self.__resources.capacity - self.__resources.n
-    
-    def isOverloaded(self):
-        return not self.canQueue and self.__resources.n<=0
-    
-    def getResources(self):
-        return self.__resources
+    def get_maximum_concurrent_requests(self):
+        last = len(self.__wait)-1
+        return self.__wait[last][0]
 
 
 class XBee(DeviceType):
