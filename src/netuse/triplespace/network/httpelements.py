@@ -10,7 +10,7 @@ from urllib2 import Request
 class HttpRequest(Request):
     # Request additional params: reqId, url, data=None, headers={}
     def __init__(self, reqId, url, data=None, headers={}):
-        super(HttpRequest, self).__init__(url, data=data, headers=headers)
+        Request.__init__(self, url, data=data, headers=headers) # old-style class
         self.__reqId = reqId;
         
     def getid(self):

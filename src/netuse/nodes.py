@@ -10,7 +10,7 @@ from netuse.triplespace.network.discovery import DiscoveryRecord
 
 class NodeGenerator(object):
     
-    def __init__(self, params, simulation=None):
+    def __init__(self, params, simulation):
         self.__params = params
         self.__simulation = simulation
         NodeGenerator.Nodes = {}

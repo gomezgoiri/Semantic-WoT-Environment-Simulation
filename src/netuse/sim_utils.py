@@ -94,7 +94,7 @@ class Timer(Process):
     def __init__(self, waitUntil=10000.0, name="timer", sim=None):
         super(Timer, self).__init__(name=name, sim=sim)
         self.__timeout = waitUntil
-        self.event = SimEvent(name="timer_event")
+        self.event = SimEvent(name="timer_event", sim=sim)
         self.ended = False
         
     def wait(self):

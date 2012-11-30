@@ -29,9 +29,9 @@ class Provider(Process, SimpleDiscoveryObserver):
         self.wp_node_name = None
         self.connector = None
         
-        self.externalCondition = SimEvent(name="external_condition_on_%s"%(self.name))
-        self.clueChanged = SimEvent(name="clue_change_on_%s"%(self.name))
-        self.stopProvider = SimEvent(name="stop_provider_%s"%(self.name))
+        self.externalCondition = SimEvent(name="external_condition_on_%s"%(self.name), sim=sim)
+        self.clueChanged = SimEvent(name="clue_change_on_%s"%(self.name), sim=sim)
+        self.stopProvider = SimEvent(name="stop_provider_%s"%(self.name), sim=sim)
         self.timer = None
     
     def update_clues_on_whitepage(self):

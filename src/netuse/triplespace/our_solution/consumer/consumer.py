@@ -19,7 +19,7 @@ class ConsumerFactory(object):
         self.simulation = simulation
         self.discovery = discovery
     
-    def _canManageClues(self, my_drecord):
+    def _canManageClues(self):
         my_drecord = self.discovery.me.discovery_record
         # really naive condition
         # TODO enhance and take into account selection module
@@ -27,9 +27,9 @@ class ConsumerFactory(object):
     
     def createConsumer(self):
         if self._canManageClues():
-            return Consumer(self.discovery)
+            return Consumer(self.simulation, self.discovery)
         else:
-            return ConsumerLite(self.discovery)
+            return ConsumerLite(self.simulation, self.discovery)
 
 
 class AbstractConsumer(SelectionProcessObserver):

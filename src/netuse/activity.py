@@ -14,9 +14,9 @@ from netuse.triplespace.network.discovery import DiscoveryFactory
 from netuse.database.parametrization import Parametrization
 from netuse.results import G
 
-class ActivityGenerator():
+class ActivityGenerator(object):
     
-    def __init__(self, params, baseGraphs, simulation=None):
+    def __init__(self, params, baseGraphs, simulation):
         self.FAKE_GRAPH = Graph().parse(StringIO("<http://www.deusto.es/fakesubject> <http://www.deusto.es/fakepredicate> <http://www.deusto.es/fakeobject> .\n"), format="nt")
         self.FAKE_GRAPH.bind("deusto", "http://www.deusto.es/", override=True)
         self.__params = params

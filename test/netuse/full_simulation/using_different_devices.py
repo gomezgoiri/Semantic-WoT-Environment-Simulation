@@ -1,11 +1,10 @@
-from SimPy.Simulation import initialize, simulate
-
 from rdflib import URIRef, Namespace, RDF
 
 from netuse.results import G
 from netuse.tracers import FileTracer
 from netuse.nodes import NodeGenerator
 from netuse.activity import ActivityGenerator
+from netuse.evaluation.simulate import BasicModel
 from netuse.evaluation.utils import ParametrizationUtils, Parameters
 from netuse.database.parametrization import Parametrization
 from netuse.devices import XBee, SamsungGalaxyTab, FoxG20, Server
@@ -13,24 +12,26 @@ from netuse.devices import XBee, SamsungGalaxyTab, FoxG20, Server
 # This script generates a simulation and records its trace in a file.
 # Used to check the functionalities under really simple simulation conditions.
 
-def performSimulation(parameters):    
-    initialize()
-    G.setNewExecution(None, tracer=FileTracer('/tmp/trace.txt'))
+class SimpleTraceModel(BasicModel):
+        
+    def initialize(self):
+        G.setNewExecution(None, tracer=FileTracer('/tmp/trace.txt'))
+        super(SimpleTraceModel, self).initialize()
     
-    nodes = NodeGenerator(parameters)
-    nodes.generateNodes()
-    
-    activity = ActivityGenerator(parameters, None)
-    activity.generateActivity()
-    
-    # activate
-    cool_down = 500
-    simulate(until=parameters.simulateUntil+cool_down)
-    
-    G.shutdown()
+    def runModel(self):        
+        self.initialize()
+        
+        nodes = NodeGenerator(self.parameters, simulation=self)
+        nodes.generateNodes()
+        self.stoppables.extend( nodes.getNodes() )
+        
+        activity = ActivityGenerator(self.parameters, None, simulation=self)
+        activity.generateActivity()
+        
+        self.simulate( until=self.parameters.simulateUntil )
 
 
-if __name__ == '__main__':
+def main():
     from netuse.sim_utils import OwnArgumentParser
     parser = OwnArgumentParser('WP selection integration test')
     parser.parse_args() # do nothing with the args (already done)
@@ -78,4 +79,9 @@ if __name__ == '__main__':
                 nodeTypes = nodeTypes
              )
     
-    performSimulation( p.create_parametrization(params) )
+    model = SimpleTraceModel( p.create_parametrization(params) )
+    model.runModel()
+
+
+if __name__ == '__main__':
+    main()

@@ -126,8 +126,7 @@ class RequestInstance(Process):
         self.__maxWaitingTime = waitUntil
         self.nodeNamesByReqId = {} # used in the gossiping mechanism with the gossiping requests
         
-        self.__timeout = SimEvent(name="request_timeout_for_%s"%(self.name))
-        self.__newResponseReceived = SimEvent(name="request_response_for_%s"%(self.name))
+        self.__newResponseReceived = SimEvent(name="request_response_for_%s"%(self.name), sim=sim)
         self.__observers = weakref.WeakSet()
         
     def startup(self):
@@ -149,10 +148,11 @@ class RequestInstance(Process):
             else:
                 raise Exception("A request to the same node is impossible! ")
         
-        self.timer = Timer(self.__timeout, waitUntil=G.timeout_after, sim=self.sim)
+        self.timer = Timer(waitUntil=G.timeout_after, sim=self.sim)
+        self.timer.event.name = "request_timeout_for_%s"%(self.name)
         self.sim.activate(self.timer, self.timer.wait(), self.__maxWaitingTime)
         while not self.allReceived() or self.timer.ended:
-            yield waitevent, self, (self.__timeout, self.__newResponseReceived,)
+            yield waitevent, self, (self.timer.event, self.__newResponseReceived,)
         
         
         if not self.allReceived(): # timeout reached

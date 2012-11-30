@@ -16,38 +16,62 @@ from commons.utils import SemanticFilesLoader
 from multiprocessing import Process, Queue, cpu_count
 
 
-class Model(Simulation):
-    def __init__(self, execution):
-        super(Model, self).__init__()
-        self.execution = execution
+class BasicModel(Simulation):
+    '''
+        Network Usage simulation model.
+    '''
     
-    def mark_execution(self):
+    def __init__(self, parameters, cool_down=500):
+        super(BasicModel, self).__init__()
+        self.parameters = parameters
+        self.cool_down = 500
+        self.stoppables = []
+    
+    def simulate(self, until=0):
+        try:
+            super(BasicModel, self).simulate( until + self.cool_down )
+        finally:
+            for stoppable in self.stoppables:
+                stoppable.stop()
+            G.shutdown()
+
+    def runModel(self):
+        pass
+
+
+class Model(BasicModel):
+        
+    def __init__(self, execution, cool_down=500):
+        super(Model, self).__init__(execution.parameters, cool_down)
+        self.execution = execution
+        
+    def initialize(self):
+        G.setNewExecution(self.execution)
+        super(Model, self).initialize()
+    
+    def _mark_execution(self):
         ''' This method is used to warn another processes that this one is already processing it.'''
         self.execution.execution_date = datetime.datetime.now()
         self.execution.save()
-    
+
     def runModel(self):
-        self.mark_execution() # 2 processes in different processes (or machines)
+        self._mark_execution() # 2 processes in different processes (or machines)
         
-        print "New simulation: %s"%(self.execution.parameters)
+        print "New simulation: %s"%(self.parameters)
         
         sfl = SemanticFilesLoader(G.dataset_path)
-        sfl.loadGraphsJustOnce(self.execution.parameters.nodes, preloadedGraph={})
+        sfl.loadGraphsJustOnce(self.parameters.nodes, preloadedGraph={})
         
         self.initialize()
-        G.setNewExecution(self.execution)
         
-        nodes = NodeGenerator(self.execution.parameters)
+        nodes = NodeGenerator(self.parameters, simulation=self)
         nodes.generateNodes()
+        self.stoppables.extend( nodes.getNodes() )
         
-        activity = ActivityGenerator(self.execution.parameters, preloadedGraph={})
+        activity = ActivityGenerator(self.parameters, preloadedGraph={}, simulation=self)
         activity.generateActivity()
         
-        # activate
-        cool_down = 500
-        self.simulate( until = self.execution.parameters.simulateUntil + cool_down )
-        
-        G.shutdown()
+        self.simulate( until = self.parameters.simulateUntil )
 
 
 class SimulationPerformer(Process):
