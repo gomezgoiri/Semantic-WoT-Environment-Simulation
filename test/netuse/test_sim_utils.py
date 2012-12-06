@@ -1,6 +1,6 @@
 import unittest
-from SimPy.Simulation import Simulation
-from netuse.sim_utils import schedule
+from SimPy.Simulation import Simulation, Process, waitevent
+from netuse.sim_utils import schedule, Timer
 
 class FakeClass(object):
     
@@ -32,6 +32,32 @@ class RequestManagerTestCase(unittest.TestCase): # classes under test: DelayedRe
         r = self.fc.function2(starts_at=200, simulation=self.simulation, str_param="helloworld")
         self.simulation.simulate(100000)
         self.assertEquals(r.get_result(), (200, "helloworld"))
+
+
+class ObjectWhichUsesTimer(Process):
+    
+    def __init__(self, timeToWait, sim):
+        super(ObjectWhichUsesTimer, self).__init__(sim=sim)
+        self.time_after_waiting = 0
+        self.timer = Timer(waitUntil=timeToWait, sim=sim)
+        
+    def do_whatever_you_do_in_simulation(self):
+        self.sim.activate(self.timer, self.timer.wait())#, self.__maxWaitingTime)
+        while not self.timer.ended:
+            yield waitevent, self, (self.timer.event,)
+        self.time_after_waiting = self.sim.now()
+
+class TimerTestCase(unittest.TestCase):
+
+    def test_wait(self):        
+        s = Simulation()
+        s.initialize()
+        
+        obj = ObjectWhichUsesTimer(timeToWait=10, sim=s)
+        s.activate(obj, obj.do_whatever_you_do_in_simulation())
+        
+        s.simulate(until=300)
+        self.assertEquals(10, obj.time_after_waiting)
 
 if __name__ == '__main__':
     unittest.main()
