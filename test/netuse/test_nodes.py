@@ -30,11 +30,12 @@ class TestNodes(unittest.TestCase):
     
     #@patch('netuse.results.G.Rnd', rndMock) # new global unrandomized variable 
     def test_node_down(self):        
-        s=Simulation()
+        s = Simulation()
         s.initialize()
         
         node = Node(sim=s)
         node.down = True
+        s.activate(node, node.processRequests())
         
         req_mngr = RequestManager()        
         source_node = self.get_source_node()
@@ -42,7 +43,7 @@ class TestNodes(unittest.TestCase):
         request = RequestInstance(source_node, (node,), "/foo/bar", sim=s)
         req_mngr.launchScheduledRequest(request, 10)    
         
-        s.simulate(until=100)
+        s.simulate(until=3000)
         
         print request.responses[0].getstatus()
 

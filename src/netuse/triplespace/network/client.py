@@ -72,6 +72,7 @@ class DelayedRequestLauncher(Process):
         self.request = request
     
     def start(self):
+        # TODO much simpler! use the "delay" attribute of "activate" function!
         yield hold, self, self.wait_for
         self.sim.activate(self.request, self.request.startup())
 
@@ -150,8 +151,8 @@ class RequestInstance(Process):
         
         self.timer = Timer(waitUntil=G.timeout_after, sim=self.sim)
         self.timer.event.name = "request_timeout_for_%s"%(self.name)
-        self.sim.activate(self.timer, self.timer.wait(), self.__maxWaitingTime)
-        while not self.allReceived() or self.timer.ended:
+        self.sim.activate(self.timer, self.timer.wait())#, self.__maxWaitingTime)
+        while not self.allReceived() and not self.timer.ended:
             yield waitevent, self, (self.timer.event, self.__newResponseReceived,)
         
         
