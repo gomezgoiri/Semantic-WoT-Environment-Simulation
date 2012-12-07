@@ -164,6 +164,7 @@ class RequestInstance(Process):
                 G.traceRequest(t_init,
                            self.__actionNode.name,
                            node_name,
+                           self.__url,
                            408, # TIMEOUT. See http://www.restlet.org/documentation/2.0/jse/api/org/restlet/data/Status.html#CLIENT_ERROR_REQUEST_TIMEOUT
                            response_time )
             
