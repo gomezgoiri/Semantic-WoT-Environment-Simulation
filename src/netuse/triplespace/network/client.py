@@ -33,7 +33,7 @@ class RequestManager(object):
     
     @staticmethod
     def launchDelayedRequest(request, wait_for):
-        r = DelayedRequest(request, wait_for, simulation=request.sim)
+        r = ScheduledRequest(request, delay=wait_for, simulation=request.sim)
         r.start() # observers should have been added to the request itself prior to this call
         return r
     
@@ -65,39 +65,18 @@ class AbstractRequest(object):
         pass
 
 
-class DelayedRequestLauncher(Process):    
-    def __init__(self, request, wait_for=0, sim=None):
-        super(DelayedRequestLauncher, self).__init__(sim=sim)
-        self.wait_for = wait_for
-        self.request = request
-    
-    def start(self):
-        yield hold, self, self.wait_for
-        self.sim.activate(self.request, self.request.startup())
-
-class DelayedRequest(AbstractRequest):
-    def __init__(self, request, wait_for, simulation=None):
-        super(DelayedRequest, self).__init__(simulation)
-        self.launcher = DelayedRequestLauncher(request, wait_for=wait_for, sim=simulation)
-    
-    def getProcess(self):
-        return self.launcher
-    
-    def start(self):
-        self.simulation.activate(self.launcher, self.launcher.start())
-
-
 class ScheduledRequest(AbstractRequest):    
-    def __init__(self, request, at, simulation=None):
+    def __init__(self, request, at = 'undefined', delay = 'undefined', simulation=None):
         super(ScheduledRequest, self).__init__(simulation)
         self.at = at
+        self.delay = delay
         self.request = request
     
     def getProcess(self):
         return self.request
     
     def start(self):
-        self.simulation.activate(self.request, self.request.startup(), at=self.at)
+        self.simulation.activate(self.request, self.request.startup(), at=self.at, delay=self.delay)
 
 
 class RequestObserver(object):    
@@ -108,7 +87,7 @@ class RequestObserver(object):
         pass
 
 
-class RequestInstance(Process):
+class RequestInstance(Process): # TODO rename to something more meaningful such as RequestSender
     """ This class performs an HTTP request in SimPy """
     
     ReqIdGenerator = 0
