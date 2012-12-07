@@ -50,27 +50,13 @@ class RequestManager(object):
         simulation.activate(pc, pc.cancel_process())
 
 
-class AbstractRequest(object):
-    __metaclass__ = ABCMeta
-    
-    def __init__(self, simulation=None):
-        self.simulation = simulation
-    
-    @abstractmethod
-    def getProcess(self):
-        pass
-    
-    @abstractmethod
-    def start(self):
-        pass
-
-
-class ScheduledRequest(AbstractRequest):    
+class ScheduledRequest(object):    
     def __init__(self, request, at = 'undefined', delay = 'undefined', simulation=None):
-        super(ScheduledRequest, self).__init__(simulation)
+        super(ScheduledRequest, self).__init__()
+        self.request = request
         self.at = at
         self.delay = delay
-        self.request = request
+        self.simulation = simulation
     
     def getProcess(self):
         return self.request
