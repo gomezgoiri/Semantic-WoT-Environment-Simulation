@@ -13,7 +13,6 @@ from netuse.triplespace.our_solution.provider.provider import Provider
 from netuse.triplespace.our_solution.consumer.consumer import ConsumerFactory
 from netuse.triplespace.dataaccess.store import DataAccess
 from netuse.triplespace.network.url_utils import URLUtils
-from netuse.triplespace.network.server import CustomSimulationHandler
 from netuse.triplespace.network.client import RequestManager, RequestInstance, RequestObserver
 
 
@@ -27,7 +26,6 @@ class TripleSpace(object):
         self.__logRequests = False
         self.reasoningCapacity = False # TODO refactor (it should be get from Device
         
-        self.handler = CustomSimulationHandler(self)
         self.dataaccess = DataAccess() # join not implemented yet
         self.network = None
     
