@@ -11,6 +11,8 @@ from SimPy.Simulation import *
 from netuse.nodes import Node
 from netuse.triplespace.network.client import RequestManager, RequestInstance
 from netuse.devices import XBee
+from netuse.results import G
+from netuse.tracers import TestingTracer
 
 def side_effect(*args):
     return args[0] + args[1]/2 # just to check how to configure different returns
@@ -29,7 +31,9 @@ class TestNodes(unittest.TestCase):
         return source_node
     
     #@patch('netuse.results.G.Rnd', rndMock) # new global unrandomized variable 
-    def test_node_down(self):        
+    def test_request_to_node_down(self):
+        G._tracer = TestingTracer()
+            
         s = Simulation()
         s.initialize()
         
@@ -45,7 +49,8 @@ class TestNodes(unittest.TestCase):
         
         s.simulate(until=3000)
         
-        print request.responses[0].getstatus()
+        self.assertEquals( 0, len(request.responses) )
+        self.assertEquals( 408, G._tracer.traces[0]['status'] )
 
 
 if __name__ == '__main__':    
