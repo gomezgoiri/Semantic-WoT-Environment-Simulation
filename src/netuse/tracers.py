@@ -91,3 +91,24 @@ class MongoDBTracer(AbstractTracer):
             status=status,
             response_time=response_time)
         n.save()
+
+class TestingTracer(AbstractTracer):
+    
+    def __init__(self):
+        self.traces = []
+    
+    def start(self):
+        pass
+        
+    def stop(self):
+        pass
+    
+    def trace(self, timestamp, client, server, path, status, response_time):
+        trace = {}
+        trace['timestamp'] = timestamp
+        trace['client'] = client
+        trace['server'] = server
+        trace['path'] = path
+        trace['status'] = status
+        trace['response_time'] = response_time
+        self.traces.append( trace )
