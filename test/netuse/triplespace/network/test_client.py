@@ -31,8 +31,8 @@ class RequestManagerTestCase(unittest.TestCase): # classes under test: DelayedRe
         self.assertEquals(self.request.when, 100) # after 100 starting in 0
     
     def test_cancel_DelayedRequest(self):
-        sq = RequestManager.launchDelayedRequest(self.request, 100)
-        RequestManager.cancelRequest(sq)
+        RequestManager.launchDelayedRequest(self.request, 100)
+        RequestManager.cancelRequest(self.request)
         self.s.simulate(100000)
         self.assertEquals(self.request.when, None)
         
@@ -42,8 +42,8 @@ class RequestManagerTestCase(unittest.TestCase): # classes under test: DelayedRe
         self.assertEquals(self.request.when, 1000) # at 1000
     
     def test_cancel_ScheduledRequest(self):
-        sq = RequestManager.launchScheduledRequest(self.request, 1000)
-        RequestManager.cancelRequest(sq)
+        RequestManager.launchScheduledRequest(self.request, 1000)
+        RequestManager.cancelRequest(self.request)
         self.s.simulate(100000)
         self.assertEquals(self.request.when, None)
 

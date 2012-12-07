@@ -26,43 +26,21 @@ class RequestManager(object):
     
     @staticmethod
     def launchNormalRequest(request):
-        simulation = request.sim
-        r = ScheduledRequest(request, at=simulation.now(), simulation=simulation)
-        r.start() # observers should have been added to the request itself prior to this call
-        return r
+        request.sim.activate(request, request.startup())
     
     @staticmethod
     def launchDelayedRequest(request, wait_for):
-        r = ScheduledRequest(request, delay=wait_for, simulation=request.sim)
-        r.start() # observers should have been added to the request itself prior to this call
-        return r
+        request.sim.activate(request, request.startup(), delay=wait_for)
     
     @staticmethod
     def launchScheduledRequest(request, at):
-        r = ScheduledRequest(request, at, simulation=request.sim)
-        r.start() # observers should have been added to the request itself prior to this call
-        return r
+        request.sim.activate(request, request.startup(), at=at)
     
     @staticmethod
-    def cancelRequest(request): # should be a delayed or scheduled request
-        simulation = request.simulation
-        pc = ProcessCanceler(request.getProcess(), sim=simulation)
+    def cancelRequest(request):
+        simulation = request.sim
+        pc = ProcessCanceler(request, sim=simulation)
         simulation.activate(pc, pc.cancel_process())
-
-
-class ScheduledRequest(object):    
-    def __init__(self, request, at = 'undefined', delay = 'undefined', simulation=None):
-        super(ScheduledRequest, self).__init__()
-        self.request = request
-        self.at = at
-        self.delay = delay
-        self.simulation = simulation
-    
-    def getProcess(self):
-        return self.request
-    
-    def start(self):
-        self.simulation.activate(self.request, self.request.startup(), at=self.at, delay=self.delay)
 
 
 class RequestObserver(object):    

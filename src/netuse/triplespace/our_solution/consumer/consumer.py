@@ -150,9 +150,10 @@ class RemoteConnector(AbstractConnector, RequestObserver):
     
     def _schedule_future_update(self):
         up_time = self.updateTimeManager.get_updatetime()
-        self.scheduled_request = RequestManager.launchScheduledRequest(
-                                    self._get_update_request(),
-                                    self.simulation.now() + up_time )
+        self.scheduled_request = self._get_update_request()
+        self.next_scheduled_at = self.simulation.now() + up_time
+        
+        RequestManager.launchScheduledRequest(self.scheduled_request, self.next_scheduled_at)
     
     def _get_update_request(self):
         req = RequestInstance( self.me_as_node,
@@ -177,7 +178,7 @@ class RemoteConnector(AbstractConnector, RequestObserver):
         self._check_if_next_update_changes() # next clue update!
     
     def _check_if_next_update_changes(self):
-        if self.scheduled_request.at <= self.simulation.now(): # if last update already done...
+        if self.next_scheduled_at <= self.simulation.now(): # if last update already done...
             # ...schedule the next one
             self._schedule_future_update()
         else: # one request already scheduled, other may override it
@@ -185,7 +186,7 @@ class RemoteConnector(AbstractConnector, RequestObserver):
             possible_next = self.simulation.now() + self.updateTimeManager.get_updatetime()
             
             # if we  have a candidate to update our next update with an earlier update...
-            if possible_next < self.scheduled_request.at:
+            if possible_next < self.next_scheduled_at:
                 # stop any previously scheduled request, start a new request
                 RequestManager.cancelRequest(self.scheduled_request)
                 
