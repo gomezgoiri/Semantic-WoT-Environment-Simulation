@@ -26,79 +26,21 @@ class RequestManager(object):
     
     @staticmethod
     def launchNormalRequest(request):
-        simulation = request.sim
-        r = ScheduledRequest(request, at=simulation.now(), simulation=simulation)
-        r.start() # observers should have been added to the request itself prior to this call
-        return r
+        request.sim.activate(request, request.startup())
     
     @staticmethod
     def launchDelayedRequest(request, wait_for):
-        r = DelayedRequest(request, wait_for, simulation=request.sim)
-        r.start() # observers should have been added to the request itself prior to this call
-        return r
+        request.sim.activate(request, request.startup(), delay=wait_for)
     
     @staticmethod
     def launchScheduledRequest(request, at):
-        r = ScheduledRequest(request, at, simulation=request.sim)
-        r.start() # observers should have been added to the request itself prior to this call
-        return r
+        request.sim.activate(request, request.startup(), at=at)
     
     @staticmethod
-    def cancelRequest(request): # should be a delayed or scheduled request
-        simulation = request.simulation
-        pc = ProcessCanceler(request.getProcess(), sim=simulation)
+    def cancelRequest(request):
+        simulation = request.sim
+        pc = ProcessCanceler(request, sim=simulation)
         simulation.activate(pc, pc.cancel_process())
-
-
-class AbstractRequest(object):
-    __metaclass__ = ABCMeta
-    
-    def __init__(self, simulation=None):
-        self.simulation = simulation
-    
-    @abstractmethod
-    def getProcess(self):
-        pass
-    
-    @abstractmethod
-    def start(self):
-        pass
-
-
-class DelayedRequestLauncher(Process):    
-    def __init__(self, request, wait_for=0, sim=None):
-        super(DelayedRequestLauncher, self).__init__(sim=sim)
-        self.wait_for = wait_for
-        self.request = request
-    
-    def start(self):
-        # TODO much simpler! use the "delay" attribute of "activate" function!
-        yield hold, self, self.wait_for
-        self.sim.activate(self.request, self.request.startup())
-
-class DelayedRequest(AbstractRequest):
-    def __init__(self, request, wait_for, simulation=None):
-        super(DelayedRequest, self).__init__(simulation)
-        self.launcher = DelayedRequestLauncher(request, wait_for=wait_for, sim=simulation)
-    
-    def getProcess(self):
-        return self.launcher
-    
-    def start(self):
-        self.simulation.activate(self.launcher, self.launcher.start())
-
-
-class ScheduledRequest(AbstractRequest):    
-    def __init__(self, request, at, simulation=None):
-        super(ScheduledRequest, self).__init__(simulation)
-        self.at = at
-        self.request = request
-    
-    def getProcess(self):
-        return self.request
-    
-    def start(self):
-        self.simulation.activate(self.request, self.request.startup(), at=self.at)
 
 
 class RequestObserver(object):    
@@ -109,7 +51,7 @@ class RequestObserver(object):
         pass
 
 
-class RequestInstance(Process):
+class RequestInstance(Process): # TODO rename to something more meaningful such as RequestSender
     """ This class performs an HTTP request in SimPy """
     
     ReqIdGenerator = 0
