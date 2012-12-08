@@ -1,6 +1,6 @@
 import unittest
+import random
 from mock import Mock
-from SimPy.Simulation import Simulation, Process, hold
 from netuse.triplespace.network.discovery.simple import MagicInstantNetwork, SimpleDiscoveryMechanism
 
 
@@ -11,6 +11,7 @@ class SimpleDiscoveryMechanismTestCase(unittest.TestCase): # classes under test:
         node.name = name
         node.discovery_record = Mock()
         node.discovery_record.add_change_observer.return_value = None
+        node.discovery_record.is_whitepage = False
         node.down = False
         return node
 
@@ -57,6 +58,21 @@ class SimpleDiscoveryMechanismTestCase(unittest.TestCase): # classes under test:
             self.assertFalse( node in nodes )
         for node in nodes:
             self.assertTrue( node in self.other_nodes )
+            
+    def test_get_no_whitepage(self):
+        wp = self.simple_discovery.get_whitepage()
+        self.assertEquals(None, wp)
+    
+    def test_get_whitepage_me(self):
+        self.main_node.discovery_record.is_whitepage = True
+        wp = self.simple_discovery.get_whitepage()
+        self.assertEquals(self.main_node, wp)
+    
+    def test_get_whitepage_others(self):
+        expected_wp = random.choice(self.other_nodes)
+        expected_wp.discovery_record.is_whitepage = True
+        wp = self.simple_discovery.get_whitepage()
+        self.assertEquals(expected_wp, wp)
 
 if __name__ == '__main__':
     unittest.main()
