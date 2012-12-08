@@ -55,7 +55,7 @@ class MagicInstantNetwork(DiscoveryRecordObserver):
                 # notifyies on "whitepage_selected_after_none"
                 for observer in self.observers:
                     # SimpleDiscoveryMechanism
-                    if not observer.node.down:
+                    if not observer.me.down:
                         observer.on_whitepage_selected_after_none()
         else:
             if wp==None:

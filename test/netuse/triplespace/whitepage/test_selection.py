@@ -4,7 +4,7 @@ from rdflib import URIRef
 from rdflib.Literal import Literal, _XSD_NS
 from netuse.nodes import Node
 from netuse.devices import DeviceType, XBee, SamsungGalaxyTab, FoxG20, Server
-from netuse.triplespace.network.discovery import DiscoveryRecord
+from netuse.triplespace.network.discovery.record import DiscoveryRecord
 from netuse.triplespace.our_solution.whitepage.selection import WhitepageSelector
 
 
