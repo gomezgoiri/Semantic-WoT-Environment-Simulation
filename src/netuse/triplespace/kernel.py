@@ -56,7 +56,7 @@ class NegativeBroadcasting(TripleSpace):
         
         # remote queries
         req = RequestInstance(self.discovery.me,
-                              self.discovery.rest,
+                              self.discovery.get_nodes(),
                               '/' + URLUtils.serialize_space_to_URL() + "query/" + URLUtils.serialize_wildcard_to_URL(template),
                               name = "queryAt"+str(self.simulation.now()),
                               sim = self.simulation )

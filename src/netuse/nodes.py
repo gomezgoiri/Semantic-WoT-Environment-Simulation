@@ -6,7 +6,7 @@ Created on Nov 26, 2011
 from SimPy.Simulation import Process, Resource, passivate, hold, release, request
 import weakref
 from devices import DeviceType, RegularComputer
-from netuse.triplespace.network.discovery import DiscoveryRecord
+from netuse.triplespace.network.discovery.record import DiscoveryRecord
 from netuse.triplespace.network.server import CustomSimulationHandler
 
 

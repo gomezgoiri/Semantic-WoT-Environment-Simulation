@@ -8,7 +8,7 @@ from abc import ABCMeta, abstractmethod
 from SimPy.Simulation import Process, SimEvent, waitevent
 from netuse.sim_utils import Timer
 from clueseval.clues.node_attached import ClueWithNode
-from netuse.triplespace.network.discovery import SimpleDiscoveryObserver
+from netuse.triplespace.network.discovery.simple import SimpleDiscoveryObserver
 from netuse.triplespace.our_solution.provider.simple_clue_management import ClueManager
 from netuse.triplespace.network.client import RequestInstance, RequestManager, RequestObserver
 
@@ -22,7 +22,7 @@ class Provider(Process, SimpleDiscoveryObserver):
         super(Provider, self).__init__(sim=sim)
         
         self.discovery = discovery
-        self.discovery.add_changes_observers(self)
+        self.discovery.add_changes_observer(self)
         self.clue_manager = ClueManager(dataaccess)
         
         self.__stop = False

@@ -1,6 +1,6 @@
 from numpy import mean, std
 from abc import ABCMeta, abstractmethod
-from netuse.triplespace.network.discovery import DiscoveryRecord
+from netuse.triplespace.network.discovery.record import DiscoveryRecord
 from netuse.triplespace.network.client import RequestInstance, RequestManager, RequestObserver       
 
 class WhitepageSelector(object):
@@ -169,7 +169,7 @@ class WhitepageSelectionManager(RequestObserver):
         self.observer = observer
     
     def choose_whitepage(self):
-        candidates = [item for item in self.discovery.rest if item not in self.refused]
+        candidates = [item for item in self.discovery.get_nodes() if item not in self.refused]
         self.last_choosen = WhitepageSelector.select_whitepage(candidates)
         if self.last_choosen==None:
             # somehow, transmit that no node could have been chosen

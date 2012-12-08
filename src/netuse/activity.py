@@ -10,7 +10,7 @@ from rdflib import Graph
 from SimPy.Simulation import random
 from netuse.nodes import NodeGenerator
 from netuse.triplespace.kernel import NegativeBroadcasting, Centralized, OurSolution
-from netuse.triplespace.network.discovery import DiscoveryFactory
+from netuse.triplespace.network.discovery.simple import DiscoveryFactory
 from netuse.database.parametrization import Parametrization
 from netuse.results import G
 
