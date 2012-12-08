@@ -30,8 +30,28 @@ class TestNodes(unittest.TestCase):
         source_node.name = "SourceNode"
         return source_node
     
-    #@patch('netuse.results.G.Rnd', rndMock) # new global unrandomized variable 
     def test_request_to_node_down(self):
+        G._tracer = TestingTracer()
+            
+        s = Simulation()
+        s.initialize()
+        
+        node = Node(sim=s)
+        node.down = True
+        s.activate(node, node.processRequests())
+        
+        req_mngr = RequestManager()        
+        source_node = self.get_source_node()
+        
+        request = RequestInstance(source_node, (node,), "/foo/bar", sim=s)
+        req_mngr.launchScheduledRequest(request, 10)    
+        
+        s.simulate(until=3000)
+        
+        self.assertEquals( 0, len(request.responses) )
+        self.assertEquals( 408, G._tracer.traces[0]['status'] )
+    
+    def test_node_is_not_shown_in_the_discoveryrequest_to_node_down(self):
         G._tracer = TestingTracer()
             
         s = Simulation()
