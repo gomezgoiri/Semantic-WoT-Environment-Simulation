@@ -40,6 +40,23 @@ class SimpleDiscoveryMechanismTestCase(unittest.TestCase): # classes under test:
         self.main_node.down = True
         nodes = self.simple_discovery.get_nodes()
         self.assertEquals( 0, len(nodes) )
+        
+    def test_get_nodes_in_network_with_down_nodes(self):
+        down_nodes = []
+        for node in self.other_nodes:
+            node.down = True
+            down_nodes.append(node)
+            if len(down_nodes)>=5:
+                break
+        
+        nodes = self.simple_discovery.get_nodes()
+        
+        self.assertEquals( 5, len(nodes) )
+        self.assertFalse( self.main_node in nodes )
+        for node in down_nodes:
+            self.assertFalse( node in nodes )
+        for node in nodes:
+            self.assertTrue( node in self.other_nodes )
 
 if __name__ == '__main__':
     unittest.main()
