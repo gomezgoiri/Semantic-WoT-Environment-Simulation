@@ -68,8 +68,7 @@ class Model(BasicModel):
         nodes.generateNodes()
         self.stoppables.extend( nodes.getNodes() )
         
-        activity = ActivityGenerator(self.parameters, preloadedGraph={}, simulation=self)
-        activity.generateActivity()
+        ActivityGenerator.create(self.parameters, preloadedGraph={}, simulation=self)
         
         self.simulate( until = self.parameters.simulateUntil )
 

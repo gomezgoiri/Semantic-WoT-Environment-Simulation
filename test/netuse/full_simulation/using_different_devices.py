@@ -25,8 +25,7 @@ class SimpleTraceModel(BasicModel):
         nodes.generateNodes()
         self.stoppables.extend( nodes.getNodes() )
         
-        activity = ActivityGenerator(self.parameters, None, simulation=self)
-        activity.generateActivity()
+        ActivityGenerator.create(self.parameters, None, simulation=self)
         
         self.simulate( until=self.parameters.simulateUntil )
 

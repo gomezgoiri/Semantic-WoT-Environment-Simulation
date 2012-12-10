@@ -36,8 +36,7 @@ class TraceAndLoadFilesModel(BasicModel):
         nodes.generateNodes()
         self.stoppables.extend( nodes.getNodes() )
         
-        activity = ActivityGenerator(self.parameters, preloadedGraph, simulation=self)
-        activity.generateActivity()
+        ActivityGenerator.create(self.parameters, preloadedGraph, simulation=self)
         
         recorder = TimeRecorder()
         recorder.start()
