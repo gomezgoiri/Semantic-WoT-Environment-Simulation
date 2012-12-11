@@ -4,7 +4,7 @@ Created on Dec 8, 2012
 @author: tulvur
 '''
 
-import random
+from random import Random
 from netuse.nodes import NodeGenerator
 from netuse.database.parametrization import Parametrization
 
@@ -33,19 +33,20 @@ class DynamicNodesModel(object):
     
     ID = Parametrization.dynamic_netmodel
     
-    def __init__(self, simulation, parametrization):
-        self.change_state_each = (5000, 3000) # (mean, std_dev)
-        self.simulation = simulation
-        self.sim_time = parametrization.simulateUntil
+    def __init__(self, simulation, parametrization, mean=5000, std_dev=3000):
+        self._change_state_each = (mean, std_dev)
+        self._simulation = simulation
+        self._sim_time = parametrization.simulateUntil
+        self._random = Random()
     
     def configure(self):
         for node in NodeGenerator.getNodes():
             last_event_time = 0
-            while last_event_time < self.sim_time:
-                next_event_on = random.normalvariate(*self.change_state_each)
+            while last_event_time < self._sim_time:
+                next_event_on = self._random.normalvariate(*self._change_state_each)
                 last_event_time += next_event_on
                 
-                if last_event_time < self.sim_time:
+                if last_event_time < self._sim_time:
                     node.swap_state(starts_at=last_event_time, simulation=self._simulation)
 
 

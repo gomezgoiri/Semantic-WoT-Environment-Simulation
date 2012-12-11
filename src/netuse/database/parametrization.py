@@ -26,7 +26,7 @@ class Parametrization(Document):
                            #choices=(negative_broadcasting, centralized, our_solution,))
     network_model = StringField(required=True,
                            default=normal_netmodel,
-                           choices=(normal_netmodel, dynamic_netmodel, chaos_netmodel,))
+                           choices=(normal_netmodel, dynamic_netmodel, chaotic_netmodel,))
     simulateUntil = FloatField(required=True, default=60000.0)
     nodes = ListField(StringField(), required=True, default=[])
     nodeTypes = ListField(StringField(), required=True, default=[])
