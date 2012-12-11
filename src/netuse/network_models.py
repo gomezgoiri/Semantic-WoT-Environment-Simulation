@@ -47,7 +47,7 @@ class DynamicNodesModel(object):
                 last_event_time += next_event_on
                 
                 if last_event_time < self._sim_time:
-                    node.swap_state(starts_at=last_event_time, simulation=self._simulation)
+                    node.swap_state(at=last_event_time)
 
 
 class ChaoticModel(object):

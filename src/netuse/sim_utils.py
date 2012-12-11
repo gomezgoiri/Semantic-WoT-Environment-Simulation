@@ -3,6 +3,7 @@ Created on Sep 18, 2011
 
 @author: tulvur
 '''
+import inspect
 from functools import wraps
 from SimPy.Simulation import Process, SimEvent, hold
 
@@ -23,15 +24,51 @@ from SimPy.Simulation import Process, SimEvent, hold
 # >> { 'a' : 9, 'b' : 10 }
 
 
-def schedule(f):
+# Can be used to avoid common bugs using SimPy's activate function with a Process
+def activatable(f):
     '''
-    Starts the decorated method at "starts_at" during the simulation process.
+    Checks that a method can be activated and activates it if so.
+    
+    This wrapper may be useful for:
+        a) Avoid common bugs using SimPy's activate function with a Process.
+        b) Visually check which functions/methods can/will be called by SimPy.
     '''
     @wraps(f)
-    def wrapped(self, starts_at, simulation=None, *args, **kwargs):
-        # waits until starts_at and changes then calls the method
+    def wrapped(self, at = 'undefined', delay = 'undefined', *args, **kwargs):
+        #if simulation is None:
+        #    raise Exception("To activate a method a simulation object should be passed as argument.")
+        if not inspect.isgeneratorfunction(f):
+            raise Exception("SimPy needs this method to be a generator to activate it.")
+        
+        # If everything is OK, activate it.
+        self.sim.activate(self, f(self, *args, **kwargs), at=at, delay=delay)
+    
+    return wrapped
+
+
+def schedule(f):
+    '''
+    Starts the decorated method at "at" during the simulation process.
+    
+    Note that each method of an object can only be activated once, so using this wrapper, we ensure
+    that a new "SimPy Process" is created for each scheduled method.
+    '''
+    @wraps(f)
+    def wrapped(self, at = 'undefined', delay = 'undefined', simulation=None, *args, **kwargs):
+        if simulation is None:
+            # the default attribute my own classes may have to store simulation objects
+            if hasattr(self, 'simulation'):
+                simulation = self.simulation
+            # the attribute SimPy's "Process" classes have to store simulation objects
+            elif hasattr(self, 'sim'):
+                simulation = self.sim
+            else:
+                raise Exception("The simulation object should be accessible either as an argument of the wrapper or as an attribute of the class being scheduled.") 
+            
         sf = ScheduledFunction(self, f, args, kwargs, sim=simulation)
-        simulation.activate(sf, sf.do_after_waiting(), at=starts_at)
+        sf.call(at=at, delay=delay)
+        # Or if we don't want to use Activa
+        # simulation.activate(sf, sf.do_after_waiting(), at=starts_at)
         
         #return f(self, *args, **kwargs)
         # If we care about the results, we should:
@@ -51,8 +88,9 @@ class ScheduledFunction(Process):
         self.method = (method, )
         self.args = args
         self.kwargs = kwargs
-        
-    def do_after_waiting(self):
+    
+    @activatable
+    def call(self):
         yield hold, self, 0 # needs to be a generator
         result = self.method[0](self.objct, *self.args, **self.kwargs)
         self.result.set_result( result )

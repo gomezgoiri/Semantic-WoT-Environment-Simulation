@@ -77,7 +77,7 @@ class AbstractActivity(object):
                         last = self.FAKE_GRAPH
                         
                     #print "%s writes at %s"%(actionNode, startsWriting+writesAt)
-                    actionNode.ts.write(starts_at=startsWriting+writesAt, simulation=self._simulation, triples=last)
+                    actionNode.ts.write(at=startsWriting+writesAt, simulation=self._simulation, triples=last)
         
     
     def _generateSimulationQueries(self, numConsumers):
@@ -91,7 +91,7 @@ class AbstractActivity(object):
                 
                 requester = consumerNodes.next()
                 #print "%s requests at %s"%(requester,startAt)
-                requester.ts.query(starts_at=startAt, simulation=self._simulation, template=template)
+                requester.ts.query(at=startAt, simulation=self._simulation, template=template)
 
 
 class NegativeBroadcastingActivity(AbstractActivity):
