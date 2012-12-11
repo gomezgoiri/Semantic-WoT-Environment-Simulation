@@ -5,6 +5,7 @@ Created on Nov 26, 2011
 '''
 from SimPy.Simulation import Process, Resource, passivate, hold, release, request
 import weakref
+from netuse.sim_utils import schedule
 from devices import DeviceType, RegularComputer
 from netuse.triplespace.network.discovery.record import DiscoveryRecord
 from netuse.triplespace.network.server import CustomSimulationHandler
@@ -142,6 +143,11 @@ class Node(Process):
 
     def stop(self):
         self._ts.stop()
+    
+    @schedule
+    def swap_state(self):
+        """If the node is alive, it goes down. Otherwise, it goes up."""
+        self.down = not self.down
     
     def __str__(self):
         return self.name

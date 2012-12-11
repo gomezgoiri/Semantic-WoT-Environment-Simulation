@@ -57,7 +57,7 @@ class AbstractActivity(object):
     
     def generate_activity(self):
         self._configure_nodes()
-        NetworkModelManager.run_model(model="normal")
+        NetworkModelManager.run_model(self._params)
         self._generateSimulationWritings()
         self._generateSimulationQueries(self._params.numConsumers)
         
@@ -105,7 +105,7 @@ class OurSolutionActivity(AbstractActivity):
     def _configure_nodes(self):
         for n in NodeGenerator.getNodes():
             discov = self._discovery_factory.create_simple_discovery(n)
-            n.ts = OurSolution(discov, self._discovery_factory) #, self._baseGraphs['ontology'])
+            n.ts = OurSolution(discov, self._simulation) #, self._baseGraphs['ontology'])
             n.ts.reasoningCapacity = n.canReason
 
 class CentralizedActivity(AbstractActivity):

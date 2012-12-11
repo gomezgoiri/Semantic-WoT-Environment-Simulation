@@ -9,14 +9,24 @@ from mongoengine import Document, StringField, FloatField, IntField, ListField
 class Parametrization(Document):
     meta = {'collection': 'parametrization'}
     
+    # valid strategies
     negative_broadcasting = "negative broadcasting"
     centralized = "centralized"
     our_solution = "our"
+    
+    # network models
+    normal_netmodel = "normal"
+    dynamic_netmodel = "dynamic"
+    chaotic_netmodel = "chaos"
+    
     
     strategy = StringField(required=True,
                            default=negative_broadcasting)
                            #don't know why stopped working :-S
                            #choices=(negative_broadcasting, centralized, our_solution,))
+    network_model = StringField(required=True,
+                           default=normal_netmodel,
+                           choices=(normal_netmodel, dynamic_netmodel, chaos_netmodel,))
     simulateUntil = FloatField(required=True, default=60000.0)
     nodes = ListField(StringField(), required=True, default=[])
     nodeTypes = ListField(StringField(), required=True, default=[])
