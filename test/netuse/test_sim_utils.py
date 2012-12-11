@@ -40,13 +40,19 @@ class ActivatableTestCase(unittest.TestCase): # wrapper under test: activatable
         except Exception, e:
             #print e
             pass
+        
+    def test_scheduled_method_without_parameters_SimPy_way(self):
+        # backwards compatible!
+        self.simulation.activate(self.proc1, self.proc1.method_without_parameters(), at=100)
+        self.simulation.simulate(1000)
+        self.assertItemsEqual( ( ("method1", 100), ), self.proc1.traces)
     
     def test_scheduled_method_without_parameters(self):
         self.proc1.method_without_parameters(at=100)
         self.proc1.method_without_parameters(at=300) # the second activation for a given object is ignored
         self.proc2.method_without_parameters(at=500)
         
-        self.simulation.simulate(10000)
+        self.simulation.simulate(1000)
         
         self.assertItemsEqual( ( ("method1", 100), ), self.proc1.traces)
         self.assertItemsEqual( ( ("method1", 500),  ), self.proc2.traces)
@@ -56,16 +62,22 @@ class ActivatableTestCase(unittest.TestCase): # wrapper under test: activatable
         self.proc1.method_with_parameters(at=300, str_param="perro") # the second activation for a given object is ignored
         self.proc2.method_with_parameters(at=100, str_param="iguana")
         
-        self.simulation.simulate(10000)
+        self.simulation.simulate(1000)
         
         self.assertItemsEqual( ( ("method2", 500, "gato"), ), self.proc1.traces)
         self.assertItemsEqual( ( ("method2", 100, "iguana"),  ), self.proc2.traces)
+    
+    def test_scheduled_method_with_parameters_SimPy_way(self):
+        # backwards compatible!
+        self.simulation.activate(self.proc1, self.proc1.method_with_parameters(str_param="gato"), at=500)
+        self.simulation.simulate(1000)
+        self.assertItemsEqual( ( ("method2", 500, "gato"), ), self.proc1.traces)
     
     def test_scheduled_methods_all(self):
         self.proc1.method_with_parameters(at=400, str_param="armadillo")
         self.proc1.method_without_parameters(at=300)  # the second activation for a given object is ignored, even if it is a different method
         
-        self.simulation.simulate(10000)
+        self.simulation.simulate(1000)
         
         self.assertItemsEqual( ( ("method2", 400, "armadillo"), ), self.proc1.traces)
 

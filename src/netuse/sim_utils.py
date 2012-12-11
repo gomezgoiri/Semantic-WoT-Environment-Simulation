@@ -29,19 +29,30 @@ def activatable(f):
     '''
     Checks that a method can be activated and activates it if so.
     
+    If no "at" or "delay" arguments are provided, the method will behave as if nothing happened.
+    This behavior can be useful, to simply annotate the method without breaking backwards compatibility with SimPy.
+    
     This wrapper may be useful for:
         a) Avoid common bugs using SimPy's activate function with a Process.
         b) Visually check which functions/methods can/will be called by SimPy.
     '''
     @wraps(f)
-    def wrapped(self, at = 'undefined', delay = 'undefined', *args, **kwargs):
+    def wrapped(self, at = None, delay = None, *args, **kwargs):
         #if simulation is None:
         #    raise Exception("To activate a method a simulation object should be passed as argument.")
         if not inspect.isgeneratorfunction(f):
             raise Exception("SimPy needs this method to be a generator to activate it.")
         
-        # If everything is OK, activate it.
-        self.sim.activate(self, f(self, *args, **kwargs), at=at, delay=delay)
+        if at is None and delay is None:
+            # somebody wants to activate it in the SimPy fashion by himself/herself, do nothing, just call the function
+            # This can be useful, to simply annotate the method without breaking backwards compatibility of the method
+            return f(self, *args, **kwargs)
+        else:
+            at = 'undefined' if at is None else at
+            delay = 'undefined' if delay is None else delay
+            
+            # If everything is OK, activate it.
+            self.sim.activate(self, f(self, *args, **kwargs), at=at, delay=delay)
     
     return wrapped
 
