@@ -4,12 +4,30 @@ Created on Nov 26, 2011
 @author: tulvur
 '''
 import os
-import random
 import glob
+import random
+from argparse import ArgumentParser
+
 from rdflib import Graph
 from FuXi.Rete.Util import generateTokenSet
 from FuXi.Rete.RuleStore import SetupRuleStore
 from FuXi.DLP.DLNormalization import NormalFormReduction
+
+
+
+class OwnArgumentParser(ArgumentParser):
+    
+    def __init__(self, description="Default description"):
+        super(OwnArgumentParser, self).__init__(description=description)
+        from netuse.results import G
+        self.add_argument('-ds','--data-set', default=G.dataset_path, dest='dataset_path',
+                    help='Specify the folder containing the dataset to perform the simulation.')
+
+    def parse_args(self):
+        from netuse.results import G
+        args = super(OwnArgumentParser, self).parse_args()
+        G.dataset_path = args.dataset_path
+        return args
 
 
 class SemanticFilesLoader(object):

@@ -3,7 +3,6 @@ Created on Sep 18, 2011
 
 @author: tulvur
 '''
-from argparse import ArgumentParser
 from functools import wraps
 from SimPy.Simulation import Process, SimEvent, hold
 
@@ -73,21 +72,6 @@ class ResultContainer(object):
     
     def has_result(self):
         return self.__has_result
-
-
-class OwnArgumentParser(ArgumentParser):
-    
-    def __init__(self, description="Default description"):
-        super(OwnArgumentParser, self).__init__(description=description)
-        from netuse.results import G
-        self.add_argument('-ds','--data-set', default=G.dataset_path, dest='dataset_path',
-                    help='Specify the folder containing the dataset to perform the simulation.')
-
-    def parse_args(self):
-        from netuse.results import G
-        args = super(OwnArgumentParser, self).parse_args()
-        G.dataset_path = args.dataset_path
-        return args
 
         
 class Timer(Process):

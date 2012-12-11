@@ -12,7 +12,7 @@ from netuse.devices import XBee, SamsungGalaxyTab, FoxG20, Server
 
 # Entry point for setup.py
 def main():
-    from netuse.sim_utils import OwnArgumentParser
+    from commons.utils import OwnArgumentParser
     parser = OwnArgumentParser('Parametrization for energy consumption measuring.')
     parser.parse_args()
     

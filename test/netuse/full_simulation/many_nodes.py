@@ -49,7 +49,7 @@ class TraceAndLoadFilesModel(BasicModel):
 
 
 def main():
-    from netuse.sim_utils import OwnArgumentParser
+    from commons.utils import OwnArgumentParser
     parser = OwnArgumentParser('Memory integration test')
     parser.parse_args() # do nothing with the args (already done)
     

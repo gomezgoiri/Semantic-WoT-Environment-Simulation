@@ -125,7 +125,7 @@ def simulateUnsimulatedExecutionSet():
 
 # Entry point for setup.py
 def main():
-    from netuse.sim_utils import OwnArgumentParser
+    from commons.utils import OwnArgumentParser
     parser = OwnArgumentParser('Start simulation process.')
     parser.parse_args()
     simulateUnsimulatedExecutionSet()

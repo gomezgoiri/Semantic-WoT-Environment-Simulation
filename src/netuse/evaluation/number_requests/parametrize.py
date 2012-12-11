@@ -12,7 +12,7 @@ from netuse.database.results import RequestsResults
 
 # Entry point for setup.py
 def main():
-    from netuse.sim_utils import OwnArgumentParser
+    from commons.utils import OwnArgumentParser
     parser = OwnArgumentParser('Parametrization for number of requests measuring.')
     parser.parse_args()
     
