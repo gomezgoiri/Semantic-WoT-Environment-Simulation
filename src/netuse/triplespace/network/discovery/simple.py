@@ -79,7 +79,8 @@ class SimpleDiscoveryMechanism(object):
     """
     def __init__(self, me, magic_network):
         self.me_ref = weakref.ref(me) # with a weakref.proxy a WeakSet.remove does not work OK
-        self.magic_network = weakref.proxy(magic_network)
+        # If you use weakref in "magic_network": the factory will be destroyed and this will be None.
+        self.magic_network = magic_network # weakref.proxy(magic_network) 
         self.magic_network.add_changes_observer(self)
         self.observers = weakref.WeakSet()
             
