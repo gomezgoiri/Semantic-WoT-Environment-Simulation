@@ -63,9 +63,13 @@ def schedule(f):
     
     Note that each method of an object can only be activated once, so using this wrapper, we ensure
     that a new "SimPy Process" is created for each scheduled method.
+    
+    On the other hand, if no values are provided for "at", "delay" and "simulation",
+    a normal call to the method will be performed.
+    This may be desirable to call the method within the simulation or a test.
     '''
     @wraps(f)
-    def wrapped(self, at = 'undefined', delay = 'undefined', simulation=None, *args, **kwargs):
+    def wrapped(self, at = None, delay = None, simulation=None, *args, **kwargs):
         if simulation is None:
             # the default attribute my own classes may have to store simulation objects
             if hasattr(self, 'simulation'):
@@ -73,19 +77,31 @@ def schedule(f):
             # the attribute SimPy's "Process" classes have to store simulation objects
             elif hasattr(self, 'sim'):
                 simulation = self.sim
+            elif at is None and delay is None:
+                # somebody may want to just call the function.
+                # E.g.: if he is testing it or if it already called within a simulation.
+                return f(self, *args, **kwargs)
             else:
                 raise Exception("The simulation object should be accessible either as an argument of the wrapper or as an attribute of the class being scheduled.") 
-            
-        sf = ScheduledFunction(self, f, args, kwargs, sim=simulation)
-        sf.call(at=at, delay=delay)
-        # Or if we don't want to use Activa
-        # simulation.activate(sf, sf.do_after_waiting(), at=starts_at)
         
-        #return f(self, *args, **kwargs)
-        # If we care about the results, we should:
-        #   - Receive a result listener as a parameter.
-        #   - Return a wrapper which will contain the result.
-        return sf.result
+        if at is None and delay is None:
+            # somebody may want to just call the function.
+            # E.g.: if he is testing it or if it already called within a simulation.
+            return f(self, *args, **kwargs)
+        else:
+            at = 'undefined' if at is None else at
+            delay = 'undefined' if delay is None else delay
+        
+            sf = ScheduledFunction(self, f, args, kwargs, sim=simulation)
+            sf.call(at=at, delay=delay)
+            # Or if we don't want to use Activa
+            # simulation.activate(sf, sf.do_after_waiting(), at=starts_at)
+            
+            #return f(self, *args, **kwargs)
+            # If we care about the results, we should:
+            #   - Receive a result listener as a parameter.
+            #   - Return a wrapper which will contain the result.
+            return sf.result
     
     return wrapped
 

@@ -127,6 +127,16 @@ class RequestManagerTestCase(unittest.TestCase): # classes under test: DelayedRe
         
         self.assertItemsEqual( ( ("method1", 100), ("method1", 300) ), self.obj1.traces)
         self.assertItemsEqual( ( ("method1", 500),  ), self.obj2.traces)
+        
+    def test_scheduled_method1(self):
+        self.obj1.method1(at=100)
+        self.obj1.method1(at=300)
+        self.obj2.method1(at=500)
+        
+        self.simulation.simulate(1000)
+        
+        self.assertItemsEqual( ( ("method1", 100), ("method1", 300) ), self.obj1.traces)
+        self.assertItemsEqual( ( ("method1", 500),  ), self.obj2.traces)
     
     def test_scheduled_method2(self):
         self.obj1.method2(at=500, str_param="gato")
@@ -151,6 +161,14 @@ class RequestManagerTestCase(unittest.TestCase): # classes under test: DelayedRe
         
         self.assertItemsEqual( ( ("method1", 400), ("method2", 500, "gato"), ("method2", 600, "lagartija") ), self.obj1.traces)
         self.assertItemsEqual( ( ("method1", 300), ("method2", 100, "iguana"), ("method2", 200, "salamandra")  ), self.obj2.traces)
+        
+    def test_normal_call(self):
+        self.obj1.method2(str_param="before")
+        self.simulation.simulate(1000)
+        self.obj1.method2(str_param="after") 
+        
+        # independent of simulation because no "simulation", "at" and "delay" are specified in both calls
+        self.assertItemsEqual( ( ("method2", 0, "before"), ("method2", 0, "after") ), self.obj1.traces)
 
 
 class ObjectWhichUsesTimer(Process):
