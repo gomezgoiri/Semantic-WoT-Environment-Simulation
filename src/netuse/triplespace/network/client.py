@@ -119,15 +119,8 @@ class RequestInstance(Process): # TODO rename to something more meaningful such 
             o.notifyRequestFinished(self)
             
     def get_unanswered_nodes(self):
-        unanswered_reqids = self.requestInit.keys()
-        for response in self.responses:
-            unanswered_reqids.remove(response.getid())
-        
-        unanswered = []
-        for reqId in unanswered_reqids:
-            unanswered.append(self.get_destination_node_name(reqId))
-            
-        return unanswered
+        # not yet deleted requestInit keys, are the ids without a response
+        return [self.get_destination_node_name(reqId) for reqId in self.requestInit.keys()]
     
     def getWaitingFor(self):
         return len(self.requestInit)

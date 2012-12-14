@@ -108,9 +108,9 @@ class RequestInstanceTestCase(unittest.TestCase):
         self.s.simulate(100000)
         
         unanswered = ri.get_unanswered_nodes()
-        self.assertTrue( nodes[1] in unanswered )
-        self.assertFalse( nodes[0] in unanswered )
-        self.assertFalse( nodes[2] in unanswered )
+        self.assertTrue( nodes[1].name in unanswered )
+        self.assertFalse( nodes[0].name in unanswered )
+        self.assertFalse( nodes[2].name in unanswered )
 
 
 if __name__ == '__main__':
