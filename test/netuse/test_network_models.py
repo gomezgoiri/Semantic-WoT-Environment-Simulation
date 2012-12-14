@@ -8,7 +8,7 @@ import unittest
 from mock import Mock, patch
 from netuse.sim_utils import schedule
 from SimPy.Simulation import Simulation, Process
-from netuse.network_models import DynamicNodesModel
+from netuse.network_models import DynamicNodesModel, ChaoticModel
 
 from netuse.nodes import NodeGenerator # used in tested class, here it is patched
 
@@ -33,7 +33,7 @@ class TestDynamicNodesModel(unittest.TestCase):
         self.nodes = []
         for _ in range(10):
             self.nodes.append( FakeNode( sim=self.simulation ) )
-                
+        
         self.random = Mock()
         self.random.normalvariate.side_effect = lambda *args: args[0] - args[1]/2 # just to check how to configure different returns
 
@@ -47,7 +47,7 @@ class TestDynamicNodesModel(unittest.TestCase):
         parametrization = Mock()
         parametrization.simulateUntil = 2000
         
-        model = DynamicNodesModel(self.simulation, parametrization, mean=500, std_dev=200)
+        model = DynamicNodesModel(parametrization, mean=500, std_dev=200)
         model._random = self.random
         
         model.configure() # test method
@@ -55,6 +55,37 @@ class TestDynamicNodesModel(unittest.TestCase):
         
         for node in self.get_nodes():
             self.assertItemsEqual( (400, 800, 1200, 1600), node.trace )
+
+
+class TestChaoticModel(unittest.TestCase):
+    
+    def setUp(self):
+        self.simulation = Simulation()
+        self.simulation.initialize()
+        
+        self.nodes = []
+        for _ in range(10):
+            self.nodes.append( FakeNode( sim=self.simulation ) )
+        
+        self.random = Mock()
+        self.random.normalvariate.side_effect = lambda *args: args[0] - args[1]/2 # just to check how to configure different returns
+        
+    def get_network(self):
+        network = Mock()
+        network.get_whitepage.return_value = self.nodes[0] # select the first as WP
+        return network
+    
+    def test_run(self):        
+        model = ChaoticModel(self.simulation, self.get_network(), mean=500, std_dev=200)
+        model._random = self.random
+        
+        model.run(at=0) # test method
+        self.simulation.simulate(until=2000)
+        
+        self.assertItemsEqual( (400, 800, 1200, 1600, 2000), self.nodes[0].trace )
+        
+        for n in range( 1, len(self.nodes) ):
+            self.assertEquals( 0, len(self.nodes[n].trace) )
 
 
 if __name__ == '__main__':
