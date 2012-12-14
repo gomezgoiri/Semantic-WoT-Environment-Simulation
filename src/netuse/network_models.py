@@ -8,12 +8,16 @@ from random import Random
 from SimPy.Simulation import Process, hold
 from netuse.sim_utils import activatable
 from netuse.nodes import NodeGenerator
-from netuse.database.parametrization import Parametrization
 
 class NetworkModelManager(object):
     """
     Class which runs different network models which simulate activity from nodes leaving and joining the network.
     """
+        
+    # network models
+    normal_netmodel = "normal"
+    dynamic_netmodel = "dynamic"
+    chaotic_netmodel = "chaos"
     
     @staticmethod
     def run_model(simulation, parametrization, network):
@@ -34,7 +38,7 @@ class DynamicNodesModel(object):
     A Model where the nodes go down and up periodically.
     """
     
-    ID = Parametrization.dynamic_netmodel
+    ID = NetworkModelManager.dynamic_netmodel
     
     def __init__(self, parametrization, mean=5000, std_dev=3000):
         self._change_state_each = (mean, std_dev)
@@ -57,7 +61,7 @@ class ChaoticModel(Process):
     A Model where the whitepage goes down and up periodically.
     """
     
-    ID = Parametrization.chaotic_netmodel
+    ID = NetworkModelManager.chaotic_netmodel
     
     def __init__(self, simulation, network, mean=5000, std_dev=3000):
         super(ChaoticModel, self).__init__(sim=simulation)

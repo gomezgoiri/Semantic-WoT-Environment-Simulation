@@ -5,6 +5,7 @@ Created on Nov 27, 2011
 '''
 import pickle
 from mongoengine import Document, StringField, FloatField, IntField, ListField
+from netuse.network_models import NetworkModelManager
 
 class Parametrization(Document):
     meta = {'collection': 'parametrization'}
@@ -14,19 +15,17 @@ class Parametrization(Document):
     centralized = "centralized"
     our_solution = "our"
     
-    # network models
-    normal_netmodel = "normal"
-    dynamic_netmodel = "dynamic"
-    chaotic_netmodel = "chaos"
-    
     
     strategy = StringField(required=True,
                            default=negative_broadcasting)
                            #don't know why stopped working :-S
                            #choices=(negative_broadcasting, centralized, our_solution,))
-    network_model = StringField(required=True,
-                           default=normal_netmodel,
-                           choices=(normal_netmodel, dynamic_netmodel, chaotic_netmodel,))
+    network_model = StringField(required = True,
+                                default = NetworkModelManager.normal_netmodel,
+                                choices = ( NetworkModelManager.normal_netmodel,
+                                            NetworkModelManager.dynamic_netmodel,
+                                            NetworkModelManager.chaotic_netmodel, )
+                                )
     simulateUntil = FloatField(required=True, default=60000.0)
     nodes = ListField(StringField(), required=True, default=[])
     nodeTypes = ListField(StringField(), required=True, default=[])
