@@ -67,12 +67,17 @@ class ChaoticModel(Process):
     
     @activatable
     def run(self):
-        while True:
+        last_wp = None
+        while True:            
             next_event_on = 0
             while next_event_on <= 0: # ignore delays with negative values!
                 next_event_on = self._random.normalvariate(*self._change_state_each)
             yield hold, self, next_event_on
             
-            wp = self._network.get_whitepage()
-            if wp is not None:
-                wp.swap_state() # normal call, not scheduling it
+            if last_wp is not None:
+                last_wp.swap_state() # to revert the going down of the previous WP
+            
+            last_wp = self._network.get_whitepage()
+            if last_wp is not None:
+                last_wp.swap_state() # normal call, not scheduling it
+                print "%s went down."%(last_wp.name)
