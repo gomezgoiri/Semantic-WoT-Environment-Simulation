@@ -5,7 +5,7 @@ Created on Nov 26, 2011
 '''
 from SimPy.Simulation import Process, Resource, passivate, hold, release, request
 import weakref
-from netuse.sim_utils import schedule
+from netuse.sim_utils import schedule, activatable
 from devices import DeviceType, RegularComputer
 from netuse.triplespace.network.discovery.record import DiscoveryRecord
 from netuse.triplespace.network.server import CustomSimulationHandler
@@ -117,6 +117,7 @@ class Node(Process):
         self.__waitingRequesters_and_InitTime = {} # TODO the "InitTime" is not longer used in this class
         self.down = False # is node down, unreachable, etc.?
     
+    @activatable
     def processRequests(self):
         while 1:
             if not self.__httpIn: # if it's empty...

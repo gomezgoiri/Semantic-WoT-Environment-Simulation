@@ -40,7 +40,7 @@ class TestNodes(unittest.TestCase):
         node.down = True
         s.activate(node, node.processRequests())
         
-        req_mngr = RequestManager()        
+        req_mngr = RequestManager()
         source_node = self.get_source_node()
         
         request = RequestInstance(source_node, (node,), "/foo/bar", sim=s)
@@ -51,7 +51,7 @@ class TestNodes(unittest.TestCase):
         self.assertEquals( 0, len(request.responses) )
         self.assertEquals( 408, G._tracer.traces[0]['status'] )
     
-    def test_node_is_not_shown_in_the_discoveryrequest_to_node_down(self):
+    def test_node_is_not_shown_in_the_discovery_when_is_down(self):
         G._tracer = TestingTracer()
             
         s = Simulation()
