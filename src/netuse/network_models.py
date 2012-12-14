@@ -23,12 +23,12 @@ class NetworkModelManager(object):
     def run_model(simulation, parametrization, network):
         model = parametrization.network_model
         
-        if model==DynamicNodesModel.ID:
-            cm = ChaoticModel(simulation, parametrization, network)
-            cm.run(at=0)
-        elif model==ChaoticModel.ID:
+        if model==NetworkModelManager.dynamic_netmodel:
             dm = DynamicNodesModel(simulation, parametrization)
             dm.configure()
+        elif model==NetworkModelManager.chaotic_netmodel:
+            cm = ChaoticModel(simulation, network)
+            cm.run(at=0)
         else: # model=="normal" or None or invalid
             pass # do nothing
 
@@ -37,8 +37,6 @@ class DynamicNodesModel(object):
     """
     A Model where the nodes go down and up periodically.
     """
-    
-    ID = NetworkModelManager.dynamic_netmodel
     
     def __init__(self, parametrization, mean=5000, std_dev=3000):
         self._change_state_each = (mean, std_dev)
@@ -61,8 +59,6 @@ class ChaoticModel(Process):
     A Model where the whitepage goes down and up periodically.
     """
     
-    ID = NetworkModelManager.chaotic_netmodel
-    
     def __init__(self, simulation, network, mean=5000, std_dev=3000):
         super(ChaoticModel, self).__init__(sim=simulation)
         self._change_state_each = (mean, std_dev)
@@ -72,7 +68,9 @@ class ChaoticModel(Process):
     @activatable
     def run(self):
         while True:
-            next_event_on = self._random.normalvariate(*self._change_state_each)
+            next_event_on = 0
+            while next_event_on <= 0: # ignore delays with negative values!
+                next_event_on = self._random.normalvariate(*self._change_state_each)
             yield hold, self, next_event_on
             
             wp = self._network.get_whitepage()
