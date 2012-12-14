@@ -10,10 +10,11 @@ from netuse.database.parametrization import Parametrization
 from commons.utils import SemanticFilesLoader
 
 class Parameters():
-    def __init__(self, simulateUntil=None, strategy=None, amountOfQueries=None, writeFrequency=None,
+    def __init__(self, simulateUntil=None, strategy=None, network_model=None, amountOfQueries=None, writeFrequency=None,
                  queries=None, nodes=None, numConsumers=None, nodeTypes=None):
         self.simulateUntil = simulateUntil
         self.strategy = strategy
+        self.network_model = network_model
         self.amountOfQueries = amountOfQueries
         self.writeFrequency = writeFrequency
         self.queries = queries
@@ -35,6 +36,7 @@ class Parameters():
         
         if filled_copy.simulateUntil is None: filled_copy.simulateUntil = default_values.simulateUntil
         if filled_copy.strategy is None: filled_copy.strategy = default_values.strategy
+        if filled_copy.network_model is None: filled_copy.network_model = default_values.network_model
         if filled_copy.amountOfQueries is None: filled_copy.amountOfQueries = default_values.amountOfQueries
         if filled_copy.writeFrequency is None: filled_copy.writeFrequency = default_values.writeFrequency
         if filled_copy.queries is None: filled_copy.queries = default_values.queries
@@ -64,6 +66,7 @@ class ParametrizationUtils():
         
         return Parametrization (
                     strategy = parameters.strategy,
+                    network_model = parameters.network_model,
                     amountOfQueries = parameters.amountOfQueries,
                     numConsumers = parameters.numConsumers,
                     writeFrequency = parameters.writeFrequency,
