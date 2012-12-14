@@ -49,7 +49,9 @@ class MagicInstantNetwork(DiscoveryRecordObserver):
     
     def notify_changes(self):
         wp = self.get_whitepage()
-        if not self.whitepage_exist:
+        if self.whitepage_exist and wp==None:
+            self.whitepage_exist = False
+        else:
             if wp!=None:
                 self.whitepage_exist = True
                 # notifyies on "whitepage_selected_after_none"
@@ -57,9 +59,6 @@ class MagicInstantNetwork(DiscoveryRecordObserver):
                     # SimpleDiscoveryMechanism
                     if not observer.me.down:
                         observer.on_whitepage_selected_after_none()
-        else:
-            if wp==None:
-                self.whitepage_exist = False
 
 
 class SimpleDiscoveryObserver(object):
