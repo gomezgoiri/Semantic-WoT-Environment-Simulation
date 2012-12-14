@@ -57,7 +57,7 @@ class AbstractActivity(object):
     
     def generate_activity(self):
         self._configure_nodes()
-        NetworkModelManager.run_model(self._params)
+        NetworkModelManager.run_model(self._simulation, self._params, self._discovery_factory.network)
         self._generateSimulationWritings()
         self._generateSimulationQueries(self._params.numConsumers)
         
