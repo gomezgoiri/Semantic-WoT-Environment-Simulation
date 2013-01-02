@@ -149,6 +149,11 @@ class Node(Process):
     def swap_state(self):
         """If the node is alive, it goes down. Otherwise, it goes up."""
         self.down = not self.down
+        if not self.down: # if the node goes up
+            self.discovery_record.is_whitepage = False # not anymore
+            # What if nobody is WP right now?
+            # After this notification of the former WP and taking into account that there is no WP,
+            # the selection process will be restarted by a consumer. 
     
     def __str__(self):
         return self.name

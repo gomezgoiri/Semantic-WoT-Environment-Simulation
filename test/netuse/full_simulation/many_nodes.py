@@ -11,6 +11,7 @@ from netuse.activity import ActivityGenerator
 from commons.utils import SemanticFilesLoader
 from netuse.database.parametrization import Parametrization
 from netuse.evaluation.utils import ParametrizationUtils, Parameters
+from netuse.network_models import NetworkModelManager
 
 # This script generates a simulation and records its trace in a file.
 # Used to check the functionalities under really simple simulation conditions.
@@ -86,7 +87,8 @@ def main():
             writeFrequency = 10000,
             queries = templates,
             nodes = p.get_random_nodes(100),
-            numConsumers = 100
+            numConsumers = 100,
+            network_model = NetworkModelManager.chaotic_netmodel
          )
     
     model = TraceAndLoadFilesModel( p.create_parametrization(params) )

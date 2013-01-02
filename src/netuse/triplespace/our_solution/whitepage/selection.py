@@ -169,6 +169,7 @@ class WhitepageSelectionManager(RequestObserver):
         self.observer = observer
     
     def choose_whitepage(self):
+        # TODO consider that I can choose myself as a WP
         candidates = [item for item in self.discovery.get_nodes() if item not in self.refused]
         self.last_choosen = WhitepageSelector.select_whitepage(candidates)
         if self.last_choosen==None:
