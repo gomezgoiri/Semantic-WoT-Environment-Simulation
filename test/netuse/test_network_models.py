@@ -18,10 +18,12 @@ class FakeNode(Process):
     def __init__(self, sim):
         super(FakeNode, self).__init__(sim=sim)
         self.trace = []
+        self.state = "up"
     
     @schedule
     def swap_state(self):
-        self.trace.append( self.sim.now() )
+        self.state = "down" if self.state is "up" else "up"
+        self.trace.append( (self.sim.now(), self.state) )
 
 
 class TestDynamicNodesModel(unittest.TestCase):
@@ -47,14 +49,17 @@ class TestDynamicNodesModel(unittest.TestCase):
         parametrization = Mock()
         parametrization.simulateUntil = 2000
         
-        model = DynamicNodesModel(parametrization, mean=500, std_dev=200)
+        model = DynamicNodesModel(parametrization, 500, 200)
         model._random = self.random
         
         model.configure() # test method
         self.simulation.simulate(until=parametrization.simulateUntil)
         
         for node in self.get_nodes():
-            self.assertItemsEqual( (400, 800, 1200, 1600), node.trace )
+            self.assertItemsEqual( ( (400, "down"),
+                                     (800, "up"),
+                                     (1200, "down"),
+                                     (1600, "up") ), node.trace )
 
 
 class TestChaoticModel(unittest.TestCase):
@@ -76,13 +81,19 @@ class TestChaoticModel(unittest.TestCase):
         return network
     
     def test_run(self):        
-        model = ChaoticModel(self.simulation, self.get_network(), mean=500, std_dev=200)
+        model = ChaoticModel(self.simulation, self.get_network(), 500, 200)
         model._random = self.random
         
         model.run(at=0) # test method
         self.simulation.simulate(until=2000)
         
-        self.assertItemsEqual( (400, 800, 1200, 1600, 2000), self.nodes[0].trace )
+        # WP from the previous loop goes up, current WP goes down
+        # In this case the WP is always the same
+        self.assertItemsEqual( ( (400, "down"),
+                                 (800, "up"), (800, "down"),
+                                 (1200, "up"), (1200, "down"),
+                                 (1600, "up"), (1600, "down"),
+                                 (2000, "up"), (2000, "down") ), self.nodes[0].trace )
         
         for n in range( 1, len(self.nodes) ):
             self.assertEquals( 0, len(self.nodes[n].trace) )
