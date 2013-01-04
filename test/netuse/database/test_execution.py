@@ -3,22 +3,16 @@ Created on Jan 4, 2012
 
 @author: tulvur
 '''
-
 import unittest
 import datetime
-from netuse.database.execution import Execution, ExecutionSet, AwesomerQuerySet
-from netuse.database.parametrization import Parametrization
 
-Execution.meta = {'collection': 'executionsTest'}
-ExecutionSet.meta ={'collection': 'executionSetTest', 'ordering': ['-creation_date'], 'queryset_class': AwesomerQuerySet}
-        
-class TestDatabase(unittest.TestCase):
-    
-    def reset_database(self):
-        # or directly dropping the database
-        for r in (Execution.objects, ExecutionSet.objects,):
-            #print param.strategy
-            r.delete()
+from testing.utils import connect_to_testing_db
+c = connect_to_testing_db()
+
+from netuse.database.execution import Execution, ExecutionSet
+
+
+class TestExecutions(unittest.TestCase):
     
     def create_simulated_execution(self):
         e = Execution(execution_date=datetime.datetime.now())
@@ -49,7 +43,7 @@ class TestDatabase(unittest.TestCase):
         
             
     def tearDown(self):
-        self.reset_database()
+        c.drop_database('tests')
     
     def test_get_simulated_execution_sets(self):
         for sim in ExecutionSet.objects.get_simulated():
@@ -64,6 +58,7 @@ class TestDatabase(unittest.TestCase):
                     unexecuted = True
                     break
             self.assertTrue(unexecuted)
+
 
 if __name__ == '__main__':
     unittest.main()

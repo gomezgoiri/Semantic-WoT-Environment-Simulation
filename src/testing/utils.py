@@ -9,6 +9,10 @@ import sys
 import time
 import unittest
 
+def connect_to_testing_db():
+    from mongoengine import connect
+    return connect('tests', host="localhost") #, host="localhost", port=12345)
+
 def create_test_suite_for_directory(base_file, recursive=True):    
     path_to_module = os.path.dirname(base_file)
     suite = unittest.TestSuite()
