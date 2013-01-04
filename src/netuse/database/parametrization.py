@@ -16,6 +16,7 @@ class NetworkModel(Document):
                 default = NetworkModelManager.normal_netmodel,
                 choices = ( NetworkModelManager.normal_netmodel,
                             NetworkModelManager.dynamic_netmodel,
+                            NetworkModelManager.onedown_netmodel,
                             NetworkModelManager.chaotic_netmodel, )
             )
 

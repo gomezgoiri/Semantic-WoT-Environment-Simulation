@@ -17,6 +17,7 @@ class NetworkModelManager(object):
     # network models
     normal_netmodel = "normal"
     dynamic_netmodel = "dynamic"
+    onedown_netmodel = "onedown"
     chaotic_netmodel = "chaos"
     
     @staticmethod
@@ -26,8 +27,13 @@ class NetworkModelManager(object):
         
         if model==NetworkModelManager.dynamic_netmodel:
             # parametrization is a ParametrizableNetworkModel
-            
             dm = DynamicNodesModel(simulation,
+                              parametrization.state_change_mean,
+                              parametrization.state_change_std_dev)
+            dm.configure()
+        elif model==NetworkModelManager.onedown_netmodel:
+            # parametrization is a ParametrizableNetworkModel
+            dm = OneNodeDownModel(simulation,
                               parametrization.state_change_mean,
                               parametrization.state_change_std_dev)
             dm.configure()
@@ -60,6 +66,33 @@ class DynamicNodesModel(object):
                 
                 if last_event_time < self._sim_time:
                     node.swap_state(at=last_event_time)
+
+class OneNodeDownModel(object):
+    """
+    A Model where one node EACH TIME goes down and up periodically.
+    """
+    
+    def __init__(self, parametrization, mean_state_change, std_dev_state_change):
+        self._change_state_each = (mean_state_change, std_dev_state_change)
+        self._sim_time = parametrization.simulateUntil
+        self._random = Random()
+    
+    def configure(self):
+        nodes = NodeGenerator.getNodes()
+        node = None
+        event_at = 0
+        while event_at < self._sim_time:
+            next_event_on = self._random.normalvariate(*self._change_state_each)
+            event_at += next_event_on
+            
+            if event_at < self._sim_time:
+                # the node choosen in the previous loop goes up
+                if node is not None:
+                    node.swap_state(at=event_at)
+                
+                # select a new node which will go down
+                node = self._random.choice(nodes)
+                node.swap_state(at=event_at)
 
 
 class ChaoticModel(Process):
