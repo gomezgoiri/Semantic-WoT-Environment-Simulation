@@ -6,7 +6,8 @@ from netuse.nodes import NodeGenerator
 from netuse.activity import ActivityGenerator
 from netuse.evaluation.simulate import BasicModel
 from netuse.evaluation.utils import ParametrizationUtils, Parameters
-from netuse.database.parametrization import Parametrization
+from netuse.database.parametrization import Parametrization, NetworkModel
+from netuse.network_models import NetworkModelManager
 from netuse.devices import XBee, SamsungGalaxyTab, FoxG20, Server
 
 # This script generates a simulation and records its trace in a file.
@@ -75,7 +76,8 @@ def main():
                 queries = temp,
                 nodes = p.get_random_nodes(numNodes),
                 numConsumers = 100,
-                nodeTypes = nodeTypes
+                nodeTypes = nodeTypes,
+                network_model = NetworkModel( type = NetworkModelManager.normal_netmodel )
              )
     
     model = SimpleTraceModel( p.create_parametrization(params) )

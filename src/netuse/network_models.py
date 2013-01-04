@@ -21,13 +21,21 @@ class NetworkModelManager(object):
     
     @staticmethod
     def run_model(simulation, parametrization, network):
-        model = parametrization.network_model
+        # parametrization should be a netuse.database.parametrization.NetworkModel
+        model = parametrization.type
         
         if model==NetworkModelManager.dynamic_netmodel:
-            dm = DynamicNodesModel(simulation, parametrization)
+            # parametrization is a ParametrizableNetworkModel
+            
+            dm = DynamicNodesModel(simulation,
+                              parametrization.state_change_mean,
+                              parametrization.state_change_std_dev)
             dm.configure()
         elif model==NetworkModelManager.chaotic_netmodel:
-            cm = ChaoticModel(simulation, network)
+            # parametrization is a ParametrizableNetworkModel
+            cm = ChaoticModel(simulation, network,
+                              parametrization.state_change_mean,
+                              parametrization.state_change_std_dev)
             cm.run(at=0)
         else: # model=="normal" or None or invalid
             pass # do nothing
@@ -38,8 +46,8 @@ class DynamicNodesModel(object):
     A Model where the nodes go down and up periodically.
     """
     
-    def __init__(self, parametrization, mean=5000, std_dev=3000):
-        self._change_state_each = (mean, std_dev)
+    def __init__(self, parametrization, mean_state_change, std_dev_state_change):
+        self._change_state_each = (mean_state_change, std_dev_state_change)
         self._sim_time = parametrization.simulateUntil
         self._random = Random()
     
@@ -59,9 +67,9 @@ class ChaoticModel(Process):
     A Model where the whitepage goes down and up periodically.
     """
     
-    def __init__(self, simulation, network, mean=5000, std_dev=3000):
+    def __init__(self, simulation, network, mean_wp_down, std_dev_wp_down):
         super(ChaoticModel, self).__init__(sim=simulation)
-        self._change_state_each = (mean, std_dev)
+        self._change_state_each = (mean_wp_down, std_dev_wp_down)
         self._network = network # type: MagicInstantNetwork
         self._random = Random()
     

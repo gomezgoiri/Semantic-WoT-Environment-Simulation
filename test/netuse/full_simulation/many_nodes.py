@@ -9,7 +9,7 @@ from netuse.tracers import FileTracer
 from netuse.nodes import NodeGenerator
 from netuse.activity import ActivityGenerator
 from commons.utils import SemanticFilesLoader
-from netuse.database.parametrization import Parametrization
+from netuse.database.parametrization import Parametrization, ParametrizableNetworkModel
 from netuse.evaluation.utils import ParametrizationUtils, Parameters
 from netuse.network_models import NetworkModelManager
 
@@ -88,7 +88,7 @@ def main():
             queries = templates,
             nodes = p.get_random_nodes(100),
             numConsumers = 100,
-            network_model = NetworkModelManager.chaotic_netmodel
+            network_model = ParametrizableNetworkModel( type = NetworkModelManager.chaotic_netmodel )
          )
     
     model = TraceAndLoadFilesModel( p.create_parametrization(params) )

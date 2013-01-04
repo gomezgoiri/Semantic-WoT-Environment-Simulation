@@ -7,7 +7,6 @@ from rdflib import RDF, Namespace
 from netuse.results import G
 from netuse.evaluation.utils import ParametrizationUtils, Parameters
 from netuse.database.parametrization import Parametrization
-from netuse.database.results import RequestsResults
 
 
 # Entry point for setup.py
