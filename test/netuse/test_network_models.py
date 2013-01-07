@@ -74,6 +74,8 @@ class TestOneNodeDownModel(unittest.TestCase):
         
         self.random = Mock()
         self.random.normalvariate.side_effect = lambda *args: args[0] - args[1]/2 # just to check how to configure different returns
+        import random
+        self.random.choice.side_effect = random.choice # otherwise choice method will be mocked!
 
     def get_nodes(self):
         return self.nodes
@@ -93,14 +95,13 @@ class TestOneNodeDownModel(unittest.TestCase):
         
         total_activity = [ (400, "down"), (800, "up"),
                            (800, "down"), (1200, "up"),
-                           (1200, "down"), (1400, "up"),
+                           (1200, "down"), (1600, "up"),
                            (1600, "down"), ]
         
         for node in self.get_nodes():
             for trace in node.trace:
                 self.assertTrue( trace in total_activity )
-                print trace[1]
-                if trace[1] is "down" and trace[0] is not 1600:
+                if trace[1] is "down" and trace[0]<1600:
                     # if the node goes down, in 400 ms should go up again
                     self.assertTrue( (trace[0]+400, "up") in node.trace )
                 

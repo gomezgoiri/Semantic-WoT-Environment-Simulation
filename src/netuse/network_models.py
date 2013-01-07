@@ -67,6 +67,7 @@ class DynamicNodesModel(object):
                 if last_event_time < self._sim_time:
                     node.swap_state(at=last_event_time)
 
+
 class OneNodeDownModel(object):
     """
     A Model where one node EACH TIME goes down and up periodically.
@@ -84,12 +85,10 @@ class OneNodeDownModel(object):
         while event_at < self._sim_time:
             next_event_on = self._random.normalvariate(*self._change_state_each)
             event_at += next_event_on
-            
             if event_at < self._sim_time:
                 # the node choosen in the previous loop goes up
                 if node is not None:
                     node.swap_state(at=event_at)
-                
                 # select a new node which will go down
                 node = self._random.choice(nodes)
                 node.swap_state(at=event_at)
