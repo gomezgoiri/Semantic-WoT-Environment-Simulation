@@ -28,20 +28,20 @@ class NetworkModelManager(object):
         if model==NetworkModelManager.dynamic_netmodel:
             # parametrization is a ParametrizableNetworkModel
             dm = DynamicNodesModel(parametrization.simulateUntil,
-                              parametrization.state_change_mean,
-                              parametrization.state_change_std_dev)
+                              parametrization.network_model.state_change_mean,
+                              parametrization.network_model.state_change_std_dev)
             dm.configure()
         elif model==NetworkModelManager.onedown_netmodel:
             # parametrization is a ParametrizableNetworkModel
             dm = OneNodeDownModel(parametrization.simulateUntil,
-                              parametrization.state_change_mean,
-                              parametrization.state_change_std_dev)
+                              parametrization.network_model.state_change_mean,
+                              parametrization.network_model.state_change_std_dev)
             dm.configure()
         elif model==NetworkModelManager.chaotic_netmodel:
             # parametrization is a ParametrizableNetworkModel
             cm = ChaoticModel(simulation, network,
-                              parametrization.state_change_mean,
-                              parametrization.state_change_std_dev)
+                              parametrization.network_model.state_change_mean,
+                              parametrization.network_model.state_change_std_dev)
             cm.run(at=0)
         else: # model=="normal" or None or invalid
             pass # do nothing
