@@ -23,17 +23,17 @@ class NetworkModelManager(object):
     @staticmethod
     def run_model(simulation, parametrization, network):
         # parametrization should be a netuse.database.parametrization.NetworkModel
-        model = parametrization.type
+        model = parametrization.network_model.type
         
         if model==NetworkModelManager.dynamic_netmodel:
             # parametrization is a ParametrizableNetworkModel
-            dm = DynamicNodesModel(simulation,
+            dm = DynamicNodesModel(parametrization.simulateUntil,
                               parametrization.state_change_mean,
                               parametrization.state_change_std_dev)
             dm.configure()
         elif model==NetworkModelManager.onedown_netmodel:
             # parametrization is a ParametrizableNetworkModel
-            dm = OneNodeDownModel(simulation,
+            dm = OneNodeDownModel(parametrization.simulateUntil,
                               parametrization.state_change_mean,
                               parametrization.state_change_std_dev)
             dm.configure()
@@ -52,9 +52,9 @@ class DynamicNodesModel(object):
     A Model where the nodes go down and up periodically.
     """
     
-    def __init__(self, parametrization, mean_state_change, std_dev_state_change):
+    def __init__(self, simulation_time, mean_state_change, std_dev_state_change):
         self._change_state_each = (mean_state_change, std_dev_state_change)
-        self._sim_time = parametrization.simulateUntil
+        self._sim_time = simulation_time
         self._random = Random()
     
     def configure(self):
@@ -73,9 +73,9 @@ class OneNodeDownModel(object):
     A Model where one node EACH TIME goes down and up periodically.
     """
     
-    def __init__(self, parametrization, mean_state_change, std_dev_state_change):
+    def __init__(self, simulation_time, mean_state_change, std_dev_state_change):
         self._change_state_each = (mean_state_change, std_dev_state_change)
-        self._sim_time = parametrization.simulateUntil
+        self._sim_time = simulation_time
         self._random = Random()
     
     def configure(self):
