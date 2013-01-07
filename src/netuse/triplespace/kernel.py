@@ -43,7 +43,7 @@ class TripleSpace(object):
 
 
 class NegativeBroadcasting(TripleSpace):
-    def __init__(self, discovery, simulation=None):
+    def __init__(self, discovery, simulation):
         super(NegativeBroadcasting, self).__init__(simulation, discovery)
     
     @schedule
@@ -64,7 +64,7 @@ class NegativeBroadcasting(TripleSpace):
         
 
 class Centralized(TripleSpace):
-    def __init__(self, me, server=None, simulation=None):
+    def __init__(self, me, server, simulation):
         super(Centralized, self).__init__(simulation, None)
         self.server = server
     
@@ -89,7 +89,7 @@ class Centralized(TripleSpace):
 
 
 class OurSolution(TripleSpace):
-    def __init__(self, discovery, simulation=None): # ontologyGraph, which may be already expanded or not
+    def __init__(self, discovery, simulation): # ontologyGraph, which may be already expanded or not
         super(OurSolution, self).__init__(simulation, discovery)
         self.provider = None
         self.consumer = None

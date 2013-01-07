@@ -99,7 +99,7 @@ class NegativeBroadcastingActivity(AbstractActivity):
     def _configure_nodes(self):
         for n in NodeGenerator.getNodes():
             discov = self._discovery_factory.create_simple_discovery(n)
-            n.ts = NegativeBroadcasting(discov)
+            n.ts = NegativeBroadcasting(discov, self._simulation)
 
 class OurSolutionActivity(AbstractActivity):       
     def _configure_nodes(self):

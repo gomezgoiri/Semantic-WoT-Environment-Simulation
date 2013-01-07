@@ -42,8 +42,8 @@ class BasicModel(Simulation):
 class Model(BasicModel):
         
     def __init__(self, execution, cool_down=500):
+        self.execution = execution # before calling to parent constructor since it calls to initialize()
         super(Model, self).__init__(execution.parameters, cool_down)
-        self.execution = execution
         
     def initialize(self):
         G.setNewExecution(self.execution)
@@ -59,8 +59,9 @@ class Model(BasicModel):
         
         print "New simulation: %s"%(self.parameters)
         
+        loadedGraphs = {}
         sfl = SemanticFilesLoader(G.dataset_path)
-        sfl.loadGraphsJustOnce(self.parameters.nodes, preloadedGraph={})
+        sfl.loadGraphsJustOnce(self.parameters.nodes, loadedGraphs)
         
         self.initialize()
         
@@ -68,7 +69,7 @@ class Model(BasicModel):
         nodes.generateNodes()
         self.stoppables.extend( nodes.getNodes() )
         
-        ActivityGenerator.create(self.parameters, preloadedGraph={}, simulation=self)
+        ActivityGenerator.create(self.parameters, loadedGraphs, simulation=self)
         
         self.simulate( until = self.parameters.simulateUntil )
 
