@@ -32,6 +32,7 @@ class Parameters():
                             nodes = self.nodes,
                             numConsumers = self.numConsumers,
                             nodeTypes = self.nodeTypes,
+                            network_model = self.network_model
                         )
         
         if filled_copy.simulateUntil is None: filled_copy.simulateUntil = default_values.simulateUntil
