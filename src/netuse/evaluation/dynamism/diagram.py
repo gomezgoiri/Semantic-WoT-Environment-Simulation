@@ -18,7 +18,7 @@ def format_time(x, pos):
     elif x<(1000*60*60):
         return '%1.f min' % (x/(1000*60))
     else:
-        return '%1.f h' % (x/(1000*60*60))
+        return "Never" #'%1.f h' % (x/(1000*60*60))
 
 
 class DiagramGenerator:

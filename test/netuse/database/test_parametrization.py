@@ -28,6 +28,7 @@ class TestParametrization(unittest.TestCase):
             self.assertIsNone(p.network_model)
         sp.save()
         
+        self.assertEquals(1, len(Parametrization.objects))
         for p in Parametrization.objects:
             net_model = p.network_model
             self.assertIsInstance(net_model, NetworkModel)
@@ -45,6 +46,7 @@ class TestParametrization(unittest.TestCase):
         sp = Parametrization( network_model = nm )
         sp.save()
         
+        self.assertEquals(1, len(Parametrization.objects))
         for p in Parametrization.objects:
             net_model = p.network_model
             self.assertIsInstance(net_model, ParametrizableNetworkModel)
