@@ -16,14 +16,14 @@ class RawDataProcessor(object):
     def __init__(self):
         self.data = {}
         
-    def _load(self, executionSet, name, strategy, additionalFilter=None):
+    def _load(self, executionSet, name, strategy):
         requests_by_interval = {} # tuples of 2 elements: number of nodes in the simulation and requests
         for execution in executionSet.executions:
             if execution.parameters.strategy==strategy:
                 net_model = execution.parameters.network_model
                 interval = None
                 if net_model.type==NetworkModelManager.normal_netmodel:#onedown_netmodel:
-                    interval = 9000000 # aka never
+                    interval = 3600000 # aka never
                 else:
                     interval = net_model.state_change_mean
                 
@@ -31,7 +31,7 @@ class RawDataProcessor(object):
                     requests_by_interval[interval] = []
                 
                 num_requests = NetworkTrace.objects(execution=execution.id).count()
-                requests_by_interval[interval].append(num_requests)
+                requests_by_interval[interval].append(num_requests) 
         
         # sort by num_nodes
         sort = sorted(requests_by_interval.items())
@@ -41,9 +41,10 @@ class RawDataProcessor(object):
         self.data[name][DiagramGenerator.REQUESTS] = [e[1] for e in sort]
     
     def load_all(self):
-        for executionSet in ExecutionSet.objects(experiment_id='dinamism').get_simulated():
+        for executionSet in ExecutionSet.objects(experiment_id='dynamism').get_simulated():
+            print "eho"
             self._load(executionSet, DiagramGenerator.NB, Parametrization.negative_broadcasting)
-            self._load(executionSet, DiagramGenerator.OURS, Parametrization.our_solution, additionalFilter=lambda p: p.numConsumers==1)
+            self._load(executionSet, DiagramGenerator.OURS, Parametrization.our_solution)
             break # just one execution set
 
     def toJson(self):
