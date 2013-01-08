@@ -39,12 +39,41 @@ class RawDataProcessor(object):
         self.data[name] = {}
         self.data[name][DiagramGenerator.DROP_INTERVAL] = [e[0] for e in sort]
         self.data[name][DiagramGenerator.REQUESTS] = [e[1] for e in sort]
+        
+    def _load_by_communication_pattern(self, executionSet, name, strategy, **trace_pattern):
+        requests_by_interval = {} # tuples of 2 elements: number of nodes in the simulation and requests
+        for execution in executionSet.executions:
+            if execution.parameters.strategy==strategy:
+                net_model = execution.parameters.network_model
+                interval = None
+                if net_model.type==NetworkModelManager.normal_netmodel:#onedown_netmodel:
+                    interval = 3600000 # aka never
+                else:
+                    interval = net_model.state_change_mean
+                
+                if interval not in requests_by_interval:
+                    requests_by_interval[interval] = []
+                
+                num_requests = NetworkTrace.objects(execution=execution.id, **trace_pattern).count()
+                requests_by_interval[interval].append(num_requests) 
+        
+        # sort by num_nodes
+        sort = sorted(requests_by_interval.items())
+        
+        self.data[name] = {}
+        self.data[name][DiagramGenerator.DROP_INTERVAL] = [e[0] for e in sort]
+        self.data[name][DiagramGenerator.REQUESTS] = [e[1] for e in sort]
     
     def load_all(self):
         for executionSet in ExecutionSet.objects(experiment_id='dynamism').get_simulated():
-            print "eho"
             self._load(executionSet, DiagramGenerator.NB, Parametrization.negative_broadcasting)
             self._load(executionSet, DiagramGenerator.OURS, Parametrization.our_solution)
+            self._load_by_communication_pattern(executionSet, DiagramGenerator.PROV_WP, Parametrization.our_solution,
+                                                path__contains="/whitepage/clues/")
+            self._load_by_communication_pattern(executionSet, DiagramGenerator.CONS_WP, Parametrization.our_solution,
+                                                path__exact="/whitepage/clues")
+            self._load_by_communication_pattern(executionSet, DiagramGenerator.CONS_PROV, Parametrization.our_solution,
+                                                path__startswith="/spaces/")
             break # just one execution set
 
     def toJson(self):

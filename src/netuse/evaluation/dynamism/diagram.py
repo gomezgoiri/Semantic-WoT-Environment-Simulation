@@ -23,8 +23,11 @@ def format_time(x, pos):
 
 class DiagramGenerator:
     
-    OURS = 'ours'
     NB = 'nb'
+    OURS = 'ours' # total
+    PROV_WP = 'prov-WP'
+    CONS_WP = 'cons-WP'
+    CONS_PROV = 'cons-prov'
     DROP_INTERVAL = 'drop_interval'
     REQUESTS = 'requests'
     
@@ -32,6 +35,7 @@ class DiagramGenerator:
       {
         'ours': { 'drop_interval': [10000, 60000, 600000, 4000000], 'requests': [[320,300,340],[420,400,380],[690,720,710],[880,900,912]] },
         'nb': { 'drop_interval': [10000, 60000, 600000, 4000000], 'requests': [[320,300,340],[420,400,380],[690,720,710],[880,900,912]] }
+        (...possibly more labels...)
       }
     '''
     def __init__(self, title, data):
@@ -40,6 +44,11 @@ class DiagramGenerator:
         self.ylabel = 'Requests'
         self.linesShapes = ('xk-','+k-.','Dk--')
         self.linesColors = ('r','y','g', 'b')
+        self.show_on_diagram = ( DiagramGenerator.NB,
+                                 DiagramGenerator.OURS,
+                                 DiagramGenerator.PROV_WP,
+                                 DiagramGenerator.CONS_WP,
+                                 DiagramGenerator.CONS_PROV )
         self.generate(data)
 
     def generate(self, data):
@@ -65,7 +74,7 @@ class DiagramGenerator:
             std_devs.append( np.std(repetitions) )
         return means, std_devs
     
-    def generate_subplot(self, ax, data, title=None):        
+    def generate_subplot(self, ax, data, title=None):
         plt.xlabel(self.xlabel)
         plt.ylabel(self.ylabel)
         if title is not None:
@@ -74,19 +83,13 @@ class DiagramGenerator:
         shapes = cycle(self.linesShapes)
         colors = cycle(self.linesColors)
         
-        color = colors.next()
-        means, std_devs = self.get_mean_and_std_dev(data[DiagramGenerator.OURS][DiagramGenerator.REQUESTS])
-        ax.errorbar( data[DiagramGenerator.OURS][DiagramGenerator.DROP_INTERVAL],
-                     means, fmt=shapes.next(), color=color,
-                     yerr=std_devs, ecolor=color,
-                     label='ours')
-        
-        color = colors.next()
-        means, std_devs = self.get_mean_and_std_dev(data[DiagramGenerator.NB][DiagramGenerator.REQUESTS])
-        ax.errorbar( data[DiagramGenerator.NB][DiagramGenerator.DROP_INTERVAL],
-                     means, fmt=shapes.next(), color=color,
-                     yerr=std_devs, ecolor=color,
-                     label='nb')
+        for label in self.show_on_diagram:
+            color = colors.next()
+            means, std_devs = self.get_mean_and_std_dev(data[label][DiagramGenerator.REQUESTS])
+            ax.errorbar( data[label][DiagramGenerator.DROP_INTERVAL],
+                         means, fmt=shapes.next(), color = color,
+                         yerr = std_devs, ecolor = color,
+                         label = label)
         
         ax.set_xlim(0)
         ax.set_ylim(0)

@@ -15,7 +15,9 @@ class RawDataProcessor(object):
     def __init__(self):
         self.data = {}
         self.our_100c_filter = lambda p: p.numConsumers==100 and p.strategy==Parametrization.our_solution
-        
+
+    # TODO using **kargs _load_prov2wp(), _load_cons2wp() and _load_cons2prov() can be written just once!
+    
     def _load_prov2wp(self, executionSet, additionalFilter=None):
         requests_by_node = {} # tuples of 2 elements: number of nodes in the simulation and requests
         for execution in executionSet.executions:
