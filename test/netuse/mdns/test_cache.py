@@ -7,13 +7,16 @@ Created on Nov 28, 2011
 import copy
 import unittest
 from mock import Mock, patch
+from SimPy.Simulation import Simulation
 from netuse.mdns.cache import Cache
 from netuse.mdns.record import PTRRecord, SVRRecord, TXTRecord
 
 class TestCache(unittest.TestCase):
     
     def setUp(self):
-        self.cache = Cache(None)
+        self.simulation = Simulation()
+        self.cache = Cache(self.simulation)
+        
         for i in range(5):
             at = i * 10
             
@@ -93,7 +96,15 @@ class TestCache(unittest.TestCase):
                 found = True
                 break
         self.assertTrue(found)
-
+        
+    def test_wait_for_next_event(self):        
+        self.simulation.initialize()
+        self.simulation.activate(self.cache, self.cache.wait_for_next_event())
+        
+        self.simulation.simulate( until=90*60*1000 ) # simulate 90 mins
+        
+        self.assertEquals(0, len(self.cache.pending_events))
+        self.assertEquals(15, len(self.cache.records))
 
 if __name__ == '__main__':    
     unittest.main()

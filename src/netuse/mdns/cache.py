@@ -5,7 +5,8 @@ Created on Jan 12, 2013
 '''
 
 from random import Random
-from SimPy.Simulation import Process
+from netuse.sim_utils import Timer
+from SimPy.Simulation import Process, SimEvent, waitevent
 
 class Cache(Process):
     
@@ -13,15 +14,18 @@ class Cache(Process):
     ACTION_FIELD = 1 # what to do
     RECORD_FIELD = 2
     
-    EVENT_USE_MULTICAST = "response_by_multicast"
+    EVENT_USE_MULTICAST = "response_by_unicast"
     EVENT_NOT_KNOWN_ANSWER = "unadded_known_answer_suppression"
     EVENT_RENEW = "try_to_renew"
+    EVENT_FLUSH= "flush_record"
     
-    def __init__(self, sim):
+    def __init__(self, sim, record_observer=None):
         super(Cache, self).__init__(sim=sim)
+        self.record_observer = record_observer
+        self.__new_record_cached = SimEvent(name="new_record_cached", sim=sim)
+        self._random = Random()
         self.pending_events = [] # tuples with the form (when, action, record)
         self.records = [] # cached records
-        self._random = Random()
     
     def _delete_events_for_record(self, record):
         to_delete = []
@@ -60,6 +64,35 @@ class Cache(Process):
         
         self.records.remove(record) # does delete the previous one?
         self.records.append(record)
+        
+        # sorts by the 1st element in the set
+        self.pending_events.sort(key=lambda tup: tup[0])
+        
+        # wake up wait_for_next_event method
+        self.__new_record_cached.signal()
     
+    # Inspired by RequestInstance class
     def wait_for_next_event(self):
-        pass
+        while True:
+            
+            if not self.pending_events: # if it's empty...
+                yield waitevent, self, (self.__new_record_cached,)
+            else:
+                next_event = self.pending_events[0]
+                
+                if self.sim.now() < next_event[Cache.WHEN_FIELD]:
+                    twait = next_event[Cache.WHEN_FIELD]-self.sim.now()
+                    self.timer = Timer(waitUntil=twait, sim=self.sim)
+                    self.timer.event.name = "sleep_until_next_event"
+                    self.sim.activate(self.timer, self.timer.wait())
+                    yield waitevent, self, (self.timer.event, self.__new_record_cached,)
+                else:
+                    del self.pending_events[0] # action will be taken
+                    
+                    if next_event[Cache.ACTION_FIELD] == Cache.EVENT_FLUSH:
+                        # delete old record
+                        self.records.remove( next_event[Cache.RECORD_FIELD] )
+                        
+                    elif next_event[Cache.ACTION_FIELD] == Cache.EVENT_RENEW:
+                        if self.record_observer is not None:
+                            self.record_observer.renew_record( next_event[Cache.RECORD_FIELD] )
