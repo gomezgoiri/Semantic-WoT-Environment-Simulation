@@ -4,6 +4,7 @@ Created on Nov 28, 2011
 @author: tulvur
 '''
 
+import copy
 import unittest
 from mock import Mock, patch
 from netuse.mdns.cache import Cache
@@ -15,9 +16,20 @@ class TestCache(unittest.TestCase):
         self.cache = Cache(None)
         for i in range(5):
             at = i * 10
-            self.cache.pending_events.append((at, "blah", PTRRecord("name%d._http._tcp.local"%i)))
-            self.cache.pending_events.append((at, "blah", SVRRecord("name%d._http._tcp.local"%i, None, None)))
-            self.cache.pending_events.append((at, "blah", TXTRecord("name%d._http._tcp.local"%i, {})))
+            
+            record = PTRRecord("name%d._http._tcp.local"%i)
+            self.cache.records.append(record)
+            self.cache.pending_events.append((at, Cache.EVENT_USE_MULTICAST, record))
+            
+            record = SVRRecord("name%d._http._tcp.local"%i, None, None)
+            self.cache.records.append(record)
+            self.cache.pending_events.append((at, Cache.EVENT_NOT_KNOWN_ANSWER, record))
+            
+            record = TXTRecord("name%d._http._tcp.local"%i, {})
+            self.cache.records.append(record)
+            self.cache.pending_events.append((at, Cache.EVENT_RENEW, record))
+        
+        self.assertEquals(15, len(self.cache.records))
         self.assertEquals(15, len(self.cache.pending_events))
         
         self.sample_txt = TXTRecord("name0._http._tcp.local", {})
@@ -64,6 +76,23 @@ class TestCache(unittest.TestCase):
         self.assertTrue( self.does_contains_event(self.sample_txt.type, self.sample_txt.name, when=910, action=Cache.EVENT_RENEW) )
         self.assertTrue( self.does_contains_event(self.sample_txt.type, self.sample_txt.name, when=960, action=Cache.EVENT_RENEW) )
         
+    def test_cache_record(self):
+        new_record = copy.deepcopy(self.sample_txt)
+        new_record.ttl = 1234
+        self.cache.cache_record(new_record) # substitutes 1 record, removes 1 event, adds 6
+        
+        # already tested in test_delete_events_for_record and test_create_new_events
+        self.assertEquals(15-1+6, len(self.cache.pending_events))
+        
+        self.assertEquals(15, len(self.cache.records))
+        
+        found = False
+        for record in self.cache.records:
+            if record.name == new_record.name and record.type == new_record.type:
+                self.assertEquals( 1234, record.ttl ) # the cache contains the new version of the TXT record
+                found = True
+                break
+        self.assertTrue(found)
 
 
 if __name__ == '__main__':    
