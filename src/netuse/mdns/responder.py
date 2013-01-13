@@ -15,16 +15,17 @@ class Responder(Process):
     ANSWER_AT_FIELD = 0
     QUERY_FIELD = 1
     
-    def __init__(self, sim):
+    def __init__(self, sim, sender=None):
         super(Responder, self).__init__(sim=sim)
         self._random = Random()
         self.__new_query_queued = SimEvent(name="new_query_queued", sim=sim)
         self.local_records = {} # key: record, value: last time advertised
         self.queued_queries = [] # tuple: ( when to answer, query )
+        self.sender = sender
     
     def write_record(self, record):
         # if already existed, is overwritten
-        self.local_records[record] = 0
+        self.local_records[record] = -1
     
     def queue_query(self, query):
         # TODO optimization:
@@ -64,43 +65,52 @@ class Responder(Process):
                     self.process_query( next_query[Responder.QUERY_FIELD] )
     
     def process_query(self, query):
-        answers = []
-        
-        for subquery in query.queries:
-            for record in self.local_records.iterkeys():
-                if subquery.record_type is "PTR": # special queries in DNS-SD!
-                    
-                    if subquery.name is "_services._dns-sd._udp.local":
-                        answers.append( deepcopy(record) ) # all of the records
-                    elif record.name.starts_with(subquery.name):
-                        answers.append( deepcopy(record) ) # all of the records
-                
-                elif subquery.name is record.name and subquery.record_type is record.type:
-                    answers.append( deepcopy(record) )
-        
+        answers = self._get_possible_answers()
         self._suppress_known_answers(query, answers)
         self._send_using_proper_method(query, answers)
+    
+    def _get_possible_answers(self, query):
+        answers = []
+        for subquery in query.queries:
+            for record in self.local_records.iterkeys():
+                if subquery.record_type == "PTR": # special queries in DNS-SD!
+                    
+                    if subquery.name == "_services._dns-sd._udp.local":
+                        answers.append( deepcopy(record) ) # all of the records
+                    elif record.name.endswith(subquery.name):
+                        answers.append( deepcopy(record) ) # all of the records
+                
+                elif subquery.name == record.name and subquery.record_type == record.type:
+                    answers.append( deepcopy(record) )
+        return answers
     
     def _suppress_known_answers(self, query, answers):
         # Section 7.1.  Known-Answer Suppression
         for known_answer in query.known_answers:
             for record in answers:
-                if known_answer.name is record.name and known_answer.record_type is record.type:
+                if known_answer.name == record.name and known_answer.type == record.type:
                     answers.remove(record)
     
     def _send_using_proper_method(self, query, answers):
         unicast = query.question_type is "QU" # unicast type
-        for record in answers:
-            thresold_time = record.ttl * 0.4
-            last_time_sent = self.local_records[record]
-            now = self.sim.now()
-            
-            if (now - last_time_sent) > thresold_time:
-                unicast = False # not recently advertised, send using multicast
-            self.local_records[record] = self.sim.now()
+        
+        # See 5.4 Questions Requesting Unicast Responses
+        if unicast:
+            # event if it was marked as unicast, can be sent as multicast
+            for record in answers:
+                thresold_time = record.ttl * 1000 * 0.25 # ttl is measured in seconds and simulation time in ms!
+                last_time_sent = self.local_records[record]
+                now = self.sim.now()
+                
+                if last_time_sent==-1: # never sent before
+                    unicast = False
+                    self.local_records[record] = now
+                elif ( now - last_time_sent ) > thresold_time:
+                    unicast = False # not recently advertised, send using multicast
+                    self.local_records[record] = now
         
         
         if unicast:
-            self.send_unicast( DNSPacket(ttype="response", data=answers) )
+            self.sender.send_unicast( DNSPacket(ttype="response", data=answers) )
         else:
-            self.send_multicast( DNSPacket(ttype="response", data=answers) )
+            self.sender.send_multicast( DNSPacket(ttype="response", data=answers) )
