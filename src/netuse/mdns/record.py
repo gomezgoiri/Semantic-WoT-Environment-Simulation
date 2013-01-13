@@ -8,8 +8,6 @@ from abc import ABCMeta#, abstractmethod
 class Record(object):
     __metaclass__ = ABCMeta
     
-    TYPES = ("PTR", "SVR", "TXT")
-    
     def __init__(self, name, ttype, ttl):
         self.name = name # instance name or service name
         self.type = ttype

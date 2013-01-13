@@ -45,7 +45,7 @@ class Responder(Process):
         
         # wake up wait_for_next_event method
         self.__new_query_queued.signal()
-        
+    
     def answer(self):
         while True:
             if not self.pending_events: # if it's empty...
@@ -68,15 +68,27 @@ class Responder(Process):
         
         for subquery in query.queries:
             for record in self.local_records.iterkeys():
-                if subquery.name is record.name and subquery.record_type is record.type:
+                if subquery.record_type is "PTR": # special queries in DNS-SD!
+                    
+                    if subquery.name is "_services._dns-sd._udp.local":
+                        answers.append( deepcopy(record) ) # all of the records
+                    elif record.name.starts_with(subquery.name):
+                        answers.append( deepcopy(record) ) # all of the records
+                
+                elif subquery.name is record.name and subquery.record_type is record.type:
                     answers.append( deepcopy(record) )
         
+        self._suppress_known_answers(query, answers)
+        self._send_using_proper_method(query, answers)
+    
+    def _suppress_known_answers(self, query, answers):
         # Section 7.1.  Known-Answer Suppression
         for known_answer in query.known_answers:
             for record in answers:
                 if known_answer.name is record.name and known_answer.record_type is record.type:
-                    answers.append(record)
-        
+                    answers.remove(record)
+    
+    def _send_using_proper_method(self, query, answers):
         unicast = query.question_type is "QU" # unicast type
         for record in answers:
             thresold_time = record.ttl * 0.4
