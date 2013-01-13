@@ -49,3 +49,10 @@ class ContinuousQuerier(Process):
                 # and perform subsequent queries at a steady-state rate of one query per hour
                 if twait>3600000:
                     twait = 3600000 # 1h
+    
+    def stop(self):
+        self.stopped = True
+        self.__stop.signal()
+    
+    def reset(self):
+        self.stopped = False
