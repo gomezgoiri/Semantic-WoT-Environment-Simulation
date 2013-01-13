@@ -22,11 +22,11 @@ class TestCache(unittest.TestCase):
             
             record = PTRRecord("_http._tcp.local", "name%d._http._tcp.local"%i, )
             self.cache.records.append(record)
-            self.cache.pending_events.append((at, Cache.EVENT_NOT_KNOWN_ANSWER, record))
+            self.cache.pending_events.append((at, Cache.EVENT_KNOWN_ANSWER, record))
             
             record = SVRRecord("name%d._http._tcp.local"%i, None, None)
             self.cache.records.append(record)
-            self.cache.pending_events.append((at, Cache.EVENT_NOT_KNOWN_ANSWER, record))
+            self.cache.pending_events.append((at, Cache.EVENT_KNOWN_ANSWER, record))
             
             record = TXTRecord("name%d._http._tcp.local"%i, {})
             self.cache.records.append(record)
@@ -48,6 +48,15 @@ class TestCache(unittest.TestCase):
             if cond:
                 return True
         return False
+    
+    def test_get_known_answers(self):
+        ka = self.cache.get_known_answers()
+        
+        # only records with action Cache.EVENT_KNOWN_ANSWER associated in pending_events
+        self.assertEquals(10, len(ka))
+        self.assertFalse( self.sample_txt in ka )
+        self.assertTrue( self.sample_svr in ka )
+        self.assertTrue( self.sample_ptr in ka )
     
     def test_delete_events_for_record(self):
         self.cache._delete_events_for_record(self.sample_txt)
@@ -72,7 +81,7 @@ class TestCache(unittest.TestCase):
         self.cache._create_new_events(self.sample_txt)
         self.assertEquals(15+5, len(self.cache.pending_events))
         
-        self.assertTrue( self.does_contain_event(self.sample_txt.type, self.sample_txt.name, when=500, action=Cache.EVENT_NOT_KNOWN_ANSWER) )
+        self.assertTrue( self.does_contain_event(self.sample_txt.type, self.sample_txt.name, when=500, action=Cache.EVENT_KNOWN_ANSWER) )
         self.assertTrue( self.does_contain_event(self.sample_txt.type, self.sample_txt.name, when=810, action=Cache.EVENT_RENEW) )
         self.assertTrue( self.does_contain_event(self.sample_txt.type, self.sample_txt.name, when=860, action=Cache.EVENT_RENEW) )
         self.assertTrue( self.does_contain_event(self.sample_txt.type, self.sample_txt.name, when=910, action=Cache.EVENT_RENEW) )

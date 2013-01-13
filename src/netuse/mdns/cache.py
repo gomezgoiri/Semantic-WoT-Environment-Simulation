@@ -4,6 +4,7 @@ Created on Jan 12, 2013
 @author: tulvur
 '''
 
+from copy import deepcopy
 from random import Random
 from netuse.sim_utils import Timer
 from SimPy.Simulation import Process, SimEvent, waitevent
@@ -14,7 +15,7 @@ class Cache(Process):
     ACTION_FIELD = 1 # what to do
     RECORD_FIELD = 2
     
-    EVENT_NOT_KNOWN_ANSWER = "unadded_known_answer_suppression"
+    EVENT_KNOWN_ANSWER = "add_to_known_answer_suppression"
     EVENT_RENEW = "try_to_renew"
     EVENT_FLUSH= "flush_record"
     
@@ -25,6 +26,18 @@ class Cache(Process):
         self._random = Random()
         self.pending_events = [] # tuples with the form (when, action, record)
         self.records = [] # cached records
+    
+    def get_known_answers(self):
+        known_answers = []
+        for record in self.records:
+            found = False
+            for event in self.pending_events:
+                if event[Cache.ACTION_FIELD] == Cache.EVENT_KNOWN_ANSWER and event[Cache.RECORD_FIELD] == record:
+                    found = True
+                    break
+            if found:
+                known_answers.append( deepcopy(record) )
+        return known_answers
     
     def _delete_events_for_record(self, record):
         to_delete = []
@@ -45,7 +58,7 @@ class Cache(Process):
         
         # at 1/2 of the TTL => does not add to known answer suppression
         when = self._get_time_after_percentage(ttl, 0.5)
-        self.pending_events.append( (when, Cache.EVENT_NOT_KNOWN_ANSWER, record) )
+        self.pending_events.append( (when, Cache.EVENT_KNOWN_ANSWER, record) )
         
         # section 5.2, http://tools.ietf.org/html/draft-cheshire-dnsext-multicastdns-15
         # at 80%, 85%, 90% and 95% of the TTL => try to renew the record
