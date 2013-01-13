@@ -20,7 +20,7 @@ class TestCache(unittest.TestCase):
         for i in range(5):
             at = i * 10
             
-            record = PTRRecord("name%d._http._tcp.local"%i)
+            record = PTRRecord("_http._tcp.local", "name%d._http._tcp.local"%i, )
             self.cache.records.append(record)
             self.cache.pending_events.append((at, Cache.EVENT_NOT_KNOWN_ANSWER, record))
             
@@ -37,7 +37,7 @@ class TestCache(unittest.TestCase):
         
         self.sample_txt = TXTRecord("name0._http._tcp.local", {})
         self.sample_svr = SVRRecord("name2._http._tcp.local", None, None)
-        self.sample_ptr = PTRRecord("name4._http._tcp.local")
+        self.sample_ptr = PTRRecord("_http._tcp.local", "name4._http._tcp.local")
     
     def does_contains_event(self, ttype, name, when=None, action=None):
         for event in self.cache.pending_events:

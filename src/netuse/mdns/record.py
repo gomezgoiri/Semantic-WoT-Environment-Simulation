@@ -9,9 +9,9 @@ class Record(object):
     __metaclass__ = ABCMeta
     
     def __init__(self, name, ttype, ttl):
-        self.name = name # instance name or service name
+        self.name = name # instance name or service name (e.g. query PTR)
         self.type = ttype
-        self.ttl = ttl
+        self.ttl = ttl # remember that ttl is measured in seconds and simulation time in ms!
     
     def __eq__(self, record):
         return self.type == record.type and self.name == record.name
@@ -19,9 +19,13 @@ class Record(object):
 class PTRRecord(Record):
     __metaclass__ = ABCMeta
     
-    def __init__(self, name):
+    def __init__(self, name, domain_name):
         super(PTRRecord, self).__init__(name, "PTR", 75*60) # TTL: 75 mins
-        # to browse, the name should be _services._dns-sd._udp.local
+        # to browse all services, the name should be _services._dns-sd._udp.local
+        self.domain_name = domain_name
+    
+    def __eq__(self, record):
+        return super(PTRRecord, self).__eq__(record) and self.domain_name == record.domain_name
 
 class TXTRecord(Record):
     __metaclass__ = ABCMeta

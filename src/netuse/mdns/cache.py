@@ -37,7 +37,8 @@ class Cache(Process):
     
     def _get_time_after_percentage(self, ttl, percentage):
         """Percentage example: 0.45 (means 45%)"""
-        return self.sim.now() + ttl * percentage
+        # remember that ttl is measured in seconds and simulation time in ms!
+        return self.sim.now() + ttl * 1000 * percentage 
     
     def _create_new_events(self, record):
         ttl = record.ttl
