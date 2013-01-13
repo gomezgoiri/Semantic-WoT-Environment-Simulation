@@ -111,6 +111,6 @@ class Responder(Process):
         
         
         if unicast:
-            self.sender.send_unicast( DNSPacket(ttype="response", data=answers) )
+            self.sender.send_unicast( DNSPacket(ttype=DNSPacket.TYPE_RESPONSE, data=answers) )
         else:
-            self.sender.send_multicast( DNSPacket(ttype="response", data=answers) )
+            self.sender.send_multicast( DNSPacket(ttype=DNSPacket.TYPE_RESPONSE, data=answers) )
