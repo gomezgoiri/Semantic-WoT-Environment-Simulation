@@ -5,9 +5,14 @@ Created on Jan 13, 2013
 '''
 
 class DNSPacket(object):
+    
+    TYPE_QUERY = "query"
+    TYPE_RESPONSE = "response"
+    
     def __init__(self, ttype, data):
-        if ttype is not "query" and ttype is not "response":
+        if ttype != DNSPacket.TYPE_QUERY and ttype != DNSPacket.TYPE_RESPONSE:
             raise Exception("The DNS packet should be a 'query' or a 'response'.")
+        self.type = ttype
         self.data = data
 
 class Query(object):
