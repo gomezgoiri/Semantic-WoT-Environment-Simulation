@@ -22,7 +22,7 @@ class TestCache(unittest.TestCase):
             
             record = PTRRecord("name%d._http._tcp.local"%i)
             self.cache.records.append(record)
-            self.cache.pending_events.append((at, Cache.EVENT_USE_MULTICAST, record))
+            self.cache.pending_events.append((at, Cache.EVENT_NOT_KNOWN_ANSWER, record))
             
             record = SVRRecord("name%d._http._tcp.local"%i, None, None)
             self.cache.records.append(record)
@@ -70,9 +70,8 @@ class TestCache(unittest.TestCase):
         
         self.sample_txt.ttl = 1000 # to ease calculations
         self.cache._create_new_events(self.sample_txt)
-        self.assertEquals(15+6, len(self.cache.pending_events))
+        self.assertEquals(15+5, len(self.cache.pending_events))
         
-        self.assertTrue( self.does_contains_event(self.sample_txt.type, self.sample_txt.name, when=250, action=Cache.EVENT_USE_MULTICAST) )
         self.assertTrue( self.does_contains_event(self.sample_txt.type, self.sample_txt.name, when=500, action=Cache.EVENT_NOT_KNOWN_ANSWER) )
         self.assertTrue( self.does_contains_event(self.sample_txt.type, self.sample_txt.name, when=810, action=Cache.EVENT_RENEW) )
         self.assertTrue( self.does_contains_event(self.sample_txt.type, self.sample_txt.name, when=860, action=Cache.EVENT_RENEW) )
@@ -85,7 +84,7 @@ class TestCache(unittest.TestCase):
         self.cache.cache_record(new_record) # substitutes 1 record, removes 1 event, adds 6
         
         # already tested in test_delete_events_for_record and test_create_new_events
-        self.assertEquals(15-1+6, len(self.cache.pending_events))
+        self.assertEquals(15-1+5, len(self.cache.pending_events))
         
         self.assertEquals(15, len(self.cache.records))
         

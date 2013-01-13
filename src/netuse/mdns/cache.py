@@ -14,7 +14,6 @@ class Cache(Process):
     ACTION_FIELD = 1 # what to do
     RECORD_FIELD = 2
     
-    EVENT_USE_MULTICAST = "response_by_unicast"
     EVENT_NOT_KNOWN_ANSWER = "unadded_known_answer_suppression"
     EVENT_RENEW = "try_to_renew"
     EVENT_FLUSH= "flush_record"
@@ -43,10 +42,6 @@ class Cache(Process):
     def _create_new_events(self, record):
         ttl = record.ttl
         
-        # at 1/4 of the TTL => no more QU responses
-        when = self._get_time_after_percentage(ttl, 0.25)
-        self.pending_events.append( (when, Cache.EVENT_USE_MULTICAST, record) )
-        
         # at 1/2 of the TTL => does not add to known answer suppression
         when = self._get_time_after_percentage(ttl, 0.5)
         self.pending_events.append( (when, Cache.EVENT_NOT_KNOWN_ANSWER, record) )
@@ -70,6 +65,10 @@ class Cache(Process):
         
         # wake up wait_for_next_event method
         self.__new_record_cached.signal()
+    
+    def flush_all(self):
+        del self.records[:]
+        del self.pending_events[:]
     
     # Inspired by RequestInstance class
     def wait_for_next_event(self):
