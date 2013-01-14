@@ -24,7 +24,7 @@ class AbstractUDPTracer(object):
         pass
     
     @abstractmethod
-    def trace_unicast_response(self, timestamp, answers):
+    def trace_unicast_response(self, timestamp, answers, receiver):
         pass
     
     @abstractmethod
@@ -71,8 +71,8 @@ class FileUDPTracer(AbstractUDPTracer):
         if self.flusher.force_flush():
             self.f.flush()
     
-    def trace_unicast_response(self, timestamp, answers):
-        self._trace_response( timestamp, "unicast", answers )
+    def trace_unicast_response(self, timestamp, answers, receiver):
+        self._trace_response( timestamp, "unicast (to %s)"%(receiver), answers )
             
     def trace_multicast_response(self, timestamp, answers):
         self._trace_response( timestamp, "multicast", answers )
@@ -92,26 +92,75 @@ class MongoDBUDPTracer(AbstractUDPTracer):
         # Apparently, calling to self.execution.save() each time an element
         # is appended to the list introduces a huge latency
     
+    def _get_mongoengine_record(self, record):
+        if record.type == "TXT":
+            from netuse.database.results import TXTRecord
+            return TXTRecord( name = record.name,
+                              ttl = record.ttl,
+                              keyvalues = record.keyvalues )
+        elif record.type == "PTR":
+            from netuse.database.results import PTRRecord
+            return PTRRecord( name = record.name,
+                              ttl = record.ttl,
+                              hostname = record.domain_name )
+        elif record.type == "SVR":
+            from netuse.database.results import SVRRecord
+            return SVRRecord( name = record.name,
+                              ttl = record.ttl,
+                              hostname = record.hostname,
+                              port = record.port )
+        else:
+            raise Exception("Not valid register")
+    
+    def _get_mongoengine_list_records(self, records):        
+        result = []
+        for record in records:
+            me_rec = self._get_mongoengine_record(record)
+            me_rec.save()
+            result.append( me_rec )
+        return result
+    
+    def _get_mongoengine_subqueries(self, queries):
+        from netuse.database.results import MDNSSubQuery
+        
+        result = []
+        for query in queries:
+            subquery = MDNSSubQuery(name=query.name, record_type=query.record_type)
+            subquery.save()
+            result.append( subquery )
+            
+        return result
+    
     def trace_query(self, timestamp, query):
-        pass
+        from netuse.database.results import MDNSQueryTrace
+        queries = self._get_mongoengine_subqueries(query.queries)
+        known_answers = self._get_mongoengine_list_records(query.known_answers)
+        n = MDNSQueryTrace(
+                execution = self.execution,
+                timestamp = timestamp,
+                question_type = query.question_type,
+                queries = queries,
+                known_answers = known_answers
+            )
+        n.save()
     
-    @abstractmethod
-    def trace_unicast_response(self, timestamp, answers):
-        pass
+    def trace_unicast_response(self, timestamp, answers, receiver):
+        from netuse.database.results import MDNSAnswerTrace
+        me_answers = self._get_mongoengine_list_records(answers)
+        n = MDNSAnswerTrace(
+                execution = self.execution,
+                timestamp = timestamp,
+                answers = me_answers,
+                to = receiver
+            )
+        n.save()
     
-    @abstractmethod
     def trace_multicast_response(self, timestamp, answers):
-        pass
-    
-    # TODO store path!
-    def trace(self, timestamp, client, server, path, status, response_time):
-        from netuse.database.results import NetworkTrace
-        n = NetworkTrace(
-            execution=self.execution,
-            timestamp=timestamp,
-            client=client,
-            server=server,
-            path=path,
-            status=status,
-            response_time=response_time)
+        from netuse.database.results import MDNSAnswerTrace
+        me_answers = self._get_mongoengine_list_records(answers)
+        n = MDNSAnswerTrace( # to == "all" by default
+                execution = self.execution,
+                timestamp = timestamp,
+                answers = me_answers
+            )
         n.save()

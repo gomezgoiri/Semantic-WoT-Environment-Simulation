@@ -15,6 +15,9 @@ class Record(object):
     
     def __eq__(self, record):
         return self.type == record.type and self.name == record.name
+    
+    def __str__(self):
+        return "\t\t%s\t%s\tttl:%0.2f\n" % (self.type, self.name, self.ttl)
 
 class PTRRecord(Record):
     __metaclass__ = ABCMeta
@@ -26,6 +29,9 @@ class PTRRecord(Record):
     
     def __eq__(self, record):
         return super(PTRRecord, self).__eq__(record) and self.domain_name == record.domain_name
+    
+    def __str__(self):
+        return super(PTRRecord, self).__str__() + "\t%s" % (self.domain_name)
 
 class TXTRecord(Record):
     __metaclass__ = ABCMeta
@@ -34,6 +40,9 @@ class TXTRecord(Record):
         super(TXTRecord, self).__init__(name, "TXT", 75*60) # TTL: 75 mins
         self.keyvalues = keyvalues # must be a dictionary
         # In reality, SVR record points to PTR record which has the name
+    
+    def __str__(self):
+        return super(TXTRecord, self).__str__() + "\t%s" % (self.keyvalues)
 
 class SVRRecord(Record):
     __metaclass__ = ABCMeta
@@ -44,3 +53,6 @@ class SVRRecord(Record):
         self.port = port
         # The name issue was simplified.
         # In reality, SVR record points to PTR record which has the name
+    
+    # I'm not doing sth special with it, so I will not ovewrite the method
+    # def __str__(self):
