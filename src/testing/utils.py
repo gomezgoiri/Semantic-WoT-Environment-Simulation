@@ -8,6 +8,9 @@ import os
 import sys
 import time
 import unittest
+from netuse.tracers.udp import AbstractUDPTracer
+from netuse.tracers.http import AbstractHTTPTracer
+
 
 def connect_to_testing_db():
     from mongoengine import connect
@@ -59,7 +62,7 @@ class TimeRecorder(object):
         return self.__str__()
 
 
-class TestingTracer():
+class TestingTracer(AbstractHTTPTracer, AbstractUDPTracer):
     
     def __init__(self):
         self.traces = []
@@ -81,4 +84,24 @@ class TestingTracer():
         trace['path'] = path
         trace['status'] = status
         trace['response_time'] = response_time
+        self.traces.append( trace )
+        
+    def trace_query(self, timestamp, query):
+        trace = {}
+        trace['timestamp'] = timestamp
+        trace['query'] = query
+        self.traces.append( trace )
+    
+    def trace_unicast_response(self, timestamp, answers, receiver):
+        trace = {}
+        trace['timestamp'] = timestamp
+        trace['answers'] = answers
+        trace['receiver'] = receiver
+        self.traces.append( trace )
+    
+    def trace_multicast_response(self, timestamp, answers):
+        trace = {}
+        trace['timestamp'] = timestamp
+        trace['answers'] = answers
+        trace['receiver'] = "all"
         self.traces.append( trace )
