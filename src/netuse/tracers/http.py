@@ -4,11 +4,11 @@ Created on Sep 26, 2012
 @author: tulvur
 '''
 
-from time import time
 from abc import ABCMeta, abstractmethod
+from netuse.tracers.utils import Flusher
 
 
-class AbstractTracer(object):
+class AbstractHTTPTracer(object):
     __metaclass__ = ABCMeta
     
     @abstractmethod
@@ -23,30 +23,8 @@ class AbstractTracer(object):
     def trace(self, timestamp, client, server, path, status, response_time):
         pass
 
-# http://stackoverflow.com/questions/3167494/how-often-does-python-flush-to-a-file
-class Flusher(object):
-    '''
-        To force flush to a file depending on the number of writes or the time since the last flush.
-        
-        Using this class, we can check the simulation output in real-time.
-    '''
-    
-    WRITES = 10 # write before flushing
-    TIME = 1000 # time before last flush
-    
-    def __init__(self):
-        self.countdown = Flusher.WRITES
-        self.last_flush = 0
-    
-    def force_flush(self):
-        t = time()
-        if self.countdown<0 or (t-self.last_flush)<Flusher.TIME:
-            self.countdown = Flusher.WRITES
-            self.last_flush = t
-            return True # you need to flush
-        return False # don't need to force the flush
 
-class FileTracer(AbstractTracer):
+class FileHTTPTracer(AbstractHTTPTracer):
     
     def __init__(self, filename='/tmp/workfile'):
         self.filename = filename
@@ -65,7 +43,7 @@ class FileTracer(AbstractTracer):
             self.f.flush()
 
 
-class MongoDBTracer(AbstractTracer):
+class MongoDBHTTPTracer(AbstractHTTPTracer):
     
     def __init__(self, execution):
         self.execution = execution
@@ -79,7 +57,6 @@ class MongoDBTracer(AbstractTracer):
         # Apparently, calling to self.execution.save() each time an element
         # is appended to the list introduces a huge latency
     
-    # TODO store path!
     def trace(self, timestamp, client, server, path, status, response_time):
         from netuse.database.results import NetworkTrace
         n = NetworkTrace(
@@ -91,24 +68,3 @@ class MongoDBTracer(AbstractTracer):
             status=status,
             response_time=response_time)
         n.save()
-
-class TestingTracer(AbstractTracer):
-    
-    def __init__(self):
-        self.traces = []
-    
-    def start(self):
-        pass
-        
-    def stop(self):
-        pass
-    
-    def trace(self, timestamp, client, server, path, status, response_time):
-        trace = {}
-        trace['timestamp'] = timestamp
-        trace['client'] = client
-        trace['server'] = server
-        trace['path'] = path
-        trace['status'] = status
-        trace['response_time'] = response_time
-        self.traces.append( trace )

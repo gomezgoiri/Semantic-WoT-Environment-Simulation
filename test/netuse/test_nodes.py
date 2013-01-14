@@ -12,7 +12,7 @@ from netuse.nodes import Node
 from netuse.triplespace.network.client import RequestManager, RequestInstance
 from netuse.devices import XBee
 from netuse.results import G
-from netuse.tracers import TestingTracer
+from testing.utils import TestingTracer
 
 def side_effect(*args):
     return args[0] + args[1]/2 # just to check how to configure different returns

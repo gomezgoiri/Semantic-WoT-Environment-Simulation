@@ -5,7 +5,7 @@ from testing.memory_usage import memory
 
 from netuse.results import G
 from netuse.evaluation.simulate import BasicModel
-from netuse.tracers import FileTracer
+from netuse.tracers.http import FileHTTPTracer
 from netuse.nodes import NodeGenerator
 from netuse.activity import ActivityGenerator
 from commons.utils import SemanticFilesLoader
@@ -20,7 +20,7 @@ from netuse.network_models import NetworkModelManager
 class TraceAndLoadFilesModel(BasicModel):
         
     def initialize(self):
-        G.setNewExecution(None, tracer=FileTracer('/tmp/trace.txt'))
+        G.setNewExecution(None, tracer=FileHTTPTracer('/tmp/trace.txt'))
         super(TraceAndLoadFilesModel, self).initialize()
     
     def runModel(self):

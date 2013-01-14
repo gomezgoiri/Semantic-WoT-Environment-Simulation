@@ -4,7 +4,7 @@ Created on Jan 7, 2012
 @author: tulvur
 '''
 from bson.objectid import ObjectId
-from netuse.tracers import FileTracer
+from netuse.tracers.http import FileHTTPTracer
 from netuse.database.execution import ExecutionSet
 from netuse.database.results import NetworkTrace
 
@@ -12,7 +12,7 @@ from netuse.database.results import NetworkTrace
 def dump_into_file(execution_id, file_path=None):
     if file_path is None:
         file_path = "/tmp/trace_%s.txt"%execution_id
-    ft = FileTracer(file_path)
+    ft = FileHTTPTracer(file_path)
     ft.start()
     
     for req in NetworkTrace.objects(execution=execution_id):

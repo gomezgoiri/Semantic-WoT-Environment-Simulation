@@ -1,7 +1,7 @@
 from rdflib import URIRef, Namespace, RDF
 
 from netuse.results import G
-from netuse.tracers import FileTracer
+from netuse.tracers.http import FileHTTPTracer
 from netuse.nodes import NodeGenerator
 from netuse.activity import ActivityGenerator
 from netuse.evaluation.simulate import BasicModel
@@ -16,7 +16,7 @@ from netuse.devices import XBee, SamsungGalaxyTab, FoxG20, Server
 class SimpleTraceModel(BasicModel):
         
     def initialize(self):
-        G.setNewExecution(None, tracer=FileTracer('/tmp/trace.txt'))
+        G.setNewExecution(None, tracer=FileHTTPTracer('/tmp/trace.txt'))
         super(SimpleTraceModel, self).initialize()
     
     def runModel(self):        

@@ -57,3 +57,28 @@ class TimeRecorder(object):
     
     def __repr__(self):
         return self.__str__()
+
+
+class TestingTracer():
+    
+    def __init__(self):
+        self.traces = []
+    
+    def start(self):
+        pass
+        
+    def stop(self):
+        pass
+    
+    #def trace(self, **kwargs):
+    #    self.traces.append( kwargs )
+    
+    def trace(self, timestamp, client, server, path, status, response_time):
+        trace = {}
+        trace['timestamp'] = timestamp
+        trace['client'] = client
+        trace['server'] = server
+        trace['path'] = path
+        trace['status'] = status
+        trace['response_time'] = response_time
+        self.traces.append( trace )

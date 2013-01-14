@@ -6,7 +6,7 @@ Created on Jan 2, 2012
 import shutil
 from tempfile import mkdtemp
 from SimPy.Simulation import random
-from netuse.tracers import MongoDBTracer #FileTracer
+from netuse.tracers.http import MongoDBHTTPTracer #FileHTTPTracer
 
 
 class G:  # global variables
@@ -22,8 +22,8 @@ class G:  # global variables
     def setNewExecution(execution, tracer=None):
         G.temporary_path = mkdtemp(prefix="/tmp/exec_")
         
-        # G._tracer = FileTracer('/tmp/workfile')
-        G._tracer = MongoDBTracer(execution) if tracer==None else tracer
+        # G._tracer = FileHTTPTracer('/tmp/workfile')
+        G._tracer = MongoDBHTTPTracer(execution) if tracer==None else tracer
         G._tracer.start()
         
     @staticmethod
