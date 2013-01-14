@@ -17,10 +17,10 @@ class DNSPacket(object):
 
 class Query(object):
     
-    def __init__(self, queries, known_answers=[], ttype="QM"):
-        if ttype is not "QM" and ttype is not "QU":
-            raise Exception("The question type should be rather QM (multicast) or QU (unicast).")
-        self.question_type = ttype
+    def __init__(self, queries, known_answers=[], to_node=None):
+        self.question_type = "QM" if to_node is None else "QU"
+        if to_node is not None:
+            self.to_node = to_node # is defined on queries willing to receive an unicast response (QU)
         self.known_answers = known_answers # for the known answer suppression, records
         self.queries = queries # SubQuery objects
         # to browse, the name should be _services._dns-sd._udp.local

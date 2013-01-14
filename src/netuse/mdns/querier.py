@@ -31,7 +31,7 @@ class ContinuousQuerier(Process):
         timer = Timer(waitUntil=twait, sim=self.sim)
         self.sim.activate(timer, timer.wait())
         yield waitevent, self, (timer.event, self.__stop,)
-        self.sender.send_query(self.subquery, query_type="QU") # joining a network
+        self.sender.send_query(self.subquery, to_node=self.sender.node_id) # joining a network
         
         # the interval between the first two queries MUST be at least one second
         twait = 1000
@@ -39,7 +39,7 @@ class ContinuousQuerier(Process):
             timer = Timer(waitUntil=twait, sim=self.sim)
             self.sim.activate(timer, timer.wait())
             yield waitevent, self, (timer.event, self.__stop,)
-            self.sender.send_query(self.subquery, query_type="QM") # subsequent queries
+            self.sender.send_query(self.subquery) # subsequent queries
             
             if twait!=3600000:
                 # the intervals between successive queries MUST increase by at least a factor of two

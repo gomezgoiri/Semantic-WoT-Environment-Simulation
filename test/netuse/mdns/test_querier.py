@@ -19,11 +19,12 @@ class FakeSender(object):
     
     def __init__(self, simulation):
         self.log = []
+        self.node_id = "fake"
         self.simulation = simulation
     
     # used by ContinuousQuerier and by self.renew_record
-    def send_query(self, subquery, query_type): # queries always through multicast
-        self.log.append( (self.simulation.now(), query_type, subquery) )
+    def send_query(self, subquery, to_node=None): # queries always through multicast
+        self.log.append( (self.simulation.now(), "QM" if to_node==None else "QU", subquery) )
 
 
 

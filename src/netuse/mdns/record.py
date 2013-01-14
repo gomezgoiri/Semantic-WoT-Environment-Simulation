@@ -14,10 +14,15 @@ class Record(object):
         self.ttl = ttl # remember that ttl is measured in seconds and simulation time in ms!
     
     def __eq__(self, record):
-        return self.type == record.type and self.name == record.name
+        return isinstance(record, Record) and self.type == record.type and self.name == record.name
+    
+    # if I don't redefine this also, it won't work in some data structures (e.g. dictionaries)
+    def __hash__(self):
+        return  self.type.__hash__() + self.name.__hash__()
     
     def __str__(self):
         return "\t\t%s\t%s\tttl:%0.2f\n" % (self.type, self.name, self.ttl)
+
 
 class PTRRecord(Record):
     __metaclass__ = ABCMeta
@@ -29,6 +34,10 @@ class PTRRecord(Record):
     
     def __eq__(self, record):
         return super(PTRRecord, self).__eq__(record) and self.domain_name == record.domain_name
+    
+    # if I don't redefine this also, it won't work in some data structures (e.g. dictionaries)
+    def __hash__(self):
+        return super(PTRRecord, self).__hash__() + self.domain_name.__hash__()
     
     def __str__(self):
         return super(PTRRecord, self).__str__() + "\t%s" % (self.domain_name)

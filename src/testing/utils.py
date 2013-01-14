@@ -65,6 +65,7 @@ class TimeRecorder(object):
 class TestingTracer(AbstractHTTPTracer, AbstractUDPTracer):
     
     def __init__(self):
+        super(TestingTracer, self).__init__()
         self.traces = []
     
     def start(self):

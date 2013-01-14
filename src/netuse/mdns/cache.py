@@ -71,7 +71,8 @@ class Cache(Process):
         self._delete_events_for_record(record)
         self._create_new_events(record)
         
-        self.records.remove(record) # does delete the previous one?
+        if record in self.records:
+            self.records.remove(record) # does delete the previous one?
         self.records.append(record)
         
         # sorts by the 1st element in the set

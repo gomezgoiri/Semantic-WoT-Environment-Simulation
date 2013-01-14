@@ -49,7 +49,7 @@ class Responder(Process):
     
     def answer(self):
         while True:
-            if not self.pending_events: # if it's empty...
+            if not self.queued_queries: # if it's empty...
                 yield waitevent, self, (self.__new_query_queued,)
             else:
                 next_query = self.queued_queries[0]
@@ -65,7 +65,7 @@ class Responder(Process):
                     self.process_query( next_query[Responder.QUERY_FIELD] )
     
     def process_query(self, query):
-        answers = self._get_possible_answers()
+        answers = self._get_possible_answers(query)
         self._suppress_known_answers(query, answers)
         self._send_using_proper_method(query, answers)
     
@@ -111,6 +111,6 @@ class Responder(Process):
         
         
         if unicast:
-            self.sender.send_unicast( DNSPacket(ttype=DNSPacket.TYPE_RESPONSE, data=answers) )
+            self.sender.send_unicast( query.to_node, DNSPacket(ttype=DNSPacket.TYPE_RESPONSE, data=answers) )
         else:
             self.sender.send_multicast( DNSPacket(ttype=DNSPacket.TYPE_RESPONSE, data=answers) )

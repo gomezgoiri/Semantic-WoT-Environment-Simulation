@@ -105,7 +105,7 @@ class TestResponder(unittest.TestCase):
     def test_send_using_proper_method_qm(self):
         fn = FakeNetwork()
         self.responder.sender = fn
-        self.responder._send_using_proper_method( Query(None, ttype="QM"), None )
+        self.responder._send_using_proper_method( Query(None), None )
         self.assertEquals("multicast", fn.got)
         
     def test_send_using_proper_method_qu_never_sent_before(self):
@@ -114,7 +114,7 @@ class TestResponder(unittest.TestCase):
         
         fn = FakeNetwork()
         self.responder.sender = fn
-        self.responder._send_using_proper_method( Query(None, ttype="QU"), (self.sample_txt,) )
+        self.responder._send_using_proper_method( Query(None, to_node="fake_id"), (self.sample_txt,) )
         self.assertEquals("multicast", fn.got)
                 
     def test_send_using_proper_method_qu_not_sent_lately(self):
@@ -125,7 +125,7 @@ class TestResponder(unittest.TestCase):
         
         fn = FakeNetwork()
         self.responder.sender = fn
-        self.responder._send_using_proper_method( Query(None, ttype="QU"), (self.sample_txt,) )
+        self.responder._send_using_proper_method( Query(None, to_node="fake_id"), (self.sample_txt,) )
         self.assertEquals("multicast", fn.got)
         
     def test_send_using_proper_method_qu_sent_lately(self):
@@ -136,7 +136,7 @@ class TestResponder(unittest.TestCase):
         
         fn = FakeNetwork()
         self.responder.sender = fn
-        self.responder._send_using_proper_method( Query(None, ttype="QU"), (self.sample_txt,) )
+        self.responder._send_using_proper_method( Query(None, to_node="fake_id"), (self.sample_txt,) )
         self.assertEquals("unicast", fn.got)
 
 
