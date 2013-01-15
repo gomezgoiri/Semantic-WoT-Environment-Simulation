@@ -39,6 +39,11 @@ class DiscoveryInstance(object):
             
     def add_changes_observer(self, observer):
         self.observers.add(observer) # of type DiscoveryEventObserver
+        
+    @abstractmethod
+    def get_discovered_records(self):
+        # TODO overlaps with get_nodes, should substitute it in the future
+        pass
     
     @abstractmethod
     def get_nodes(self):
