@@ -12,7 +12,7 @@ from abc import abstractmethod, ABCMeta
 from netuse.nodes import NodeGenerator
 from netuse.network_models import NetworkModelManager
 from netuse.triplespace.kernel import NegativeBroadcasting, Centralized, OurSolution
-from netuse.triplespace.network.discovery.simple import DiscoveryFactory
+from netuse.triplespace.network.discovery.discovery import DiscoveryFactory
 from netuse.database.parametrization import Parametrization
 from netuse.results import G
 

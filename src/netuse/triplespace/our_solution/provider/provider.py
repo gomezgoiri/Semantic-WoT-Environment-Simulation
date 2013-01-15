@@ -8,12 +8,12 @@ from abc import ABCMeta, abstractmethod
 from SimPy.Simulation import Process, SimEvent, waitevent
 from netuse.sim_utils import Timer
 from clueseval.clues.node_attached import ClueWithNode
-from netuse.triplespace.network.discovery.simple import SimpleDiscoveryObserver
+from netuse.triplespace.network.discovery.discovery import DiscoveryEventObserver
 from netuse.triplespace.our_solution.provider.simple_clue_management import ClueManager
 from netuse.triplespace.network.client import RequestInstance, RequestManager, RequestObserver
 
 
-class Provider(Process, SimpleDiscoveryObserver):
+class Provider(Process, DiscoveryEventObserver):
     
     RETRY_ON_FAILURE = 10000 # 10 secs
     UPDATE_TIME = 3600000 # 1h

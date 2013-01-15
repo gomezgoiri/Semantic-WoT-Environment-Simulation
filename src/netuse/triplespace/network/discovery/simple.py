@@ -3,19 +3,9 @@ Created on Sep 16, 2012
 
 @author: tulvur
 '''
-
-from abc import ABCMeta, abstractmethod
 import weakref
+from netuse.triplespace.network.discovery.discovery import DiscoveryInstance
 from netuse.triplespace.network.discovery.record import DiscoveryRecordObserver
-
-
-class DiscoveryFactory(object):
-    
-    def __init__(self, nodes):
-        self.network = MagicInstantNetwork(nodes)
-        
-    def create_simple_discovery(self, localNode):
-        return SimpleDiscoveryMechanism(localNode, self.network)
 
 
 class MagicInstantNetwork(DiscoveryRecordObserver):
@@ -61,30 +51,16 @@ class MagicInstantNetwork(DiscoveryRecordObserver):
                         observer.on_whitepage_selected_after_none()
 
 
-class SimpleDiscoveryObserver(object):
-    __metaclass__ = ABCMeta
-    
-    @abstractmethod
-    def on_whitepage_selected_after_none(self):
-        '''
-        When no whitepage existed in the space and a new one has been selected.
-        '''
-        pass
-
-
-class SimpleDiscoveryMechanism(object):
+class SimpleDiscoveryMechanism(DiscoveryInstance):
     """
     Simple discovery, which just asks to the MagicInstantNetwork object to get the latest state.
     """
     def __init__(self, me, magic_network):
+        super(SimpleDiscoveryMechanism, self).__init__()
         self.me_ref = weakref.ref(me) # with a weakref.proxy a WeakSet.remove does not work OK
         # If you use weakref in "magic_network": the factory will be destroyed and this will be None.
         self.magic_network = magic_network # weakref.proxy(magic_network) 
         self.magic_network.add_changes_observer(self)
-        self.observers = weakref.WeakSet()
-            
-    def add_changes_observer(self, observer):
-        self.observers.add(observer)
     
     # paradox: it just intermediates (to avoid directly observing other nodes' registers)
     def on_whitepage_selected_after_none(self):
