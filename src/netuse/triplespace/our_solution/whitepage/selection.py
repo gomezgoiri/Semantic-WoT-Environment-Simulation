@@ -1,5 +1,6 @@
 from numpy import mean, std
 from abc import ABCMeta, abstractmethod
+from netuse.nodes import NodeGenerator
 from netuse.triplespace.network.discovery.record import DiscoveryRecord
 from netuse.triplespace.network.client import RequestInstance, RequestManager, RequestObserver       
 
@@ -35,15 +36,15 @@ class WhitepageSelector(object):
         else:
             return value
     
-    #def memory_is_less_than(node, min_memory_limit):
-    #    mem = WhitepageSelector._to_bytes(*node.discovery_record.memory)
+    #def memory_is_less_than(record, min_memory_limit):
+    #    mem = WhitepageSelector._to_bytes(*record.memory)
     #    return mem<min_memory_limit
     
     @staticmethod
     def _filter_less_memory_than(candidates, min_memory_limit):
         # a) Filtra a los que no tengan al menos X memoria.        
         min = WhitepageSelector._to_bytes(*min_memory_limit) # supose 1KB per node
-        greater_than_min = lambda node: WhitepageSelector._to_bytes(*node.discovery_record.memory) >= min
+        greater_than_min = lambda record: WhitepageSelector._to_bytes(*record.memory) >= min
         return filter(greater_than_min, candidates)
     
     @staticmethod
@@ -51,42 +52,42 @@ class WhitepageSelector(object):
         # b) Filtra a los que no tengan al menos X almacenamiento.
         #    Se estima en base a las medidas tomadas en la evaluacion de clues y el numero de nodos en ese espacio.
         required = WhitepageSelector._to_bytes(total_num_nodes, 'KB') # supose 1KB per node
-        greater_than_required = lambda node: WhitepageSelector._to_bytes(*node.discovery_record.storage) >= required
+        greater_than_required = lambda record: WhitepageSelector._to_bytes(*record.storage) >= required
         return filter(greater_than_required, candidates)
     
     @staticmethod
-    def _any_with_full_battery(nodes):
-        for node in nodes:
-            if node.discovery_record.battery_lifetime==DiscoveryRecord.INFINITE_BATTERY:
+    def _any_with_full_battery(records):
+        for record in records:
+            if record.battery_lifetime==DiscoveryRecord.INFINITE_BATTERY:
                 return True
         return False
     
     @staticmethod
     def _choose_within_full_battery_nodes(candidates):        
         # c1) Filtra los que tienen bateria a 1
-        additional_filter = lambda node: node.discovery_record.battery_lifetime==DiscoveryRecord.INFINITE_BATTERY
+        additional_filter = lambda record: record.battery_lifetime==DiscoveryRecord.INFINITE_BATTERY
         
         # d1) Selecciona al que tenga mejores caracteristicas: Memoria
         return WhitepageSelector._choose_the_one_with_most_memory(candidates, additional_filter)    
     
     @staticmethod
     def _choose_the_one_with_most_memory(candidates, additionalFilter=lambda n: True):
-        best_memory_node = None
+        best_memory_record = None
             
-        for node in candidates:
-            if additionalFilter(node):
-                if best_memory_node==None:
-                    best_memory_node = node
-                elif best_memory_node.discovery_record.memory < node.discovery_record.memory:
-                    best_memory_node = node
+        for record in candidates:
+            if additionalFilter(record):
+                if best_memory_record is None:
+                    best_memory_record = record
+                elif best_memory_record.memory < record.memory:
+                    best_memory_record = record
                     
-        return best_memory_node
+        return best_memory_record
     
     @staticmethod
     def _filter_unsteady_nodes(candidates):
         # c2) filtra a aquellos que han demostrado inestabilidad (no se puede confiar en ellos)
         #    Si la media es mayor de 1h, (asi si inicias la red de 0, te evitas este filtro)
-        joins = [node.discovery_record.joined_since for node in candidates]
+        joins = [record.joined_since for record in candidates]
         joins_mean = mean( joins )
         if joins_mean>2: # measured in slots of 30 mins
             #  Eliges a todos aquellos que tengan un z-score mayor que 1.
@@ -99,8 +100,8 @@ class WhitepageSelector(object):
             # Si no hay ninguno por encima de 1, eliges los que esten por encima de la media (z-score>0)
             if not new_candidates:
                 new_candidates = []
-                for node in candidates:
-                    if node.discovery_record.joined_since >= joins_mean:
+                for record in candidates:
+                    if record.joined_since >= joins_mean:
                         new_candidates.append(node)
                         
             return new_candidates
@@ -110,7 +111,7 @@ class WhitepageSelector(object):
     @staticmethod
     def _filter_nodes_with_more_battery(candidates):
         # d2) De entre aquellos con z-score de bateria de 1 o mas: el que tenga mas memoria.
-        battery = [node.discovery_record.battery_lifetime for node in candidates]
+        battery = [record.battery_lifetime for record in candidates]
 
         new_candidates = list(candidates)
         zsco = WhitepageSelector._zscores( battery )
@@ -122,14 +123,14 @@ class WhitepageSelector(object):
         if not new_candidates:
             new_candidates = []
             battery_mean = mean( battery )
-            for node in candidates:
-                if node.discovery_record.battery_lifetime >= battery_mean:
+            for record in candidates:
+                if record.battery_lifetime >= battery_mean:
                     new_candidates.append(node)
         return new_candidates                
     
     @staticmethod
-    def select_whitepage(candidate_nodes):
-        candidates = list(candidate_nodes)
+    def select_whitepage(candidate_records):
+        candidates = list(candidate_records)
         total_len = len(candidates)
         
         candidates = WhitepageSelector._filter_less_memory_than(candidates, WhitepageSelector.MEMORY_LIMIT)
@@ -163,14 +164,14 @@ class WhitepageSelectionManager(RequestObserver):
         self.discovery = discovery
         self.refused = []
         self.observer = None
-        self.last_choosen = None
+        self.last_choosen = None # contains the name of the last choosen node
         
     def set_observer(self, observer):
         self.observer = observer
     
     def choose_whitepage(self):
         # TODO consider that I can choose myself as a WP
-        candidates = [item for item in self.discovery.get_nodes() if item not in self.refused]
+        candidates = [item for item in self.discovery.get_discovered_records() if item.node_name not in self.refused]
         self.last_choosen = WhitepageSelector.select_whitepage(candidates)
         if self.last_choosen==None:
             # somehow, transmit that no node could have been chosen
@@ -180,7 +181,7 @@ class WhitepageSelectionManager(RequestObserver):
     
     def _get_choose_request(self):
         req = RequestInstance( self.discovery.me,
-                               [self.last_choosen],
+                               [ NodeGenerator.getNodeByName(self.last_choosen) ],
                                '/whitepage/choose', data = '',
                                sim = self.simulation ) # it has data => POST
         req.addObserver(self)
@@ -189,7 +190,7 @@ class WhitepageSelectionManager(RequestObserver):
     def notifyRequestFinished(self, request_instance):
         for unique_response in request_instance.responses:
             if unique_response.getstatus()==200:
-                self.observer.wp_selection_finished(self.last_choosen)
+                self.observer.wp_selection_finished( NodeGenerator.getNodeByName(self.last_choosen) )
             else: # has refused being whitepage!
                 self.refused.append(self.last_choosen)
                 self.choose_whitepage()

@@ -8,11 +8,11 @@ from netuse.triplespace.network.discovery.record import DiscoveryRecord
 from netuse.triplespace.our_solution.whitepage.selection import WhitepageSelector
 
 
-class FakeNode():
+class TestRecord(DiscoveryRecord):
     
     def __init__(self, memory='1MB', storage='1MB',
                  joined_since=1, battery_lifetime=DiscoveryRecord.INFINITE_BATTERY, sac=False, is_whitepage=False):
-        self.discovery_record = DiscoveryRecord(memory, storage, joined_since, sac, battery_lifetime)
+        super(TestRecord, self).__init__("fake_node_name", memory, storage, joined_since, sac, battery_lifetime)
     
     def tuple_to_str(self, tuple):
         return str(tuple[0]) + tuple[1]
@@ -24,59 +24,59 @@ class FakeNode():
 class WhitepageSelectorTestCase(unittest.TestCase):
     
     def setUp(self):
-        self.nodes = []
-        self.nodes.append(FakeNode('3MB', '22MB', 3))
-        self.nodes.append(FakeNode('8MB', '32MB', 2, '1d'))
-        self.nodes.append(FakeNode('32MB', '32MB', 2))
-        self.nodes.append(FakeNode('34MB', '32MB', 3, '1d'))
-        self.nodes.append(FakeNode('16MB', '50MB', 1)) # best, but unstable
-        self.nodes.append(FakeNode('3MB', '1GB', 2))
+        self.record = []
+        self.record.append(TestRecord('3MB', '22MB', 3))
+        self.record.append(TestRecord('8MB', '32MB', 2, '1d'))
+        self.record.append(TestRecord('32MB', '32MB', 2))
+        self.record.append(TestRecord('34MB', '32MB', 3, '1d'))
+        self.record.append(TestRecord('16MB', '50MB', 1)) # best, but unstable
+        self.record.append(TestRecord('3MB', '1GB', 2))
     
     def test_filter_less_memory_than(self):
-        filtered_nodes = WhitepageSelector._filter_less_memory_than(list(self.nodes), (16,'MB'))
-        expected = (self.nodes[2], self.nodes[3], self.nodes[4])
-        self.assertItemsEqual(filtered_nodes, expected)
+        filtered_records = WhitepageSelector._filter_less_memory_than(list(self.record), (16,'MB'))
+        expected = (self.record[2], self.record[3], self.record[4])
+        self.assertItemsEqual(filtered_records, expected)
         
     def test_filter_less_storage_than(self):
-        filtered_nodes = WhitepageSelector._filter_less_storage_than(list(self.nodes), 1024*42) # 500 nodes * (1KB * 1024) = at least 42MBs
-        expected = (self.nodes[4], self.nodes[5])
-        self.assertItemsEqual(filtered_nodes, expected)
+        filtered_records = WhitepageSelector._filter_less_storage_than(list(self.record), 1024*42) # 500 record * (1KB * 1024) = at least 42MBs
+        expected = (self.record[4], self.record[5])
+        self.assertItemsEqual(filtered_records, expected)
     
     def test_any_with_full_battery(self):
-        self.assertTrue(self.nodes)
+        self.assertTrue(self.record)
         
-        nodes2 = []
-        nodes2.append(FakeNode('3MB', '22MB', 2, '2h'))
-        nodes2.append(FakeNode('8MB', '32MB', 2, '1d'))
-        self.assertFalse(WhitepageSelector._any_with_full_battery(nodes2))
+        records2 = []
+        records2.append(TestRecord('3MB', '22MB', 2, '2h'))
+        records2.append(TestRecord('8MB', '32MB', 2, '1d'))
+        self.assertFalse(WhitepageSelector._any_with_full_battery(records2))
         
     def test_choose_within_full_battery_nodes(self):
-        selected_node = WhitepageSelector._choose_within_full_battery_nodes(self.nodes)
-        self.assertEquals(self.nodes[2], selected_node)
+        selected_record = WhitepageSelector._choose_within_full_battery_nodes(self.record)
+        self.assertEquals(self.record[2], selected_record)
     
     def test_choose_the_one_with_most_memory(self):
-        selected_node = WhitepageSelector._choose_the_one_with_most_memory(self.nodes)
-        self.assertEquals(self.nodes[3], selected_node)
+        selected_record = WhitepageSelector._choose_the_one_with_most_memory(self.record)
+        self.assertEquals(self.record[3], selected_record)
         
     def test_filter_unsteady_nodes(self):
-        filtered_nodes = WhitepageSelector._filter_unsteady_nodes(list(self.nodes)) # 500 nodes * (1KB * 1024) = at least 42MBs
-        expected = (self.nodes[0], self.nodes[3])
-        self.assertItemsEqual(filtered_nodes, expected)
+        filtered_records = WhitepageSelector._filter_unsteady_nodes(list(self.record)) # 500 record * (1KB * 1024) = at least 42MBs
+        expected = (self.record[0], self.record[3])
+        self.assertItemsEqual(filtered_records, expected)
 
     def test_select_whitepage_with_infinite_battery_candidates(self):        
-        selected_node = WhitepageSelector.select_whitepage(self.nodes)
-        self.assertEquals(self.nodes[2], selected_node)
+        selected_record = WhitepageSelector.select_whitepage(self.record)
+        self.assertEquals(self.record[2], selected_record)
         
     def test_select_with_real_devices(self):
         candidates = []
         
-        for _ in range(1): candidates.append( Node("server", DeviceType.create(Server.TYPE_ID)) )
-        for i in range(30): candidates.append( Node("galaxy_%d"%(i), DeviceType.create(SamsungGalaxyTab.TYPE_ID)) )
-        for i in range(69): candidates.append( Node("fox_%d"%(i), DeviceType.create(FoxG20.TYPE_ID)) )
-        for i in range(200): candidates.append( Node("xbee_%d"%(i), DeviceType.create(XBee.TYPE_ID)) )
+        for _ in range(1): candidates.append( Node("server", DeviceType.create(Server.TYPE_ID)).discovery_record )
+        for i in range(30): candidates.append( Node("galaxy_%d"%(i), DeviceType.create(SamsungGalaxyTab.TYPE_ID)).discovery_record )
+        for i in range(69): candidates.append( Node("fox_%d"%(i), DeviceType.create(FoxG20.TYPE_ID)).discovery_record )
+        for i in range(200): candidates.append( Node("xbee_%d"%(i), DeviceType.create(XBee.TYPE_ID)).discovery_record )
         
-        selected_node = WhitepageSelector.select_whitepage(candidates)
-        self.assertEquals("server", selected_node.name)
+        selected_record = WhitepageSelector.select_whitepage(candidates)
+        self.assertEquals("server", selected_record.node_name)
 
 
 if __name__ == '__main__':
