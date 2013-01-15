@@ -17,8 +17,9 @@ class DiscoveryRecordObserver(object):
 class DiscoveryRecord(object):
     INFINITE_BATTERY = 'inf' # plugged in to the plug
     
-    def __init__(self, memory='1MB', storage='1MB',
+    def __init__(self, node_name, memory='1MB', storage='1MB',
                  joined_since=1, sac=False, battery_lifetime=INFINITE_BATTERY, is_whitepage=False):
+        self.node_name = node_name
         self.change_observers = weakref.WeakSet()
         self.memory = self._separate_units_from_values(memory) # does not change
         self.storage = self._separate_units_from_values(storage) # does not change

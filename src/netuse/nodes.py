@@ -106,7 +106,8 @@ class Node(Process):
         self.__device = device if device!=None else RegularComputer() # device type 
         self.__connections = Connections( self.__device, sim = sim, name = "%s's connections"%(name) )
         
-        self.discovery_record = DiscoveryRecord(memory = self.__device.ram_memory,
+        self.discovery_record = DiscoveryRecord(node_name = name,
+                                                memory = self.__device.ram_memory,
                                                 storage = self.__device.storage_capacity,
                                                 joined_since = joined_since,
                                                 sac = sac,
