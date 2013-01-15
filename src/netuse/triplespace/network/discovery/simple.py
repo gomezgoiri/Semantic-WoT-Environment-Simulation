@@ -67,6 +67,17 @@ class SimpleDiscoveryMechanism(DiscoveryInstance):
         for observer in self.observers:
             observer.on_whitepage_selected_after_none()
     
+    def get_discovered_records(self):
+        if not self.me.down:
+            ret = []
+            nodes = self.magic_network.get_nodes()
+            for node in nodes:
+                # TODO avoid this dependency with node
+                # each DiscoveryInstance should store its own discovery nodes
+                ret.append( node.discovery_record )
+            return ret
+        return []
+    
     def get_nodes(self):
         if not self.me.down:
             restOfTheNodes = self.magic_network.get_nodes()
