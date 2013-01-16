@@ -1,6 +1,6 @@
 ######### PROJECT's ##########
 
-src/netuse/database/__init__.py # database connection info
+/src/netuse/database/__init__.py # database connection info
 
 
 ########## PYTHON's ###########
