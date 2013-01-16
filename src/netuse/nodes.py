@@ -6,7 +6,7 @@ Created on Nov 26, 2011
 from SimPy.Simulation import Process, Resource, passivate, hold, release, request
 import weakref
 from netuse.sim_utils import schedule, activatable
-from devices import DeviceType, RegularComputer
+from devices import RegularComputer
 from netuse.triplespace.network.discovery.record import DiscoveryRecord
 from netuse.triplespace.network.server import CustomSimulationHandler
 
@@ -19,12 +19,6 @@ class NodeManager(object):
         self.__params = params
         self.__simulation = simulation
         NodeManager.nodes = {}
-    
-    def generateNodes(self):
-        for nodeName, nodeType in zip(self.__params.nodes, self.__params.nodeTypes):
-            node = Node(nodeName, DeviceType.create(nodeType), sim=self.__simulation)
-            NodeManager.nodes[nodeName] = node
-            self.__simulation.activate(node,node.processRequests())
     
     @staticmethod
     def getNodes():

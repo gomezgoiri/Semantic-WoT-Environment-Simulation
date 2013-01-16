@@ -21,7 +21,7 @@ class MagicInstantNetwork(DiscoveryRecordObserver):
         self.instances.add(discovery_instance)
         
     def _get_node_for_record(self, record):
-        return NodeManager.nodes[record.node_name]
+        return NodeManager.getNodeByName(record.node_name)
     
     def get_records(self):
         current_records = weakref.WeakSet()
@@ -94,7 +94,7 @@ class SimpleDiscoveryMechanism(DiscoveryInstance):
         return None if wp_rec is None else self._get_node_for_record( wp_rec ) 
     
     def _get_node_for_record(self, record):
-        return NodeManager.nodes[record.node_name]
+        return NodeManager.getNodeByName(record.node_name)
     
     @property
     def me(self):
