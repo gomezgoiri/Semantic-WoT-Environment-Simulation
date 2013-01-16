@@ -24,20 +24,21 @@ def create_test_suite_for_directory(base_file, recursive=True):
                 
 def add_to_test_suite_rec(suite, loader, directory, recursive=True):
     sys.path.append(directory)
-    files_in_dir = os.listdir(directory)
     
-    for entry in files_in_dir:
+    for entry in os.listdir(directory):
+        entry_with_path = directory + "/" + entry
         modname = os.path.splitext(entry)[0]
         if entry.endswith("py") and entry.startswith("test_"):
             entry = __import__( modname,{},{},['1'] )
             suite.addTest(loader.loadTestsFromModule(entry))
-        elif os.path.isdir(entry):
+        elif os.path.isdir(entry_with_path):
             if recursive:
                 try:
-                    subdirectory = directory + "/" + entry
-                    add_to_test_suite_rec(suite, loader, subdirectory, recursive)
+                    add_to_test_suite_rec(suite, loader, entry_with_path, recursive)
                 except:
                     pass # not valid entry
+
+    sys.path.remove(directory)
 
 
 class TimeRecorder(object):
