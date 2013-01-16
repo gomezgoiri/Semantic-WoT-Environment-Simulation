@@ -97,7 +97,7 @@ class OurSolution(TripleSpace):
         
     def be_whitepage(self):
         self.whitepage = Whitepage()
-        self.discovery.me.discovery_record.is_whitepage=True
+        self.discovery.get_my_record().is_whitepage=True
         # TODO check if another whitepage already exist and resolve conflict (step 6)
     
     @schedule

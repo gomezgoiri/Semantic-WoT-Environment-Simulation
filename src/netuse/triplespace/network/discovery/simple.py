@@ -67,6 +67,9 @@ class SimpleDiscoveryMechanism(DiscoveryInstance):
         for observer in self.observers:
             observer.on_whitepage_selected_after_none()
     
+    def get_my_record(self):
+        return self.me.discovery_record
+    
     def get_discovered_records(self):
         if not self.me.down:
             ret = []

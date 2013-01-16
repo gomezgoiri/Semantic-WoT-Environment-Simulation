@@ -20,7 +20,7 @@ class ConsumerFactory(object):
         self.discovery = discovery
     
     def _canManageClues(self):
-        my_drecord = self.discovery.me.discovery_record
+        my_drecord = self.discovery.get_my_record()
         # really naive condition
         # TODO enhance and take into account selection module
         return WhitepageSelector._to_bytes(*my_drecord.memory) > WhitepageSelector._to_bytes(*WhitepageSelector.MEMORY_LIMIT)            
