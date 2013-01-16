@@ -46,14 +46,13 @@ class TestDynamicNodesModel(unittest.TestCase):
     def test_configure(self, mock_method):
         mock_method.side_effect = self.get_nodes
         
-        parametrization = Mock()
-        parametrization.simulateUntil = 2000
+        simulateUntil = 2000
         
-        model = DynamicNodesModel(parametrization, 500, 200)
+        model = DynamicNodesModel(simulateUntil, 500, 200)
         model._random = self.random
-        
+                
         model.configure() # test method
-        self.simulation.simulate(until=parametrization.simulateUntil)
+        self.simulation.simulate(until=simulateUntil)
         
         for node in self.get_nodes():
             self.assertItemsEqual( ( (400, "down"),
@@ -84,14 +83,13 @@ class TestOneNodeDownModel(unittest.TestCase):
     def test_configure(self, mock_method):
         mock_method.side_effect = self.get_nodes
         
-        parametrization = Mock()
-        parametrization.simulateUntil = 2000
+        simulateUntil = 2000
         
-        model = OneNodeDownModel(parametrization, 500, 200)
+        model = OneNodeDownModel(simulateUntil, 500, 200)
         model._random = self.random
         
         model.configure() # test method
-        self.simulation.simulate(until=parametrization.simulateUntil)
+        self.simulation.simulate(until=simulateUntil)
         
         total_activity = [ (400, "down"), (800, "up"),
                            (800, "down"), (1200, "up"),
