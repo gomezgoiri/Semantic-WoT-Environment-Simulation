@@ -5,15 +5,18 @@ Created on Jan 15, 2013
 '''
 import weakref
 from abc import ABCMeta, abstractmethod
-from netuse.triplespace.network.discovery.simple import MagicInstantNetwork, SimpleDiscoveryMechanism
 
 
 class DiscoveryFactory(object):
     
     def __init__(self, nodes):
+        # Dirty. If it is imported at the beginning of the module, it throws a recursion error
+        from netuse.triplespace.network.discovery.simple import MagicInstantNetwork
         self.network = MagicInstantNetwork(nodes)
         
     def create_simple_discovery(self, localNode):
+        # Dirty. If it is imported at the beginning of the module, it throws a recursion error
+        from netuse.triplespace.network.discovery.simple import SimpleDiscoveryMechanism
         return SimpleDiscoveryMechanism(localNode, self.network)
 
 
