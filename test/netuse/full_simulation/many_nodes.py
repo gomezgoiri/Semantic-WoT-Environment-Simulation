@@ -32,12 +32,9 @@ class TraceAndLoadFilesModel(BasicModel):
         #trace.tchange(outfile=open(r"/tmp/simulation.log","w"))
         
         self.initialize()
-        
-        nodes = NodeGenerator(self.parameters, simulation=self)
-        nodes.generateNodes()
-        self.stoppables.extend( nodes.getNodes() )
-        
+                
         ActivityGenerator.create(self.parameters, preloadedGraph, simulation=self)
+        self.stoppables.extend( NodeGenerator.getNodes() )
         
         recorder = TimeRecorder()
         recorder.start()

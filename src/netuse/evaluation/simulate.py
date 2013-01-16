@@ -64,12 +64,9 @@ class Model(BasicModel):
         sfl.loadGraphsJustOnce(self.parameters.nodes, loadedGraphs)
         
         self.initialize()
-        
-        nodes = NodeGenerator(self.parameters, simulation=self)
-        nodes.generateNodes()
-        self.stoppables.extend( nodes.getNodes() )
-        
+                
         ActivityGenerator.create(self.parameters, loadedGraphs, simulation=self)
+        self.stoppables.extend( NodeGenerator.getNodes() )
         
         self.simulate( until = self.parameters.simulateUntil )
 

@@ -13,11 +13,12 @@ from netuse.triplespace.network.server import CustomSimulationHandler
 
 class NodeGenerator(object):
     
+    Nodes = {}
+    
     def __init__(self, params, simulation):
         self.__params = params
         self.__simulation = simulation
         NodeGenerator.Nodes = {}
-        self.__totalRequests = -1
     
     def generateNodes(self):
         for nodeName, nodeType in zip(self.__params.nodes, self.__params.nodeTypes):
@@ -90,6 +91,7 @@ class Node(Process):
         #  2. We can create a new handler for each request or share the same handler.
         #     In absence of better arguments, we use the second alternative to save resources.
         self._http_handler = CustomSimulationHandler(ts_strategy)
+        self._ts.discovery = self._discovery_instance # sets the discovery instance
     
     @ts.deleter
     def ts(self):
@@ -99,7 +101,7 @@ class Node(Process):
     def canReason(self):
         return self.__device.canReason
     
-    def __init__(self, name="node", device=None, joined_since=1, sac=False, battery_lifetime=1, sim=None):
+    def __init__(self, name="node", discovery_factory=None, device=None, joined_since=1, sac=False, battery_lifetime=1, sim=None):
         super(Node, self).__init__(name=name, sim=sim)
         self._ts = None
         self._http_handler = None
@@ -112,6 +114,7 @@ class Node(Process):
                                                 joined_since = joined_since,
                                                 sac = sac,
                                                 battery_lifetime = battery_lifetime if self.__device.hasBattery else DiscoveryRecord.INFINITE_BATTERY)
+        self._discovery_instance = discovery_factory.create_simple_discovery(self)
         
         self.__httpIn = []
         self.__reqIdGenerator = 0

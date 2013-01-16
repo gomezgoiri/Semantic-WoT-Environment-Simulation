@@ -9,12 +9,14 @@ from itertools import cycle
 from rdflib import Graph
 from SimPy.Simulation import random
 from abc import abstractmethod, ABCMeta
-from netuse.nodes import NodeGenerator
+from devices import DeviceType
+from netuse.nodes import NodeGenerator, Node
 from netuse.network_models import NetworkModelManager
 from netuse.triplespace.kernel import NegativeBroadcasting, Centralized, OurSolution
 from netuse.triplespace.network.discovery.discovery import DiscoveryFactory
 from netuse.database.parametrization import Parametrization
 from netuse.results import G
+
 
 class ActivityGenerator(object):
     
@@ -55,7 +57,14 @@ class AbstractActivity(object):
     def _configure_nodes(self):
         pass
     
+    def _generate_nodes(self):
+        for nodeName, nodeType in zip(self.__params.nodes, self.__params.nodeTypes):
+            node = Node(nodeName, self._discovery_factory, DeviceType.create(nodeType), sim=self.__simulation)
+            NodeGenerator.Nodes[nodeName] = node
+            self.__simulation.activate(node,node.processRequests())
+    
     def generate_activity(self):
+        self._generate_nodes()
         self._configure_nodes()
         NetworkModelManager.run_model(self._simulation, self._params, self._discovery_factory.network)
         self._generateSimulationWritings()
