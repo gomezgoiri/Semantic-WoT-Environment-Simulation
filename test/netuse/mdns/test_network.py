@@ -83,6 +83,7 @@ class TestResponder(unittest.TestCase):
         # Node C asks: Node A and Node B send their records using unicast (because the answer was recently sent) 
         self.assertEquals(3, self.count_unicast_communications())
 
+
 class FakeNetwork(object):
     
     def send_unicast(self, *args):

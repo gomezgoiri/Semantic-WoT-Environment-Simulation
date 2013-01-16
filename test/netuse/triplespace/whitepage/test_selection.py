@@ -1,5 +1,6 @@
 import unittest
 import urllib
+from mock import Mock
 from rdflib import URIRef
 from rdflib.Literal import Literal, _XSD_NS
 from netuse.nodes import Node
@@ -70,10 +71,13 @@ class WhitepageSelectorTestCase(unittest.TestCase):
     def test_select_with_real_devices(self):
         candidates = []
         
-        for _ in range(1): candidates.append( Node("server", DeviceType.create(Server.TYPE_ID)).discovery_record )
-        for i in range(30): candidates.append( Node("galaxy_%d"%(i), DeviceType.create(SamsungGalaxyTab.TYPE_ID)).discovery_record )
-        for i in range(69): candidates.append( Node("fox_%d"%(i), DeviceType.create(FoxG20.TYPE_ID)).discovery_record )
-        for i in range(200): candidates.append( Node("xbee_%d"%(i), DeviceType.create(XBee.TYPE_ID)).discovery_record )
+        factory = Mock()
+        factory.create_simple_discovery.side_effect = lambda node, record: candidates.append(record)
+        
+        for _ in range(1): Node("server", discovery_factory = factory, device = DeviceType.create(Server.TYPE_ID))
+        for i in range(30): Node("galaxy_%d"%(i), discovery_factory = factory, device = DeviceType.create(SamsungGalaxyTab.TYPE_ID))
+        for i in range(69): Node("fox_%d"%(i), discovery_factory = factory, device = DeviceType.create(FoxG20.TYPE_ID))
+        for i in range(200): Node("xbee_%d"%(i), discovery_factory = factory, device = DeviceType.create(XBee.TYPE_ID))
         
         selected_record = WhitepageSelector.select_whitepage(candidates)
         self.assertEquals("server", selected_record.node_name)

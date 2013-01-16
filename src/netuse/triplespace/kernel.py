@@ -19,9 +19,9 @@ from netuse.triplespace.network.client import RequestManager, RequestInstance, R
 class TripleSpace(object):
     __metaclass__ = ABCMeta
     
-    def __init__(self, simulation, discovery):
+    def __init__(self, simulation):
         self.simulation = simulation
-        self.discovery = discovery
+        self.discovery = None # should be set
         
         self.__logRequests = False
         self.reasoningCapacity = False # TODO refactor (it should be get from Device
@@ -43,8 +43,8 @@ class TripleSpace(object):
 
 
 class NegativeBroadcasting(TripleSpace):
-    def __init__(self, discovery, simulation):
-        super(NegativeBroadcasting, self).__init__(simulation, discovery)
+    def __init__(self, simulation):
+        super(NegativeBroadcasting, self).__init__(simulation)
     
     @schedule
     def write(self, triples):
@@ -89,8 +89,8 @@ class Centralized(TripleSpace):
 
 
 class OurSolution(TripleSpace):
-    def __init__(self, discovery, simulation): # ontologyGraph, which may be already expanded or not
-        super(OurSolution, self).__init__(simulation, discovery)
+    def __init__(self, simulation): # ontologyGraph, which may be already expanded or not
+        super(OurSolution, self).__init__(simulation)
         self.provider = None
         self.consumer = None
         self.whitepage = None # just the whitepage will have this attribute to !=None

@@ -55,9 +55,10 @@ class SimpleDiscoveryMechanism(DiscoveryInstance):
     """
     Simple discovery, which just asks to the MagicInstantNetwork object to get the latest state.
     """
-    def __init__(self, me, magic_network):
+    def __init__(self, me, my_record, magic_network):
         super(SimpleDiscoveryMechanism, self).__init__()
         self.me_ref = weakref.ref(me) # with a weakref.proxy a WeakSet.remove does not work OK
+        self.my_record = my_record
         # If you use weakref in "magic_network": the factory will be destroyed and this will be None.
         self.magic_network = magic_network # weakref.proxy(magic_network) 
         self.magic_network.add_changes_observer(self)
@@ -68,7 +69,7 @@ class SimpleDiscoveryMechanism(DiscoveryInstance):
             observer.on_whitepage_selected_after_none()
     
     def get_my_record(self):
-        return self.me.discovery_record
+        return self.my_record
     
     def get_discovered_records(self):
         if not self.me.down:

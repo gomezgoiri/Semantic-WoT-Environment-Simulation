@@ -28,7 +28,7 @@ class SimpleDiscoveryMechanismTestCase(unittest.TestCase): # classes under test:
             self.other_nodes.append(node)
         
         self.network = MagicInstantNetwork(nodes)
-        self.simple_discovery = SimpleDiscoveryMechanism(self.main_node, self.network)
+        self.simple_discovery = SimpleDiscoveryMechanism(self.main_node, self.main_node.discovery_record, self.network)
     
     def test_get_nodes(self):
         nodes = self.simple_discovery.get_nodes()

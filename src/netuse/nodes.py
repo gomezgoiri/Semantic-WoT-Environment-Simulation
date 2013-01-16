@@ -108,13 +108,14 @@ class Node(Process):
         self.__device = device if device!=None else RegularComputer() # device type 
         self.__connections = Connections( self.__device, sim = sim, name = "%s's connections"%(name) )
         
+        # TODO remove external dependency with self.discovery_record
         self.discovery_record = DiscoveryRecord(node_name = name,
                                                 memory = self.__device.ram_memory,
                                                 storage = self.__device.storage_capacity,
                                                 joined_since = joined_since,
                                                 sac = sac,
                                                 battery_lifetime = battery_lifetime if self.__device.hasBattery else DiscoveryRecord.INFINITE_BATTERY)
-        self._discovery_instance = discovery_factory.create_simple_discovery(self)
+        self._discovery_instance = discovery_factory.create_simple_discovery(self, self.discovery_record)
         
         self.__httpIn = []
         self.__reqIdGenerator = 0
@@ -154,7 +155,7 @@ class Node(Process):
         """If the node is alive, it goes down. Otherwise, it goes up."""
         self.down = not self.down
         if not self.down: # if the node goes up
-            self.discovery_record.is_whitepage = False # not anymore
+            self._discovery_instance.get_my_record().is_whitepage = False # not anymore
             # What if nobody is WP right now?
             # After this notification of the former WP and taking into account that there is no WP,
             # the selection process will be restarted by a consumer. 

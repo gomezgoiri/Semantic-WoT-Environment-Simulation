@@ -14,7 +14,7 @@ class DiscoveryFactory(object):
         from netuse.triplespace.network.discovery.simple import MagicInstantNetwork
         self.network = MagicInstantNetwork(nodes)
         
-    def create_simple_discovery(self, localNode):
+    def create_simple_discovery(self, localNode, my_record):
         # Dirty. If it is imported at the beginning of the module, it throws a recursion error
         from netuse.triplespace.network.discovery.simple import SimpleDiscoveryMechanism
         return SimpleDiscoveryMechanism(localNode, self.network)

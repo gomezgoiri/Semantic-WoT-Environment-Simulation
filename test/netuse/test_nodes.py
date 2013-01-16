@@ -36,7 +36,7 @@ class TestNodes(unittest.TestCase):
         s = Simulation()
         s.initialize()
         
-        node = Node(sim=s)
+        node = Node(sim=s, discovery_factory=Mock())
         node.down = True
         s.activate(node, node.processRequests())
         
@@ -57,7 +57,7 @@ class TestNodes(unittest.TestCase):
         s = Simulation()
         s.initialize()
         
-        node = Node(sim=s)
+        node = Node(sim=s, discovery_factory=Mock())
         node.down = True
         s.activate(node, node.processRequests())
         
