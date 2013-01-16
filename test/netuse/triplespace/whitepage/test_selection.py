@@ -72,7 +72,7 @@ class WhitepageSelectorTestCase(unittest.TestCase):
         candidates = []
         
         factory = Mock()
-        factory.create_simple_discovery.side_effect = lambda node, record: candidates.append(record)
+        factory.create_simple_discovery.side_effect = lambda record: candidates.append(record)
         
         for _ in range(1): Node("server", discovery_factory = factory, device = DeviceType.create(Server.TYPE_ID))
         for i in range(30): Node("galaxy_%d"%(i), discovery_factory = factory, device = DeviceType.create(SamsungGalaxyTab.TYPE_ID))

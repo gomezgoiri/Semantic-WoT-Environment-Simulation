@@ -9,15 +9,15 @@ from abc import ABCMeta, abstractmethod
 
 class DiscoveryFactory(object):
     
-    def __init__(self, nodes):
+    def __init__(self):
         # Dirty. If it is imported at the beginning of the module, it throws a recursion error
         from netuse.triplespace.network.discovery.simple import MagicInstantNetwork
-        self.network = MagicInstantNetwork(nodes)
+        self.network = MagicInstantNetwork()
         
-    def create_simple_discovery(self, localNode, my_record):
+    def create_simple_discovery(self, my_record):
         # Dirty. If it is imported at the beginning of the module, it throws a recursion error
         from netuse.triplespace.network.discovery.simple import SimpleDiscoveryMechanism
-        return SimpleDiscoveryMechanism(localNode, self.network)
+        return SimpleDiscoveryMechanism(my_record, self.network)
 
 
 class DiscoveryEventObserver(object):
