@@ -4,7 +4,7 @@ Created on Sep 16, 2012
 @author: tulvur
 '''
 import weakref
-from netuse.nodes import NodeGenerator
+from netuse.nodes import NodeManager
 from netuse.triplespace.network.discovery.discovery import DiscoveryInstance
 from netuse.triplespace.network.discovery.record import DiscoveryRecordObserver
 
@@ -21,7 +21,7 @@ class MagicInstantNetwork(DiscoveryRecordObserver):
         self.instances.add(discovery_instance)
         
     def _get_node_for_record(self, record):
-        return NodeGenerator.Nodes[record.node_name]
+        return NodeManager.nodes[record.node_name]
     
     def get_records(self):
         current_records = weakref.WeakSet()
@@ -94,7 +94,7 @@ class SimpleDiscoveryMechanism(DiscoveryInstance):
         return None if wp_rec is None else self._get_node_for_record( wp_rec ) 
     
     def _get_node_for_record(self, record):
-        return NodeGenerator.Nodes[record.node_name]
+        return NodeManager.nodes[record.node_name]
     
     @property
     def me(self):

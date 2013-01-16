@@ -2,7 +2,7 @@ from rdflib import URIRef, Namespace, RDF
 
 from netuse.results import G
 from netuse.tracers.http import FileHTTPTracer
-from netuse.nodes import NodeGenerator
+from netuse.nodes import NodeManager
 from netuse.activity import ActivityGenerator
 from netuse.evaluation.simulate import BasicModel
 from netuse.evaluation.utils import ParametrizationUtils, Parameters
@@ -23,7 +23,7 @@ class SimpleTraceModel(BasicModel):
         self.initialize()
         
         ActivityGenerator.create(self.parameters, None, simulation=self)
-        self.stoppables.extend( NodeGenerator.getNodes() )
+        self.stoppables.extend( NodeManager.getNodes() )
         
         self.simulate( until=self.parameters.simulateUntil )
 

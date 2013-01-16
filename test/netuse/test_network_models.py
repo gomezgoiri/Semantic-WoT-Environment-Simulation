@@ -10,7 +10,7 @@ from netuse.sim_utils import schedule
 from SimPy.Simulation import Simulation, Process
 from netuse.network_models import DynamicNodesModel, OneNodeDownModel, ChaoticModel
 
-from netuse.nodes import NodeGenerator # used in tested class, here it is patched
+from netuse.nodes import NodeManager # used in tested class, here it is patched
 
 
 class FakeNode(Process):
@@ -42,7 +42,7 @@ class TestDynamicNodesModel(unittest.TestCase):
     def get_nodes(self):
         return self.nodes
     
-    @patch.object(NodeGenerator, 'getNodes')
+    @patch.object(NodeManager, 'getNodes')
     def test_configure(self, mock_method):
         mock_method.side_effect = self.get_nodes
         
@@ -79,7 +79,7 @@ class TestOneNodeDownModel(unittest.TestCase):
     def get_nodes(self):
         return self.nodes
     
-    @patch.object(NodeGenerator, 'getNodes')
+    @patch.object(NodeManager, 'getNodes')
     def test_configure(self, mock_method):
         mock_method.side_effect = self.get_nodes
         

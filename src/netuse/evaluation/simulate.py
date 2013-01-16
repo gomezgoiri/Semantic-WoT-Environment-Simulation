@@ -8,7 +8,7 @@ import datetime
 # "SimulationTrace" instead of "Simulation" to debug
 from SimPy.Simulation import Simulation
 from netuse.activity import ActivityGenerator
-from netuse.nodes import NodeGenerator
+from netuse.nodes import NodeManager
 from netuse.database.execution import ExecutionSet, Execution
 from netuse.results import G
 from commons.utils import SemanticFilesLoader
@@ -66,7 +66,7 @@ class Model(BasicModel):
         self.initialize()
                 
         ActivityGenerator.create(self.parameters, loadedGraphs, simulation=self)
-        self.stoppables.extend( NodeGenerator.getNodes() )
+        self.stoppables.extend( NodeManager.getNodes() )
         
         self.simulate( until = self.parameters.simulateUntil )
 

@@ -10,7 +10,7 @@ from rdflib import Graph
 from SimPy.Simulation import random
 from abc import abstractmethod, ABCMeta
 from devices import DeviceType
-from netuse.nodes import NodeGenerator, Node
+from netuse.nodes import NodeManager, Node
 from netuse.network_models import NetworkModelManager
 from netuse.triplespace.kernel import NegativeBroadcasting, Centralized, OurSolution
 from netuse.triplespace.network.discovery.discovery import DiscoveryFactory
@@ -51,7 +51,7 @@ class AbstractActivity(object):
         self._params = params
         self._baseGraphs = baseGraphs
         self._simulation = simulation
-        self._discovery_factory = DiscoveryFactory(NodeGenerator.getNodes())
+        self._discovery_factory = DiscoveryFactory(NodeManager.getNodes())
     
     @abstractmethod
     def _configure_nodes(self):
@@ -60,7 +60,7 @@ class AbstractActivity(object):
     def _generate_nodes(self):
         for nodeName, nodeType in zip(self.__params.nodes, self.__params.nodeTypes):
             node = Node(nodeName, self._discovery_factory, DeviceType.create(nodeType), sim=self.__simulation)
-            NodeGenerator.Nodes[nodeName] = node
+            NodeManager.nodes[nodeName] = node
             self.__simulation.activate(node,node.processRequests())
     
     def generate_activity(self):
@@ -75,7 +75,7 @@ class AbstractActivity(object):
         if 0 < self._params.writeFrequency:
             # writings
             for i in range(0,self._params.numberOfNodes):
-                actionNode = NodeGenerator.getNodes()[i]
+                actionNode = NodeManager.getNodes()[i]
                 graphsToWrite = () if self._baseGraphs==None or not actionNode.name in self._baseGraphs else copy.deepcopy(self._baseGraphs[actionNode.name])                
                 # a little bit of randomness to avoid all the nodes writing at the same time
                 startsWriting = random.randint(0, self._params.writeFrequency)
@@ -90,7 +90,7 @@ class AbstractActivity(object):
         
     
     def _generateSimulationQueries(self, numConsumers):
-        consumerNodes = cycle(G.Rnd.sample(NodeGenerator.getNodes(), numConsumers))
+        consumerNodes = cycle(G.Rnd.sample(NodeManager.getNodes(), numConsumers))
         
         # queries to central node
         if self._params.numberOfNodes>1: # otherwise it does not make sense!
@@ -106,21 +106,21 @@ class AbstractActivity(object):
 class NegativeBroadcastingActivity(AbstractActivity):
     
     def _configure_nodes(self):
-        for n in NodeGenerator.getNodes():
+        for n in NodeManager.getNodes():
             n.ts = NegativeBroadcasting(self._simulation)
 
 class OurSolutionActivity(AbstractActivity):       
     def _configure_nodes(self):
-        for n in NodeGenerator.getNodes():
+        for n in NodeManager.getNodes():
             n.ts = OurSolution(self._simulation) #, self._baseGraphs['ontology'])
             n.ts.reasoningCapacity = n.canReason
 
 class CentralizedActivity(AbstractActivity):
     def _configure_nodes(self):
-        centralNode = NodeGenerator.getNodes()[0] # for instance
+        centralNode = NodeManager.getNodes()[0] # for instance
         centralNode.ts = Centralized(centralNode)
         
-        rest = list(NodeGenerator.getNodes())
+        rest = list(NodeManager.getNodes())
         rest.remove(centralNode)
         for n in rest:
             n.ts = Centralized(n, centralNode)

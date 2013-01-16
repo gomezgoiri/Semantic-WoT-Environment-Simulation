@@ -6,7 +6,7 @@ from testing.memory_usage import memory
 from netuse.results import G
 from netuse.evaluation.simulate import BasicModel
 from netuse.tracers.http import FileHTTPTracer
-from netuse.nodes import NodeGenerator
+from netuse.nodes import NodeManager
 from netuse.activity import ActivityGenerator
 from commons.utils import SemanticFilesLoader
 from netuse.database.parametrization import Parametrization, ParametrizableNetworkModel
@@ -34,7 +34,7 @@ class TraceAndLoadFilesModel(BasicModel):
         self.initialize()
                 
         ActivityGenerator.create(self.parameters, preloadedGraph, simulation=self)
-        self.stoppables.extend( NodeGenerator.getNodes() )
+        self.stoppables.extend( NodeManager.getNodes() )
         
         recorder = TimeRecorder()
         recorder.start()

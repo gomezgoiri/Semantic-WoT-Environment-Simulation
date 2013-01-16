@@ -7,7 +7,7 @@ from abc import abstractmethod, ABCMeta
 from netuse.sim_utils import schedule
 from SimPy.Simulation import Process, hold
 
-from netuse.nodes import NodeGenerator
+from netuse.nodes import NodeManager
 from netuse.triplespace.our_solution.whitepage.whitepage import Whitepage
 from netuse.triplespace.our_solution.provider.provider import Provider
 from netuse.triplespace.our_solution.consumer.consumer import ConsumerFactory
@@ -170,7 +170,7 @@ class QueryFinisher(Process, RequestObserver):
                     destNodes = []
                     for node_name in selected_nodes:
                         if node_name!=self.discovery.me.name: # local query already done
-                            destNodes.append(NodeGenerator.getNodeByName(node_name))
+                            destNodes.append(NodeManager.getNodeByName(node_name))
                     
                     req = RequestInstance(self.discovery.me, destNodes,
                                           '/' + self.fromSpaceToURL + "query/" + self.fromTemplateToURLtemplate,

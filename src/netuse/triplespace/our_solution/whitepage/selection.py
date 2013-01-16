@@ -1,6 +1,6 @@
 from numpy import mean, std
 from abc import ABCMeta, abstractmethod
-from netuse.nodes import NodeGenerator
+from netuse.nodes import NodeManager
 from netuse.triplespace.network.discovery.record import DiscoveryRecord
 from netuse.triplespace.network.client import RequestInstance, RequestManager, RequestObserver       
 
@@ -181,7 +181,7 @@ class WhitepageSelectionManager(RequestObserver):
     
     def _get_choose_request(self):
         req = RequestInstance( self.discovery.me,
-                               [ NodeGenerator.getNodeByName(self.last_choosen) ],
+                               [ NodeManager.getNodeByName(self.last_choosen) ],
                                '/whitepage/choose', data = '',
                                sim = self.simulation ) # it has data => POST
         req.addObserver(self)
@@ -190,7 +190,7 @@ class WhitepageSelectionManager(RequestObserver):
     def notifyRequestFinished(self, request_instance):
         for unique_response in request_instance.responses:
             if unique_response.getstatus()==200:
-                self.observer.wp_selection_finished( NodeGenerator.getNodeByName(self.last_choosen) )
+                self.observer.wp_selection_finished( NodeManager.getNodeByName(self.last_choosen) )
             else: # has refused being whitepage!
                 self.refused.append(self.last_choosen)
                 self.choose_whitepage()

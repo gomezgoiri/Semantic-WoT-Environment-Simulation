@@ -11,28 +11,28 @@ from netuse.triplespace.network.discovery.record import DiscoveryRecord
 from netuse.triplespace.network.server import CustomSimulationHandler
 
 
-class NodeGenerator(object):
+class NodeManager(object):
     
-    Nodes = {}
+    nodes = {}
     
     def __init__(self, params, simulation):
         self.__params = params
         self.__simulation = simulation
-        NodeGenerator.Nodes = {}
+        NodeManager.nodes = {}
     
     def generateNodes(self):
         for nodeName, nodeType in zip(self.__params.nodes, self.__params.nodeTypes):
             node = Node(nodeName, DeviceType.create(nodeType), sim=self.__simulation)
-            NodeGenerator.Nodes[nodeName] = node
+            NodeManager.nodes[nodeName] = node
             self.__simulation.activate(node,node.processRequests())
     
     @staticmethod
     def getNodes():
-        return NodeGenerator.Nodes.values()
+        return NodeManager.nodes.values()
     
     @staticmethod
     def getNodeByName(node_name):
-        return NodeGenerator.Nodes[node_name]
+        return NodeManager.nodes[node_name]
 
 
 class ConcurrentThread(Process):

@@ -7,7 +7,7 @@ Created on Dec 8, 2012
 from random import Random
 from SimPy.Simulation import Process, hold
 from netuse.sim_utils import activatable
-from netuse.nodes import NodeGenerator
+from netuse.nodes import NodeManager
 
 class NetworkModelManager(object):
     """
@@ -58,7 +58,7 @@ class DynamicNodesModel(object):
         self._random = Random()
     
     def configure(self):
-        for node in NodeGenerator.getNodes():
+        for node in NodeManager.getNodes():
             last_event_time = 0
             while last_event_time < self._sim_time:
                 next_event_on = self._random.normalvariate(*self._change_state_each)
@@ -79,7 +79,7 @@ class OneNodeDownModel(object):
         self._random = Random()
     
     def configure(self):
-        nodes = NodeGenerator.getNodes()
+        nodes = NodeManager.getNodes()
         node = None
         event_at = 0
         while event_at < self._sim_time:
