@@ -41,7 +41,7 @@ class MagicInstantNetwork(DiscoveryRecordObserver):
         return None
     
     def notify_changes(self):
-        wp = self.get_whitepage()
+        wp = self.get_whitepage_record()
         if self.whitepage_exist and wp==None:
             self.whitepage_exist = False
         else:

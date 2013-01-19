@@ -43,8 +43,8 @@ class WhitepageSelector(object):
     @staticmethod
     def _filter_less_memory_than(candidates, min_memory_limit):
         # a) Filtra a los que no tengan al menos X memoria.        
-        min = WhitepageSelector._to_bytes(*min_memory_limit) # supose 1KB per node
-        greater_than_min = lambda record: WhitepageSelector._to_bytes(*record.memory) >= min
+        minm = WhitepageSelector._to_bytes(*min_memory_limit) # supose 1KB per node
+        greater_than_min = lambda record: WhitepageSelector._to_bytes(*record.memory) >= minm
         return filter(greater_than_min, candidates)
     
     @staticmethod
@@ -181,7 +181,7 @@ class WhitepageSelectionManager(RequestObserver):
     
     def _get_choose_request(self):
         req = RequestInstance( self.discovery.me,
-                               [ NodeManager.getNodeByName(self.last_choosen) ],
+                               [ NodeManager.getNodeByName(self.last_choosen.node_name) ],
                                '/whitepage/choose', data = '',
                                sim = self.simulation ) # it has data => POST
         req.addObserver(self)

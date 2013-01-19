@@ -117,8 +117,8 @@ class ChaoticModel(Process):
             if last_wp is not None:
                 last_wp.swap_state() # to revert the going down of the previous WP
                 #print "%s went up on %d."%(last_wp.name, self.sim.now())
-            
-            last_wp = self._network.get_whitepage()
+            last_wp = self._network.get_whitepage_record()
             if last_wp is not None:
+                last_wp = self._network._get_node_for_record( last_wp )
                 last_wp.swap_state() # normal call, not scheduling it
                 #print "%s went down on %d."%(last_wp.name, self.sim.now())

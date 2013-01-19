@@ -58,10 +58,10 @@ class AbstractActivity(object):
         pass
     
     def _generate_nodes(self):
-        for nodeName, nodeType in zip(self.__params.nodes, self.__params.nodeTypes):
-            node = Node(nodeName, self._discovery_factory, DeviceType.create(nodeType), sim=self.__simulation)
+        for nodeName, nodeType in zip(self._params.nodes, self._params.nodeTypes):
+            node = Node(nodeName, self._discovery_factory, DeviceType.create(nodeType), sim=self._simulation)
             NodeManager.nodes[nodeName] = node
-            self.__simulation.activate(node,node.processRequests())
+            self._simulation.activate(node,node.processRequests())
     
     def generate_activity(self):
         self._generate_nodes()
