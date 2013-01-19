@@ -95,7 +95,7 @@ class Node(Process):
     def canReason(self):
         return self.__device.canReason
     
-    def __init__(self, name="node", discovery_factory=None, device=None, joined_since=1, sac=False, battery_lifetime=1, sim=None):
+    def __init__(self, name="node", discovery_factory=None, device=None, joined_since=1, battery_lifetime=1, sim=None):
         super(Node, self).__init__(name=name, sim=sim)
         self._ts = None
         self._http_handler = None
@@ -106,7 +106,6 @@ class Node(Process):
                                                 memory = self.__device.ram_memory,
                                                 storage = self.__device.storage_capacity,
                                                 joined_since = joined_since,
-                                                sac = sac,
                                                 battery_lifetime = battery_lifetime if self.__device.hasBattery else DiscoveryRecord.INFINITE_BATTERY)
         self._discovery_instance = discovery_factory.create_simple_discovery(discovery_record)
         

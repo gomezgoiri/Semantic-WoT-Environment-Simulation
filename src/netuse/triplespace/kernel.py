@@ -115,7 +115,7 @@ class OurSolution(TripleSpace):
     def query(self, template):
         if self.consumer is None:
             factory = ConsumerFactory(self.simulation, self.discovery)
-            self.consumer = factory.createConsumer() # change the discovery registry to set "sac" property
+            self.consumer = factory.createConsumer()
         
         # remote queries
         qf = QueryFinisher(self.consumer,

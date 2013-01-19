@@ -12,8 +12,8 @@ from netuse.triplespace.our_solution.whitepage.selection import WhitepageSelecto
 class TestRecord(DiscoveryRecord):
     
     def __init__(self, memory='1MB', storage='1MB',
-                 joined_since=1, battery_lifetime=DiscoveryRecord.INFINITE_BATTERY, sac=False, is_whitepage=False):
-        super(TestRecord, self).__init__("fake_node_name", memory, storage, joined_since, sac, battery_lifetime)
+                 joined_since=1, battery_lifetime=DiscoveryRecord.INFINITE_BATTERY, is_whitepage=False):
+        super(TestRecord, self).__init__("fake_node_name", memory, storage, joined_since, battery_lifetime)
     
     def tuple_to_str(self, tuple):
         return str(tuple[0]) + tuple[1]

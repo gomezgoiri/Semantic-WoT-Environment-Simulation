@@ -18,13 +18,12 @@ class DiscoveryRecord(object):
     INFINITE_BATTERY = 'inf' # plugged in to the plug
     
     def __init__(self, node_name, memory='1MB', storage='1MB',
-                 joined_since=1, sac=False, battery_lifetime=INFINITE_BATTERY, is_whitepage=False):
+                 joined_since=1, battery_lifetime=INFINITE_BATTERY, is_whitepage=False):
         self.node_name = node_name
         self.change_observers = weakref.WeakSet()
         self.memory = self._separate_units_from_values(memory) # does not change
         self.storage = self._separate_units_from_values(storage) # does not change
         self.__joined_since = joined_since
-        self.__sac = sac
         self.__battery_lifetime = battery_lifetime
         self.__is_whitepage = is_whitepage
         
@@ -44,19 +43,6 @@ class DiscoveryRecord(object):
     def __record_updated(self):
         for observer in self.change_observers:
             observer.notify_changes()
-        
-    @property
-    def sac(self):
-        return self.__sac
-    
-    @sac.setter
-    def sac(self, sac):
-        self.__sac = sac
-        self.__record_updated()
-    
-    @sac.deleter
-    def sac(self):
-        del self.__sac
     
     @property
     def joined_since(self):
