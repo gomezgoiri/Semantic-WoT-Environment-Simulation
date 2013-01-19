@@ -65,6 +65,12 @@ class SimpleDiscoveryMechanism(DiscoveryInstance):
         self.magic_network = magic_network # weakref.proxy(magic_network) 
         self.magic_network.join_space(self)
     
+    def start(self):
+        pass
+    
+    def stop(self):
+        pass
+    
     # paradox: it just intermediates (to avoid directly observing other nodes' registers)
     def on_whitepage_selected_after_none(self):
         for observer in self.observers:

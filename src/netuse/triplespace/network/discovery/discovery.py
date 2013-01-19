@@ -9,15 +9,26 @@ from abc import ABCMeta, abstractmethod
 
 class DiscoveryFactory(object):
     
-    def __init__(self):
-        # Dirty. If it is imported at the beginning of the module, it throws a recursion error
-        from netuse.triplespace.network.discovery.simple import MagicInstantNetwork
-        self.network = MagicInstantNetwork()
+    def __init__(self, simulation):
+        self.simulation = simulation
         
-    def create_simple_discovery(self, my_record):
+    def create_simple(self, my_record):
         # Dirty. If it is imported at the beginning of the module, it throws a recursion error
+        if not hasattr(self, 'network'):
+            from netuse.triplespace.network.discovery.simple import MagicInstantNetwork
+            self.network = MagicInstantNetwork()
+        
         from netuse.triplespace.network.discovery.simple import SimpleDiscoveryMechanism
         return SimpleDiscoveryMechanism(my_record, self.network)
+    
+    def create_mdns(self, my_record, simulation):
+        # Dirty. If it is imported at the beginning of the module, it throws a recursion error
+        if not hasattr(self, 'network'):
+            from netuse.mdns.network import UDPNetwork
+            self.network = UDPNetwork(self.simulation, udp_tracer = None)
+        
+        from netuse.triplespace.network.discovery.mdns import MDNSDiscoveryInstance
+        return MDNSDiscoveryInstance(my_record, self.network, self.simulation)
 
 
 class DiscoveryEventObserver(object):
@@ -39,6 +50,14 @@ class DiscoveryInstance(object):
     
     def __init__(self):
         self.observers = weakref.WeakSet()
+        
+    @abstractmethod
+    def start(self):
+        pass
+    
+    @abstractmethod
+    def stop(self):
+        pass
             
     def add_changes_observer(self, observer):
         self.observers.add(observer) # of type DiscoveryEventObserver

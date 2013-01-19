@@ -56,8 +56,14 @@ class MDNSDiscoveryInstance(DiscoveryInstance, DiscoveryRecordObserver):
         self.mdns_node.write_record( SVRRecord(domain_name, "0.0.0.0", 9999) )
         self.mdns_node.write_record( DiscoveryRecordConverter.to_txt_record(self.my_record) )
         
+        
+    # stop() when node goes down!
+    
+    def start(self):
         self.mdns_node.start()
-        # stop() when node goes down!
+    
+    def stop(self):
+        self.mdns_node.stop()
     
     # inherited from DiscoveryRecordObserver
     def notify_changes(self):
@@ -72,7 +78,7 @@ class MDNSDiscoveryInstance(DiscoveryInstance, DiscoveryRecordObserver):
         return self.my_record
     
     def get_discovered_records(self):
-        if not self.me.down:
+        if self.mdns_node.running: # self.me.down:
             restOfTheRecords = []
             for record in self.mdns_node.cache.records:
                 if record.type=="TXT":

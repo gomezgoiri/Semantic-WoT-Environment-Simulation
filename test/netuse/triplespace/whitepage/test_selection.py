@@ -67,19 +67,23 @@ class WhitepageSelectorTestCase(unittest.TestCase):
     def test_select_whitepage_with_infinite_battery_candidates(self):        
         selected_record = WhitepageSelector.select_whitepage(self.record)
         self.assertEquals(self.record[2], selected_record)
-        
+    
+    def log_candidates(self, record):
+        self.candidates.append(record)
+        return Mock() # returns a factory
+    
     def test_select_with_real_devices(self):
-        candidates = []
+        self.candidates = []
         
         factory = Mock()
-        factory.create_simple_discovery.side_effect = lambda record: candidates.append(record)
+        factory.create_simple.side_effect = self.log_candidates
         
         for _ in range(1): Node("server", discovery_factory = factory, device = DeviceType.create(Server.TYPE_ID))
         for i in range(30): Node("galaxy_%d"%(i), discovery_factory = factory, device = DeviceType.create(SamsungGalaxyTab.TYPE_ID))
         for i in range(69): Node("fox_%d"%(i), discovery_factory = factory, device = DeviceType.create(FoxG20.TYPE_ID))
         for i in range(200): Node("xbee_%d"%(i), discovery_factory = factory, device = DeviceType.create(XBee.TYPE_ID))
         
-        selected_record = WhitepageSelector.select_whitepage(candidates)
+        selected_record = WhitepageSelector.select_whitepage(self.candidates)
         self.assertEquals("server", selected_record.node_name)
 
 

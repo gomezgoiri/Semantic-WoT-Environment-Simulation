@@ -51,7 +51,7 @@ class AbstractActivity(object):
         self._params = params
         self._baseGraphs = baseGraphs
         self._simulation = simulation
-        self._discovery_factory = DiscoveryFactory(NodeManager.getNodes())
+        self._discovery_factory = DiscoveryFactory(simulation)
     
     @abstractmethod
     def _configure_nodes(self):
