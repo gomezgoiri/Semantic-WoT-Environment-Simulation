@@ -88,22 +88,25 @@ class TestingTracer(AbstractHTTPTracer, AbstractUDPTracer):
         trace['response_time'] = response_time
         self.traces.append( trace )
         
-    def trace_query(self, timestamp, query):
+    def trace_query(self, timestamp, fromm, query):
         trace = {}
         trace['timestamp'] = timestamp
+        trace['from'] = fromm
         trace['query'] = query
         self.traces.append( trace )
     
-    def trace_unicast_response(self, timestamp, answers, receiver):
+    def trace_unicast_response(self, timestamp, fromm, answers, receiver):
         trace = {}
         trace['timestamp'] = timestamp
+        trace['from'] = fromm
         trace['answers'] = answers
         trace['receiver'] = receiver
         self.traces.append( trace )
     
-    def trace_multicast_response(self, timestamp, answers):
+    def trace_multicast_response(self, timestamp, fromm, answers):
         trace = {}
         trace['timestamp'] = timestamp
+        trace['from'] = fromm
         trace['answers'] = answers
         trace['receiver'] = "all"
         self.traces.append( trace )

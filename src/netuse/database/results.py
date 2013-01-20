@@ -30,6 +30,7 @@ class UDPTrace(Document):
     
     execution = ReferenceField(Execution)
     timestamp = FloatField(default=0.0)
+    fromm = StringField( required = True )
     
 class MDNSSubQuery(Document):
     meta = {'collection': 'udp_trace'}

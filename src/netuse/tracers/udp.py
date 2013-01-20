@@ -20,15 +20,15 @@ class AbstractUDPTracer(object):
         pass
     
     @abstractmethod
-    def trace_query(self, timestamp, query):
+    def trace_query(self, timestamp, fromm, query):
         pass
     
     @abstractmethod
-    def trace_unicast_response(self, timestamp, answers, receiver):
+    def trace_unicast_response(self, timestamp, fromm, answers, receiver):
         pass
     
     @abstractmethod
-    def trace_multicast_response(self, timestamp, answers):
+    def trace_multicast_response(self, timestamp, fromm, answers):
         pass
 
 
@@ -54,16 +54,16 @@ class FileUDPTracer(AbstractUDPTracer):
         for known_answer in known_answers:
             self.f.write("\t\t%s\t%s\n"%(known_answer.type,known_answer.name))
     
-    def trace_query(self, timestamp, query):
-        self.f.write("%0.2f\t%s\n"%(timestamp,query.question_type))
+    def trace_query(self, timestamp, fromm, query):
+        self.f.write("%0.2f\t%s\t%s\n"%(timestamp, fromm, query.question_type))
         self._trace_subqueries(query.queries)
         self._trace_known_answer(query.known_answers)
         
         if self.flusher.force_flush():
             self.f.flush()
     
-    def _trace_response(self, timestamp, response_type, answers):
-        self.f.write( "%0.2f\t%s\n" % (timestamp, response_type) )
+    def _trace_response(self, timestamp, fromm, response_type, answers):
+        self.f.write( "%0.2f\t%s\t%s\n" % (timestamp, fromm, response_type) )
         self.f.write( "\tAnswers:\n" )
         for answer in answers:
             self.f.write( "\t\t%s\n"%(answer) )
@@ -71,11 +71,11 @@ class FileUDPTracer(AbstractUDPTracer):
         if self.flusher.force_flush():
             self.f.flush()
     
-    def trace_unicast_response(self, timestamp, answers, receiver):
-        self._trace_response( timestamp, "unicast (to %s)"%(receiver), answers )
+    def trace_unicast_response(self, timestamp, fromm, answers, receiver):
+        self._trace_response( timestamp, fromm, "unicast (to %s)"%(receiver), answers )
             
-    def trace_multicast_response(self, timestamp, answers):
-        self._trace_response( timestamp, "multicast", answers )
+    def trace_multicast_response(self, timestamp, fromm, answers):
+        self._trace_response( timestamp, fromm, "multicast", answers )
 
 
 class MongoDBUDPTracer(AbstractUDPTracer):
@@ -131,36 +131,39 @@ class MongoDBUDPTracer(AbstractUDPTracer):
             
         return result
     
-    def trace_query(self, timestamp, query):
+    def trace_query(self, timestamp, fromm, query):
         from netuse.database.results import MDNSQueryTrace
         queries = self._get_mongoengine_subqueries(query.queries)
         known_answers = self._get_mongoengine_list_records(query.known_answers)
         n = MDNSQueryTrace(
                 execution = self.execution,
                 timestamp = timestamp,
+                fromm = fromm,
                 question_type = query.question_type,
                 queries = queries,
                 known_answers = known_answers
             )
         n.save()
     
-    def trace_unicast_response(self, timestamp, answers, receiver):
+    def trace_unicast_response(self, timestamp, fromm, answers, receiver):
         from netuse.database.results import MDNSAnswerTrace
         me_answers = self._get_mongoengine_list_records(answers)
         n = MDNSAnswerTrace(
                 execution = self.execution,
                 timestamp = timestamp,
+                fromm = fromm,
                 answers = me_answers,
                 to = receiver
             )
         n.save()
     
-    def trace_multicast_response(self, timestamp, answers):
+    def trace_multicast_response(self, timestamp, fromm, answers):
         from netuse.database.results import MDNSAnswerTrace
         me_answers = self._get_mongoengine_list_records(answers)
         n = MDNSAnswerTrace( # to == "all" by default
                 execution = self.execution,
                 timestamp = timestamp,
+                fromm = fromm,
                 answers = me_answers
             )
         n.save()

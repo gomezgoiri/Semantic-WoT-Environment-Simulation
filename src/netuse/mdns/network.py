@@ -22,9 +22,9 @@ class UDPNetwork(object):
     def send_multicast(self, from_node, dns_packet):
         if self.udp_tracer is not None:
             if dns_packet.type == DNSPacket.TYPE_QUERY:
-                self.udp_tracer.trace_query(self.simulation.now(), dns_packet.data)
+                self.udp_tracer.trace_query(self.simulation.now(), from_node, dns_packet.data)
             else:
-                self.udp_tracer.trace_multicast_response(self.simulation.now(), dns_packet.data)
+                self.udp_tracer.trace_multicast_response(self.simulation.now(), from_node, dns_packet.data)
             
         for node_id, mdns_node in self.mdns_nodes.iteritems():
             if mdns_node.running and node_id != from_node:
@@ -33,7 +33,7 @@ class UDPNetwork(object):
     def send_unicast(self, from_node, to_node, dns_packet):
         # trace it even if "to_node" does not receive the packet
         if self.udp_tracer is not None:
-            self.udp_tracer.trace_unicast_response(self.simulation.now(), dns_packet.data, to_node)
+            self.udp_tracer.trace_unicast_response(self.simulation.now(), from_node, dns_packet.data, to_node)
         
         mdns_node = self.mdns_nodes[to_node]
         if mdns_node.running:
