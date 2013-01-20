@@ -3,6 +3,7 @@ Created on Jan 17, 2013
 
 @author: tulvur
 '''
+from clueseval.clues.versions.management import Version
 from netuse.nodes import NodeManager
 from netuse.mdns.network import MDNSNode
 from netuse.mdns.record import PTRRecord, SVRRecord, TXTRecord
@@ -19,18 +20,26 @@ class DiscoveryRecordConverter(object):
         keyvalues['js'] = discovery_record.joined_since
         keyvalues['bl'] = discovery_record.battery_lifetime
         keyvalues['iw'] = discovery_record.is_whitepage
+        if discovery_record.version is not None:
+            keyvalues['g'] = discovery_record.version.generation
+            keyvalues['v'] = discovery_record.version.version
         name = discovery_record.node_name + "._http._tcp.local"
         return TXTRecord(name, keyvalues)
     
     @staticmethod
     def to_discovery_record(txt_record):
         node_name = txt_record.name.split("._http._tcp.local")[0]
-        return DiscoveryRecord( node_name,
+        dr = DiscoveryRecord( node_name,
                                 memory = txt_record.keyvalues['m'],
                                 storage = txt_record.keyvalues['s'],
                                 joined_since = txt_record.keyvalues['js'],
                                 battery_lifetime = txt_record.keyvalues['bl'],
                                 is_whitepage = txt_record.keyvalues['iw'] )
+        
+        if 'g' in txt_record.keyvalues and 'v' in txt_record.keyvalues:
+            dr.version = Version( generation = txt_record.keyvalues['g'],
+                                  version = txt_record.keyvalues['v'] )
+        return dr
 
 
 class MDNSDiscoveryInstance(DiscoveryInstance, DiscoveryRecordObserver):

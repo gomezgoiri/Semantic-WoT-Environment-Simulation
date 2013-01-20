@@ -26,6 +26,7 @@ class DiscoveryRecord(object):
         self.__joined_since = joined_since
         self.__battery_lifetime = battery_lifetime
         self.__is_whitepage = is_whitepage
+        self.__version = None
         
     def _separate_units_from_values(self, unstandardized):
         i = 0
@@ -68,5 +69,19 @@ class DiscoveryRecord(object):
     
     @is_whitepage.setter
     def is_whitepage(self, is_whitepage):
+        self.__is_whitepage = is_whitepage
+        self.__record_updated()
+        
+    @property
+    def version(self):
+        return self.__version
+    
+    @version.setter
+    def version(self, version):
+        self.__version = version
+        self.__record_updated()
+    
+    def change_transactionally(self, is_whitepage, version):
+        self.__version = version
         self.__is_whitepage = is_whitepage
         self.__record_updated()

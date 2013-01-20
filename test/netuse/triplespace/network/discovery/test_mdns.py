@@ -1,5 +1,6 @@
 import unittest
 import random
+from clueseval.clues.versions.management import Version
 from netuse.triplespace.network.discovery.mdns import DiscoveryRecordConverter
 from netuse.mdns.record import TXTRecord
 from netuse.triplespace.network.discovery.record import DiscoveryRecord
@@ -22,7 +23,7 @@ class DiscoveryRecordConverterTestCase(unittest.TestCase):
         
         self.record2_txt = TXTRecord(
                                 "name1._http._tcp.local",
-                                keyvalues = {'js': 20, 'bl': 21, 'iw': False, 'm': '32MB', 's': '4GB' }
+                                keyvalues = {'js': 20, 'bl': 21, 'iw': False, 'm': '32MB', 's': '4GB', 'g': 10, 'v': 20 }
                             )
         self.record2_dr = DiscoveryRecord(
                                 "name1",
@@ -31,6 +32,7 @@ class DiscoveryRecordConverterTestCase(unittest.TestCase):
                                 joined_since = 20,
                                 battery_lifetime = 21,
                                 is_whitepage = False )
+        self.record2_dr.version = Version( generation = 10, version = 20 )
     
     def test_to_txt_record(self):
         got = DiscoveryRecordConverter.to_txt_record(self.record1_dr)
