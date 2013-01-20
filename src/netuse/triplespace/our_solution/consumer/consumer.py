@@ -6,7 +6,6 @@ Created on Sep 17, 2012
 import json
 from abc import ABCMeta, abstractmethod
 from clueseval.clues.storage.sqlite import SQLiteClueStore
-from clueseval.clues.storage.memory import MemoryClueStore
 from netuse.triplespace.network.url_utils import URLUtils
 from netuse.triplespace.our_solution.consumer.time_update import UpdateTimesManager
 from netuse.triplespace.our_solution.whitepage.selection import WhitepageSelector, WhitepageSelectionManager, SelectionProcessObserver
@@ -168,6 +167,8 @@ class RemoteConnector(AbstractConnector, RequestObserver):
         for unique_response in request_instance.responses:
             if unique_response.getstatus()==200:
                 self.clues.fromJson(unique_response.get_data())
+                # update version on discovery record
+                self.me_as_node._discovery_instance.get_my_record().version = self.clues.version
                 self.first_load_in_store = True
                 break
             else:
