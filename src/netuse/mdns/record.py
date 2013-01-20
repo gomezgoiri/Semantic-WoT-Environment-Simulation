@@ -16,12 +16,20 @@ class Record(object):
     def __eq__(self, record):
         return isinstance(record, Record) and self.type == record.type and self.name == record.name
     
+    def __ne__(self, other):
+        return not self == other
+    
     # if I don't redefine this also, it won't work in some data structures (e.g. dictionaries)
     def __hash__(self):
         return  self.type.__hash__() + self.name.__hash__()
     
     def __str__(self):
         return "\t\t%s\t%s\tttl:%0.2f\n" % (self.type, self.name, self.ttl)
+    
+    def have_data_changed(self, old_record):
+        if self != old_record:
+            raise Exception("You are trying to compare data from different records.")
+        return False
 
 
 class PTRRecord(Record):
@@ -41,6 +49,9 @@ class PTRRecord(Record):
     
     def __str__(self):
         return super(PTRRecord, self).__str__() + "\t%s" % (self.domain_name)
+    
+    # def have_data_changed(self, old_record)
+    # If 2 PTR record are equal, they cannot change according to the fields they have
 
 class TXTRecord(Record):
     __metaclass__ = ABCMeta
@@ -52,6 +63,9 @@ class TXTRecord(Record):
     
     def __str__(self):
         return super(TXTRecord, self).__str__() + "\t%s" % (self.keyvalues)
+    
+    def have_data_changed(self, old_record):
+        return super(TXTRecord, self).have_data_changed(old_record) or self.keyvalues != old_record.keyvalues
 
 class SVRRecord(Record):
     __metaclass__ = ABCMeta
@@ -65,3 +79,8 @@ class SVRRecord(Record):
     
     # I'm not doing sth special with it, so I will not ovewrite the method
     # def __str__(self):
+    
+    def have_data_changed(self, old_record):
+        return super(SVRRecord, self).have_data_changed(old_record) \
+                or self.hostname != old_record.hostname \
+                or self.port != old_record.port
