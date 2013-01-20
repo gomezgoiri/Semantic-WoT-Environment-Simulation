@@ -56,7 +56,7 @@ class AbstractConsumer(SelectionProcessObserver):
                 self.ongoing_selection = True
                 wsm = WhitepageSelectionManager(self.simulation, self.discovery)
                 wsm.set_observer(self)
-                wsm.choose_whitepage()
+                wsm.choose_whitepage(self.get_clue_store())
         else:
             self._update_connector(wp)
     
@@ -71,6 +71,10 @@ class AbstractConsumer(SelectionProcessObserver):
     def stop(self):
         if self.connector is not None:
             self.connector.stop()
+    
+    # to initialize the WP if this consumer node becomes WP
+    def get_clue_store(self):
+        return None
 
 class Consumer(AbstractConsumer):
     def _update_connector(self, wp):
@@ -84,6 +88,11 @@ class Consumer(AbstractConsumer):
             else:
                 self.connector = RemoteConnector(self.discovery.me, wp, simulation=self.simulation)
             self.connector.start()
+    
+    def get_clue_store(self):
+        if self.connector is not None:
+            return self.connector.get_clue_store()
+        return None
 
 class ConsumerLite(AbstractConsumer):
     def _update_connector(self, wp):
@@ -120,7 +129,11 @@ class LocalConnector(AbstractConnector):
     
     def get_query_candidates(self, template, previously_unresolved):
         return self.local_whitepage.get_query_candidates(template)
-
+    
+    # this SHOULD never be called!
+    # Why would a WP become into a WP?
+    def get_clue_store(self):
+        return self.local_whitepage.clues
 
 class RemoteConnector(AbstractConnector, RequestObserver):
     
@@ -205,6 +218,9 @@ class RemoteConnector(AbstractConnector, RequestObserver):
             raise Exception("Wait for the first clue loading.")
         
         return self.clues.get_query_candidates(template)
+    
+    def get_clue_store(self):
+        return self.clues
 
 
 class RemoteLiteConnector(AbstractConnector, RequestObserver):

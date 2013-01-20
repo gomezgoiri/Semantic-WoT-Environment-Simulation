@@ -169,7 +169,7 @@ class WhitepageSelectionManager(RequestObserver):
     def set_observer(self, observer):
         self.observer = observer
     
-    def choose_whitepage(self):
+    def choose_whitepage(self, clue_store):
         # TODO consider that I can choose myself as a WP
         candidates = [item for item in self.discovery.get_discovered_records() if item.node_name not in self.refused]
         self.last_choosen = WhitepageSelector.select_whitepage(candidates)
@@ -177,12 +177,12 @@ class WhitepageSelectionManager(RequestObserver):
             # somehow, transmit that no node could have been chosen
             pass
         else:
-            RequestManager.launchNormalRequest(self._get_choose_request())
+            RequestManager.launchNormalRequest( self._get_choose_request( clue_store.toJson() ) )
     
-    def _get_choose_request(self):
+    def _get_choose_request(self, aggregated_clues_json):
         req = RequestInstance( self.discovery.me,
                                [ NodeManager.getNodeByName(self.last_choosen.node_name) ],
-                               '/whitepage/choose', data = '',
+                               '/whitepage/choose', data = aggregated_clues_json,
                                sim = self.simulation ) # it has data => POST
         req.addObserver(self)
         return req

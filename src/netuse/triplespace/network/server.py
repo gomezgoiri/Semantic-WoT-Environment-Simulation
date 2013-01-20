@@ -110,7 +110,7 @@ class WhitepageHandler(object):
             method = request.get_method()
             if method=='POST':
                 # set as whitepage
-                self.tskernel.be_whitepage()
+                self.tskernel.be_whitepage( request.get_data() )
                 return (200, """TODO JSON""", CustomSimulationHandler.CONTENT_TYPES['json'])
             
         elif wp_path.startswith('clues'):

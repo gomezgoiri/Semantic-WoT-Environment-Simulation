@@ -3,10 +3,12 @@ Created on Dec 12, 2011
 
 @author: tulvur
 '''
+import json
 from abc import abstractmethod, ABCMeta
 from netuse.sim_utils import schedule
 from SimPy.Simulation import Process, hold
-
+from clueseval.clues.storage.abstract_store import AggregationClueUtils # to manually parse the json
+from clueseval.clues.versions.management import Version
 from netuse.nodes import NodeManager
 from netuse.triplespace.our_solution.whitepage.whitepage import Whitepage
 from netuse.triplespace.our_solution.provider.provider import Provider
@@ -94,12 +96,32 @@ class OurSolution(TripleSpace):
         self.provider = None
         self.consumer = None
         self.whitepage = None # just the whitepage will have this attribute to !=None
+    
+    def be_whitepage(self, json_clues_sent_by_the_chooser):
+        my_clue_store = None if self.consumer is None else self.consumer.get_clue_store()
+        if my_clue_store is None:
+                self.whitepage = Whitepage( clue_store = None,
+                                            generation_time = self.simulation.now() )
+                self.whitepage.clues.fromJson( json_clues_sent_by_the_chooser )
+        else: # if the sent clues are newer load them, otherwise don't
+            # no need to create a new store for this json yet
+            # just take the version
+            dictio = json.loads(json_clues_sent_by_the_chooser)
+            sent_version = Version( dictio[AggregationClueUtils.GENERATION_FIELD],
+                                    dictio[AggregationClueUtils.VERSION_FIELD] )
+            
+            if sent_version < self.my_clues_store.version:
+                self.whitepage = Whitepage( clue_store = my_clue_store )
+            else:
+                self.whitepage = Whitepage( clue_store = None, generation_time = 0 )
+                self.whitepage.clues.fromJson( json_clues_sent_by_the_chooser )
         
-    def be_whitepage(self):
-        self.whitepage = Whitepage( generation_time = self.simulation.now() )
-        v = None # get an updated version of aggregation clue!!!
+        
+        # A WP shares through discovery record the first version it started providing
+        loaded_version = self.whitepage.clues.version
         self.discovery.get_my_record().change_transactionally( is_whitepage = True,
-                                                               version = v )
+                                                               version = loaded_version )
+        
         # TODO check if another whitepage already exist and resolve conflict (step 6)
     
     @schedule
