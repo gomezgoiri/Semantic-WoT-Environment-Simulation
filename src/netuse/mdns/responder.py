@@ -7,7 +7,7 @@ Created on Jan 12, 2013
 from copy import deepcopy
 from random import Random
 from netuse.sim_utils import Timer
-from netuse.mdns.packet import DNSPacket
+from netuse.mdns.packet import DNSPacket, Query, SubQuery
 from SimPy.Simulation import Process, SimEvent, waitevent
 
 class Responder(Process):
@@ -23,9 +23,41 @@ class Responder(Process):
         self.queued_queries = [] # tuple: ( when to answer, query )
         self.sender = sender
     
+    def record_changes(self, record):
+        for old_record in self.local_records.iterkeys():
+            if record == old_record:
+                return record.have_data_changed(old_record)
+        return False # if that record didn't exist before
+    
     def write_record(self, record):
-        # if already existed, is overwritten
-        self.local_records[record] = -1
+        if record in self.local_records:
+            if self.record_changes(record):
+                # "Whenever a host has a resource record with new data"
+                self.announce(record)
+        else:
+            # "Whenever a host has a resource record with new data"
+            self.local_records[record] = -1
+            self.announce(record)
+    
+    def something_happened(self):
+        # Whenever it might potentially be new data (e.g. after rebooting, waking from
+        # sleep, connecting to a new network link, changing IP address, etc.)
+        for record in self.local_records.iterkeys():
+            self.announce(record)
+    
+    # 10.2 Announcements to Flush Outdated Cache Entries
+    def announce(self, announced_record):
+        # TODO optimize to announce more than one? is that possible according to the standard?
+        
+        # Generating a fake query which will never be sent
+        sq = SubQuery(announced_record.name, announced_record.type)
+        # They may know my other records, I'm just announcing one
+        known_answers = [record for record in self.local_records if record!=announced_record]
+        q = Query( queries = [sq,], known_answers = known_answers )
+        
+        # a little trick here, we queue a false query which will result in a response
+        # containing the record we want to announce
+        self.queue_query(q)
     
     def queue_query(self, query):
         # TODO optimization:
@@ -67,7 +99,8 @@ class Responder(Process):
     def process_query(self, query):
         answers = self._get_possible_answers(query)
         self._suppress_known_answers(query, answers)
-        self._send_using_proper_method(query, answers)
+        if len(answers)>0: # avoid sending empty UDP messages!
+            self._send_using_proper_method(query, answers)
     
     def _get_possible_answers(self, query):
         answers = []

@@ -30,6 +30,9 @@ class TestResponder(unittest.TestCase):
         self.sample_ptr2 = PTRRecord("_app._udp.local", "instance1._app._udp.local")
         self.responder.write_record(self.sample_ptr2)
         
+        # ignore fake-queries generated to announce new records
+        self.responder.queued_queries = []
+        
         self.responder._random = Mock()
         self.responder._random.random.side_effect = lambda *args: 0.5 # 0.5 * 2% == 1% of variation
     
