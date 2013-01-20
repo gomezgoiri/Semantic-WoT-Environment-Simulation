@@ -96,7 +96,7 @@ class OurSolution(TripleSpace):
         self.whitepage = None # just the whitepage will have this attribute to !=None
         
     def be_whitepage(self):
-        self.whitepage = Whitepage()
+        self.whitepage = Whitepage( generation_time = self.simulation.now() )
         self.discovery.get_my_record().is_whitepage=True
         # TODO check if another whitepage already exist and resolve conflict (step 6)
     

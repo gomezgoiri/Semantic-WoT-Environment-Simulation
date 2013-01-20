@@ -2,8 +2,8 @@ from clueseval.clues.storage.sqlite import SQLiteClueStore
 
 class Whitepage(object):
     
-    def __init__(self):
-        self.clues = SQLiteClueStore(in_memory=True)
+    def __init__(self, generation_time):
+        self.clues = SQLiteClueStore(generation_time, in_memory=True)
         self.clues.start() # TODO when should be stopped???
         
     def get_query_candidates(self, template):

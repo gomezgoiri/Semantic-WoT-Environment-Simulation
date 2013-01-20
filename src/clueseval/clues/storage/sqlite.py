@@ -9,6 +9,7 @@ import string
 import random
 import sqlite3
 from tempfile import mkstemp
+from clueseval.clues.versions.management import VersionFactory, Version
 from clueseval.clues.storage.abstract_store import AbstractStore, AggregationClueUtils
 from clueseval.clues.parent_clue import Clue
 from clueseval.clues.node_attached import ClueWithNode
@@ -18,6 +19,7 @@ from clueseval.clues.class_based import ClassBasedClue
 
 # Note that currently just predicate-based clues' persistent store has been implemented.
 class SQLiteClueStore(AbstractStore):
+    VERSION_TABLE = "version"
     SCHEMAS_TABLE = "schemas"
     PREDICATES_TABLE = "predicates"
     CLASSES_TABLE = "classes"
@@ -29,7 +31,8 @@ class SQLiteClueStore(AbstractStore):
     _SELECT_SCHEMA = "select * from " + SCHEMAS_TABLE    
     _SELECT_PREDICATE = "select * from " + PREDICATES_TABLE
     
-    def __init__(self, in_memory=False, database_name=None, database_path=None, tipe=None):
+    def __init__(self, generation_version = None, in_memory = False,
+                 database_name = None, database_path = None, tipe = None ):
         db_path = database_path if database_path is None or database_path.endswith("/") else database_path + "/"
         
         if in_memory:
@@ -41,6 +44,9 @@ class SQLiteClueStore(AbstractStore):
                 self.db_file = database_name
                 
         self.type = PredicateBasedClue.ID() # right now, just predicate-based clues have been implemented in SQLite store
+        # not stored to simplify
+        self.version_factory = VersionFactory(generation_version)
+        self.increment_version()
         
     def start(self):
         self.conn = sqlite3.connect(self.db_file)
@@ -70,6 +76,9 @@ class SQLiteClueStore(AbstractStore):
     def stop(self):
         self.cur.close()
         self.conn.close()
+    
+    def increment_version(self):
+        self.version = self.version_factory.create_version()
         
     def _get_schema_name_for_URI(self, URI):
         '''
@@ -182,6 +191,8 @@ class SQLiteClueStore(AbstractStore):
             if self.type==SchemaBasedClue.ID():
                 raise NotImplementedError()
             elif self.type==PredicateBasedClue.ID():
+                dictio[AggregationClueUtils.GENERATION_FIELD] = self.version.generation
+                dictio[AggregationClueUtils.VERSION_FIELD] = self.version.version
                 dictio[SchemaBasedClue._SCHEMA()] = self.get_schemas()
                 dictio[PredicateBasedClue._PREDICATE()] = self.get_predicates()
             elif self.type==PredicateBasedClue.ID():
@@ -204,6 +215,11 @@ class SQLiteClueStore(AbstractStore):
         if dictio: # if the dictionary is empty, we don't do anything
             self.type = dictio[Clue.ID_P()]
             
+            # sets a concrete version
+            self.version = Version( generation = dictio[AggregationClueUtils.GENERATION_FIELD],
+                                    version = dictio[AggregationClueUtils.VERSION_FIELD] )
+            self.version_factory.previous_version = self.version
+            
             if self.type==SchemaBasedClue.ID():
                 raise NotImplementedError()
             elif self.type==PredicateBasedClue.ID():
@@ -222,12 +238,12 @@ class SQLiteClueStore(AbstractStore):
                 raise NotImplementedError()
     
     # TODO delete schemas if they are no longer used?
-    def reset_preficates_for_node(self, node_name):
+    def reset_predicates_for_node(self, node_name):
         self.conn.execute( "delete from %s where node='%s'"%(SQLiteClueStore.PREDICATES_TABLE, node_name) )
         self.conn.commit()
     
     def add_clue(self, node_name, clue_json):
-        self.reset_preficates_for_node(node_name)
+        self.reset_predicates_for_node(node_name)
         dictio = json.loads(clue_json)
         
         clue_type = dictio[Clue.ID_P()]
@@ -250,6 +266,7 @@ class SQLiteClueStore(AbstractStore):
                 for prefix, endings in dictio[PredicateBasedClue._PREDICATE()].iteritems():
                     actual_prefix = prefix if prefix not in mappings else mappings[prefix]
                     self.conn.executemany( SQLiteClueStore._INSERT_PREDICATE, [(node_name, actual_prefix, ending) for ending in endings] )
+            self.increment_version() # this is a new version of "aggregated clue"
         elif self.type==ClassBasedClue.ID():
             raise NotImplementedError()
     

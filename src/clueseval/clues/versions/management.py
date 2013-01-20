@@ -7,7 +7,7 @@ import time
 
 class VersionFactory:
     
-    def __init__(self, generation=None):
+    def __init__(self, previous_version=None, generation=None):
         if generation is None:
             self.generation = time.time()
         self.previous_version = None

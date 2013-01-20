@@ -15,6 +15,8 @@ class AggregationClueUtils(object):
     """
     {
       "i": 1,
+      "g": 2324,
+      "v": 3,
       "s": [
         ["dc", "http://purl.org/dc/elements/1.1/"],
         ["dul", "http://www.loa.istc.cnr.it/ontologies/DUL.owl#"],
@@ -30,6 +32,9 @@ class AggregationClueUtils(object):
           "dc": ["description"]
     } } }
     """
+    
+    GENERATION_FIELD = "g"
+    VERSION_FIELD = "v"
     
     @staticmethod
     def validate(dictionary):

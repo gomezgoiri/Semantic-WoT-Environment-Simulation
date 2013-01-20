@@ -133,6 +133,7 @@ class RemoteConnector(AbstractConnector, RequestObserver):
         
         # Aspecto discutido en issue #1
         # self.clues = SQLiteClueStore(database_path=G.temporary_path)
+        # generation id does not matter, will be ovewritten
         self.clues = SQLiteClueStore(in_memory=True)
         self.first_load_in_store = False
         
