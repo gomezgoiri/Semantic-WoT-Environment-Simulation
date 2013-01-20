@@ -121,10 +121,14 @@ class TestChaoticModel(unittest.TestCase):
         
         self.random = Mock()
         self.random.normalvariate.side_effect = lambda *args: args[0] - args[1]/2 # just to check how to configure different returns
-        
+    
+    def _get_node_for_record(self, record):
+        print record
+    
     def get_network(self):
         network = Mock()
-        network.get_whitepage.return_value = self.nodes[0] # select the first as WP
+        network.get_whitepage_record.return_value = self.nodes[0] # to force record!=None
+        network._get_node_for_record.return_value = self.nodes[0] # select the first as WP
         return network
     
     def test_run(self):        
