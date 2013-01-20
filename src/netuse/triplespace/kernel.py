@@ -97,7 +97,9 @@ class OurSolution(TripleSpace):
         
     def be_whitepage(self):
         self.whitepage = Whitepage( generation_time = self.simulation.now() )
-        self.discovery.get_my_record().is_whitepage=True
+        v = None # get an updated version of aggregation clue!!!
+        self.discovery.get_my_record().change_transactionally( is_whitepage = True,
+                                                               version = v )
         # TODO check if another whitepage already exist and resolve conflict (step 6)
     
     @schedule
