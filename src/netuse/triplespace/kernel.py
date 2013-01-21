@@ -42,6 +42,10 @@ class TripleSpace(object):
 
     def stop(self):
         pass
+    
+    # used to reset some settings before joining the network again
+    def recover_from_drop(self):
+        pass
 
 
 class NegativeBroadcasting(TripleSpace):
@@ -155,6 +159,11 @@ class OurSolution(TripleSpace):
         # may be because a method of the same object cannot be used at the same simulation time?
         # In this case, when they overlap, the activation of _finish_query_waiting may be ignored when they overlap in time
         self.simulation.activate(qf, qf._finish_query_waiting(template)) # to wait for whitepages
+
+    def recover_from_drop(self):
+        # after a drop I won't be WP anymore
+        # setting to None helps to answer correct 501 answer on the server-side
+        self.whitepage = None
 
     def stop(self):
         if self.provider is not None:

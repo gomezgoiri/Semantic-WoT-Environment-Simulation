@@ -147,14 +147,15 @@ class Node(Process):
     def swap_state(self):
         """If the node is alive, it goes down. Otherwise, it goes up."""
         self.down = not self.down
-        if not self.down: # if the node goes up
+        if self.down: # if the node goes down
+            self._discovery_instance.stop()
+        else: # if the node goes up
+            self.ts.recover_from_drop() # remove whitepage component
             self._discovery_instance.get_my_record().is_whitepage = False # not anymore
             self._discovery_instance.start()
             # What if nobody is WP right now?
             # After this notification of the former WP and taking into account that there is no WP,
             # the selection process will be restarted by a consumer. 
-        else:
-            self._discovery_instance.stop()
     
     def __str__(self):
         return self.name
