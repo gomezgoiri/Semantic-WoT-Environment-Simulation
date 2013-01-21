@@ -10,9 +10,10 @@ from netuse.database.parametrization import Parametrization
 from commons.utils import SemanticFilesLoader
 
 class Parameters():
-    def __init__(self, simulateUntil=None, strategy=None, network_model=None, amountOfQueries=None, writeFrequency=None,
-                 queries=None, nodes=None, numConsumers=None, nodeTypes=None):
+    def __init__(self, simulateUntil=None, discovery=None, strategy=None, network_model=None, amountOfQueries=None,
+                 writeFrequency=None, queries=None, nodes=None, numConsumers=None, nodeTypes=None):
         self.simulateUntil = simulateUntil
+        self.discovery = discovery
         self.strategy = strategy
         self.network_model = network_model
         self.amountOfQueries = amountOfQueries
@@ -24,8 +25,9 @@ class Parameters():
     
     def fill_blank_values(self, default_values): # default_values is an instance of Parameters also, with some default values )
         filled_copy = Parameters(
-                            simulateUntil = self.simulateUntil, 
-                            strategy = self.strategy, 
+                            simulateUntil = self.simulateUntil,
+                            discovery = self.discovery,
+                            strategy = self.strategy,
                             amountOfQueries = self.amountOfQueries,
                             writeFrequency = self.writeFrequency,
                             queries = self.queries,
@@ -36,6 +38,7 @@ class Parameters():
                         )
         
         if filled_copy.simulateUntil is None: filled_copy.simulateUntil = default_values.simulateUntil
+        if filled_copy.discovery is None: filled_copy.discovery = default_values.discovery
         if filled_copy.strategy is None: filled_copy.strategy = default_values.strategy
         if filled_copy.network_model is None: filled_copy.network_model = default_values.network_model
         if filled_copy.amountOfQueries is None: filled_copy.amountOfQueries = default_values.amountOfQueries
@@ -66,6 +69,7 @@ class ParametrizationUtils():
             parameters.nodeTypes = (RegularComputer.TYPE_ID,)*len(parameters.nodes)
         
         return Parametrization (
+                    discovery = parameters.discovery,
                     strategy = parameters.strategy,
                     network_model = parameters.network_model,
                     amountOfQueries = parameters.amountOfQueries,

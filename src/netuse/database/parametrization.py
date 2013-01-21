@@ -6,6 +6,7 @@ Created on Nov 27, 2011
 import pickle
 from mongoengine import Document, StringField, FloatField, IntField, ListField, ReferenceField, NULLIFY
 from netuse.network_models import NetworkModelManager
+from netuse.triplespace.network.discovery.discovery import DiscoveryFactory
 
 
 class NetworkModel(Document):
@@ -39,8 +40,13 @@ class Parametrization(Document):
     
     # To reference a document that has not yet been defined, use the name of the undefined document as the constructor's argument.
     network_model = ReferenceField(NetworkModel, reverse_delete_rule=NULLIFY) # TODO give a default value
-    strategy = StringField(required=True,
-                           default=negative_broadcasting)
+    discovery = StringField( required = True,
+                                      default = DiscoveryFactory.SIMPLE_DISCOVERY,
+                                      choices = ( DiscoveryFactory.SIMPLE_DISCOVERY,
+                                                  DiscoveryFactory.MDNS_DISCOVERY, )
+                                     )
+    strategy = StringField( required = True,
+                            default = negative_broadcasting )
                            #don't know why stopped working :-S
                            #choices=(negative_broadcasting, centralized, our_solution,))
     simulateUntil = FloatField(required=True, default=60000.0)

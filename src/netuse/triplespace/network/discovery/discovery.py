@@ -9,6 +9,9 @@ from abc import ABCMeta, abstractmethod
 
 class DiscoveryFactory(object):
     
+    SIMPLE_DISCOVERY = "simple"
+    MDNS_DISCOVERY = "mdns"
+    
     def __init__(self, simulation):
         self.simulation = simulation
         
