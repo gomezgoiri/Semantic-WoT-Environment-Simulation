@@ -103,15 +103,22 @@ class MDNSDiscoveryInstance(DiscoveryInstance, DiscoveryRecordObserver):
         return ret
     
     def get_whitepage_record(self):
+        last_whitepage = None
         if self.get_my_record().is_whitepage:
-            return self.get_my_record()
+            last_whitepage = self.get_my_record()
         
+        # if more than 1 records are marked as WP, we choose the last one
         for record in self.mdns_node.cache.records:
             if record.type=="TXT":
                 if record.keyvalues['iw']:
-                    return DiscoveryRecordConverter.to_discovery_record(record)
+                    if last_whitepage is None:
+                        last_whitepage = DiscoveryRecordConverter.to_discovery_record(record)
+                    else:
+                        possible_whitepage = DiscoveryRecordConverter.to_discovery_record(record)
+                        if last_whitepage.version < possible_whitepage.version:
+                            last_whitepage = possible_whitepage
         
-        return None
+        return last_whitepage
     
     def get_whitepage(self):
         wp_r = self.get_whitepage_record()
