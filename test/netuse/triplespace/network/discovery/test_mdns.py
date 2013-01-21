@@ -1,9 +1,13 @@
-import unittest
 import random
+import unittest
+from mock import Mock
+from SimPy.Simulation import Simulation, Process, hold
+
 from clueseval.clues.versions.management import Version
-from netuse.triplespace.network.discovery.mdns import DiscoveryRecordConverter
 from netuse.mdns.record import TXTRecord
 from netuse.triplespace.network.discovery.record import DiscoveryRecord
+from netuse.triplespace.network.discovery.mdns import DiscoveryRecordConverter, NewWPDetector
+
 
 class DiscoveryRecordConverterTestCase(unittest.TestCase):
     
@@ -76,6 +80,53 @@ class DiscoveryRecordConverterTestCase(unittest.TestCase):
             self.fail()
         except:
             pass
+
+
+class WhitepageSetter(Process):
+        
+    def __init__(self, mdns_instance_mock, node_name, sim):
+        super(WhitepageSetter, self).__init__( sim = sim )
+        self.instance = mdns_instance_mock
+        self.node_name = node_name
+    
+    def set_wp(self):
+        self.instance.get_whitepage_record = Mock()
+        self.instance.get_whitepage_record.node_name.return_value = self.node_name
+        yield hold, self, 0
+
+
+class NewWPDetectorTestCase(unittest.TestCase):
+    
+    def setUp(self):
+        self.simulation = Simulation()
+        
+        self.mdns_instance = Mock()
+        self.mdns_instance.get_whitepage_record.return_value = None
+        self.mdns_instance.notify_whitepage_changed.side_effect = self._log_event
+        
+        self.detector = NewWPDetector(self.mdns_instance, self.simulation)
+        
+        self.log = []
+        
+        self.simulation.initialize()
+    
+    def _log_event(self):
+        self.log.append(self.simulation.now()) # notification at
+    
+    def test_check_new_wps(self):
+        self.simulation.activate(self.detector, self.detector.check_new_wps(), at = 0)
+        
+        s = WhitepageSetter(self.mdns_instance, "node0", self.simulation)
+        self.simulation.activate(s, s.set_wp(), at = 1500)
+        
+        s = WhitepageSetter(self.mdns_instance, "node1", self.simulation)
+        self.simulation.activate(s, s.set_wp(), at = 2500)
+        
+        self.simulation.simulate(until = 10000)
+        
+        self.assertEquals(2, len(self.log))
+        self.assertEquals(2000, self.log[0]) # when it does not discover a WP, it waits 1 secs
+        self.assertEquals(7000, self.log[1]) # after discovering a it waits 5 secs
 
 
 if __name__ == '__main__':

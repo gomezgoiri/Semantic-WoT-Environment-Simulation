@@ -3,6 +3,7 @@ Created on Jan 17, 2013
 
 @author: tulvur
 '''
+from SimPy.Simulation import Process, hold
 from clueseval.clues.versions.management import Version
 from netuse.nodes import NodeManager
 from netuse.mdns.network import MDNSNode
@@ -79,9 +80,10 @@ class MDNSDiscoveryInstance(DiscoveryInstance, DiscoveryRecordObserver):
         # rewrites into the cache
         self.mdns_node.write_record( DiscoveryRecordConverter.to_txt_record(self.my_record) )
     
-    # TODO or delete!
-    def on_whitepage_selected_after_none(self):
-        pass
+    
+    def notify_whitepage_changed(self):
+        for observer in self.observers:
+            observer.on_whitepage_selected_after_none()
     
     def get_my_record(self):
         return self.my_record
@@ -132,3 +134,26 @@ class MDNSDiscoveryInstance(DiscoveryInstance, DiscoveryRecordObserver):
     @property
     def me(self):
         return self._get_node_for_record(self.get_my_record())
+
+
+class NewWPDetector(Process):
+    
+    FREQUENCY_WITH_NO_WP = 1000 # poll more frequently if no WP has been detected (some consumer will select it)
+    FREQUENCY_WITH_WP = 5000
+    
+    def __init__(self, mdns_instance, sim):
+        super(NewWPDetector, self).__init__( sim = sim )
+        self.instance = mdns_instance
+        self.last_wp_name = None
+    
+    def check_new_wps(self):
+        while True:
+            wp_r = self.instance.get_whitepage_record()
+            if wp_r is None:
+                yield hold, self, NewWPDetector.FREQUENCY_WITH_NO_WP
+            else:
+                new_name = wp_r.node_name
+                if self.last_wp_name != new_name:
+                    self.instance.notify_whitepage_changed()
+                    self.last_wp_name = new_name
+                yield hold, self, NewWPDetector.FREQUENCY_WITH_WP

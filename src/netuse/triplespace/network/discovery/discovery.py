@@ -37,7 +37,8 @@ class DiscoveryEventObserver(object):
     @abstractmethod
     def on_whitepage_selected_after_none(self):
         '''
-        When no whitepage existed in the space and a new one has been selected.
+        DEPRECATED: When no whitepage existed in the space and a new one has been selected.
+        The notation has slightly changed, now it means "on new whitepage detected"
         '''
         pass
 
