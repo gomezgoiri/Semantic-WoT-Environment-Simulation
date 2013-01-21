@@ -56,6 +56,7 @@ class Provider(Process, DiscoveryEventObserver):
                         # nothing to send, the Provider can continue sleeping
                         # as if nothing happened
                         sleep_for = remaining if remaining > 0 else Provider.UPDATE_TIME
+                self.alive_for_external_condition = False # for the next iteration
             else:
                 # last clue has expired or it has changed => send it to the WP
                 retry = self.sent_through_connector()
