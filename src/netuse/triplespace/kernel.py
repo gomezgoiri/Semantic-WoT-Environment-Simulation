@@ -102,19 +102,23 @@ class OurSolution(TripleSpace):
         if my_clue_store is None:
                 self.whitepage = Whitepage( clue_store = None,
                                             generation_time = self.simulation.now() )
-                self.whitepage.clues.fromJson( json_clues_sent_by_the_chooser )
+                if json_clues_sent_by_the_chooser is not None:
+                    self.whitepage.clues.fromJson( json_clues_sent_by_the_chooser )
         else: # if the sent clues are newer load them, otherwise don't
             # no need to create a new store for this json yet
             # just take the version
-            dictio = json.loads(json_clues_sent_by_the_chooser)
-            sent_version = Version( dictio[AggregationClueUtils.GENERATION_FIELD],
-                                    dictio[AggregationClueUtils.VERSION_FIELD] )
-            
-            if sent_version < self.my_clues_store.version:
+            if json_clues_sent_by_the_chooser is None:
                 self.whitepage = Whitepage( clue_store = my_clue_store )
             else:
-                self.whitepage = Whitepage( clue_store = None, generation_time = 0 )
-                self.whitepage.clues.fromJson( json_clues_sent_by_the_chooser )
+                dictio = json.loads(json_clues_sent_by_the_chooser)
+                sent_version = Version( dictio[AggregationClueUtils.GENERATION_FIELD],
+                                        dictio[AggregationClueUtils.VERSION_FIELD] )
+                
+                if sent_version < my_clue_store.version:
+                    self.whitepage = Whitepage( clue_store = my_clue_store )
+                else:
+                    self.whitepage = Whitepage( clue_store = None, generation_time = 0 ) # gt will be ovewritten
+                    self.whitepage.clues.fromJson( json_clues_sent_by_the_chooser )
         
         
         # A WP shares through discovery record the first version it started providing

@@ -102,18 +102,22 @@ class MDNSDiscoveryInstance(DiscoveryInstance, DiscoveryRecordObserver):
             ret.append( self._get_node_for_record(record) )
         return ret
     
-    def get_whitepage(self):
-        '''Returns the node currently acting as whitepage. None if no whitepage exists in the space.'''
+    def get_whitepage_record(self):
         if self.get_my_record().is_whitepage:
-            return self.me
+            return self.get_my_record()
         
         for record in self.mdns_node.cache.records:
             if record.type=="TXT":
                 if record.keyvalues['iw']:
-                    dr = DiscoveryRecordConverter.to_discovery_record(record)
-                    return self._get_node_for_record( dr.node_name )
+                    return DiscoveryRecordConverter.to_discovery_record(record)
         
         return None
+    
+    def get_whitepage(self):
+        wp_r = self.get_whitepage_record()
+        
+        if wp_r is None: return None
+        return self._get_node_for_record( wp_r )
     
     def _get_node_for_record(self, record):
         return NodeManager.getNodeByName(record.node_name)

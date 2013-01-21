@@ -80,3 +80,8 @@ class DiscoveryInstance(object):
     def get_whitepage(self):
         '''Returns the node currently acting as whitepage. None if no whitepage exists in the space.'''
         pass
+    
+    @abstractmethod
+    def get_whitepage_record(self):
+        '''Returns the record of the node currently acting as whitepage. None if no whitepage exists in the space.'''
+        pass

@@ -110,7 +110,8 @@ class WhitepageHandler(object):
             method = request.get_method()
             if method=='POST':
                 # set as whitepage
-                self.tskernel.be_whitepage( request.get_data() )
+                data = request.get_data()
+                self.tskernel.be_whitepage( None if data=='' else data )
                 return (200, """TODO JSON""", CustomSimulationHandler.CONTENT_TYPES['json'])
             
         elif wp_path.startswith('clues'):
@@ -131,7 +132,8 @@ class WhitepageHandler(object):
                 if method=='POST':
                     node_id = clues_path[:-1] if clues_path.endswith('/') else clues_path
                     self.tskernel.whitepage.add_clue(node_id, request.get_data())
-                    return (200, "The clue was successfully updated", CustomSimulationHandler.CONTENT_TYPES['html'])
+                    json_data = self.tskernel.whitepage.clues.version.to_json()
+                    return (200, json_data, CustomSimulationHandler.CONTENT_TYPES['html'])
                 else:
                     if clues_path.startswith('query/wildcards/'):
                         wildcard_str = clues_path[len('query/wildcards/'):]

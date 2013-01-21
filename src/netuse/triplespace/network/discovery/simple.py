@@ -92,11 +92,13 @@ class SimpleDiscoveryMechanism(DiscoveryInstance):
             ret.append( self._get_node_for_record(record) )
         return ret
     
-    def get_whitepage(self):
-        '''Returns the node currently acting as whitepage. None if no whitepage exists in the space.'''
+    def get_whitepage_record(self):
         if self.get_my_record().is_whitepage:
-            return self.me
-        wp_rec = self.magic_network.get_whitepage_record()
+            return self.get_my_record()
+        return self.magic_network.get_whitepage_record() 
+    
+    def get_whitepage(self):
+        wp_rec = self.get_whitepage_record()
         return None if wp_rec is None else self._get_node_for_record( wp_rec ) 
     
     def _get_node_for_record(self, record):

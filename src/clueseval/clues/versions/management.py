@@ -4,6 +4,7 @@ Created on Nov 23, 2012
 @author: tulvur
 '''
 import time
+import json
 
 class VersionFactory:
     
@@ -30,3 +31,12 @@ class Version:
         if self.generation is other.generation:
             return self.version - other.version
         return self.generation - other.generation
+    
+    def to_json(self):
+        dictio = {'g': self.generation, 'v': self.version}
+        return json.dumps(dictio)
+    
+    @staticmethod
+    def create_from_json(json_str):
+        dictio = json.loads(json_str)
+        return Version( dictio['g'], dictio['v'] )

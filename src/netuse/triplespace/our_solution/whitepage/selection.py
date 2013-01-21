@@ -177,12 +177,13 @@ class WhitepageSelectionManager(RequestObserver):
             # somehow, transmit that no node could have been chosen
             pass
         else:
-            RequestManager.launchNormalRequest( self._get_choose_request( clue_store.toJson() ) )
+            RequestManager.launchNormalRequest( self._get_choose_request( clue_store ) )
     
-    def _get_choose_request(self, aggregated_clues_json):
+    def _get_choose_request(self, clue_store):
+        data = '' if clue_store is None else clue_store.toJson()
         req = RequestInstance( self.discovery.me,
                                [ NodeManager.getNodeByName(self.last_choosen.node_name) ],
-                               '/whitepage/choose', data = aggregated_clues_json,
+                               '/whitepage/choose', data = data,
                                sim = self.simulation ) # it has data => POST
         req.addObserver(self)
         return req
