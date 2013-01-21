@@ -4,14 +4,15 @@ from testing.utils import TimeRecorder
 from testing.memory_usage import memory
 
 from netuse.results import G
-from netuse.evaluation.simulate import BasicModel
-from netuse.tracers.http import FileHTTPTracer
 from netuse.nodes import NodeManager
-from netuse.activity import ActivityGenerator
 from commons.utils import SemanticFilesLoader
-from netuse.database.parametrization import Parametrization, ParametrizableNetworkModel
-from netuse.evaluation.utils import ParametrizationUtils, Parameters
+from netuse.activity import ActivityGenerator
+from netuse.tracers.http import FileHTTPTracer
 from netuse.network_models import NetworkModelManager
+from netuse.evaluation.simulate import BasicModel
+from netuse.evaluation.utils import ParametrizationUtils, Parameters
+from netuse.triplespace.network.discovery.discovery import DiscoveryFactory
+from netuse.database.parametrization import Parametrization, ParametrizableNetworkModel
 
 # This script generates a simulation and records its trace in a file.
 # Used to check the functionalities under really simple simulation conditions.
@@ -79,6 +80,7 @@ def main():
     p = ParametrizationUtils('memory_integration_test', '/home/tulvur/dev/dataset', None)
     params = Parameters (
             simulateUntil = 400000,
+            discovery = DiscoveryFactory.MDNS_DISCOVERY, #.SIMPLE_DISCOVERY,
             strategy = Parametrization.our_solution,
             amountOfQueries = 1000,
             writeFrequency = 10000,
