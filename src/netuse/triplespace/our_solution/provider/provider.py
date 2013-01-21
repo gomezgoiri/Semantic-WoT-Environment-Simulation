@@ -79,6 +79,7 @@ class Provider(Process, DiscoveryEventObserver):
     def __update_connector_if_needed(self):
         wp = self.discovery.get_whitepage()
         if wp!=None:
+            # TODO reuse connectors as done in "consumer" module
             if self.wp_node_name==None or self.wp_node_name!=wp.name:
                 self.wp_node_name = wp.name
                 if wp==self.discovery.me:
