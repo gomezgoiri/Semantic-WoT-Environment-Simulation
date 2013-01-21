@@ -39,7 +39,6 @@ class AbstractConsumer(SelectionProcessObserver):
         self.simulation = simulation
         self.discovery = discovery
         self.connector = None
-        self.wp_node_name = None
         self.ongoing_selection = False
     
     def get_query_candidates(self, template, previously_unresolved=False):
@@ -77,17 +76,39 @@ class AbstractConsumer(SelectionProcessObserver):
         return None
 
 class Consumer(AbstractConsumer):
-    def _update_connector(self, wp):
-        if self.wp_node_name is None or self.wp_node_name!=wp.name:
-            if self.connector is not None:
-                self.connector.stop()
-            
-            self.wp_node_name = wp.name
-            if wp==self.discovery.me:                
-                self.connector = LocalConnector(self.discovery)
-            else:
-                self.connector = RemoteConnector(self.discovery.me, wp, simulation=self.simulation)
+    def __init__(self, simulation, discovery):
+        super(Consumer, self).__init__( simulation, discovery )
+        self.local_connector = True # overwritten in _set_connector_for_the_first_time, but just in case
+    
+    def _set_connector_for_the_first_time(self, wp):
+        if wp==self.discovery.me:
+            self.connector = LocalConnector(self.discovery)
             self.connector.start()
+            self.local_connector = True
+        else:
+            self.connector = RemoteConnector(self.discovery.me, wp, simulation=self.simulation)
+            self.connector.start()
+            self.local_connector = False
+    
+    def _update_connector(self, wp):
+        if self.connector is None: # for the first time
+            self._set_connector_for_the_first_time(wp)
+        else: # for the Nth time
+            if wp==self.discovery.me:
+                if not self.local_connector: # otherwise the proper local-connector is already set
+                    self.connector.stop() # stop the remote connector first, we go to local now!
+                    self.connector = LocalConnector(self.discovery)
+                    self.connector.start()
+                    self.local_connector = True
+            else:
+                if self.local_connector:
+                    self.connector.stop() # stop the local connector first
+                    self.connector = RemoteConnector(self.discovery.me, wp, simulation=self.simulation)
+                    self.connector.start()
+                    self.local_connector = False
+                else: # the WP has changed but it is still remote!
+                    # reuse the same connector changing the destination of the queries
+                    self.connector.change_whitepage(wp)
     
     def get_clue_store(self):
         if self.connector is not None:
@@ -96,16 +117,16 @@ class Consumer(AbstractConsumer):
 
 class ConsumerLite(AbstractConsumer):
     def _update_connector(self, wp):
-        if self.wp_node_name is None or self.wp_node_name!=wp.name:
-            if self.connector is not None:
-                self.connector.stop()
-            
-            self.wp_node_name = wp.name
-            if wp==self.discovery.me:
-                raise Exception("A lite consumer cannot be whitepage, check the selection algorithm.")
-            else:
+        if wp==self.discovery.me:
+            raise Exception("A lite consumer cannot be whitepage, check the selection algorithm.")
+        else:
+            if self.connector is None:
                 self.connector = RemoteLiteConnector(self.discovery.me, wp, simulation=self.simulation)
-            self.connector.start()
+                self.connector.start()
+                # when to self.connector.stop() ???
+            else:
+                # reusing the same connector
+                self.connector.change_whitepage( wp )
 
 
 class AbstractConnector(object):
@@ -157,6 +178,15 @@ class RemoteConnector(AbstractConnector, RequestObserver):
     def stop(self):
         self.clues.stop()
     
+    def change_whitepage(self, whitepage_node):
+        self.whitepage_node = whitepage_node
+        
+        # re-schedule the request to send it to the new whitepage instead to the old one
+        RequestManager.cancelRequest(self.scheduled_request)
+        self.scheduled_request = self._get_update_request() # to new receiver
+        # at the same moment that the previous one
+        RequestManager.launchScheduledRequest(self.scheduled_request, self.next_scheduled_at)
+    
     def _initialize_clues(self):
         # request to whitepage
         RequestManager.launchNormalRequest(self._get_update_request())
@@ -183,14 +213,14 @@ class RemoteConnector(AbstractConnector, RequestObserver):
                 # update version on discovery record
                 self.me_as_node._discovery_instance.get_my_record().version = self.clues.version
                 self.first_load_in_store = True
+                self._check_if_next_update_changes() # schedule next clue update!
                 break
-            else:
-                # TODO
-                # If it has not been received, the next request should be quickly,
-                # otherwise the node is going to wait too much if the WP
-                # is just setting up and receiving clues for the first time!
+            elif unique_response.getstatus()==408 or unique_response.getstatus()==501:
+                # if timeout or the node is not a whitepage anymore
+                # If it was TIMEOUT, we could retry it
+                # To simplify RETRY==0!
+                # TODO flush record from this whitepage
                 pass
-        self._check_if_next_update_changes() # next clue update!
     
     def _check_if_next_update_changes(self):
         if self.next_scheduled_at <= self.simulation.now(): # if last update already done...
@@ -273,3 +303,7 @@ class RemoteLiteConnector(AbstractConnector, RequestObserver):
             self.responses[templateURL] = None # create a slot to store the response later and warn that it's being requested until then
             RequestManager.launchNormalRequest(self._get_candidates_from_wp_request(templateURL))
             return None # waiting for it
+    
+    def change_whitepage(self, whitepage_node):
+        # nothing scheduled, so I simply change the WP for the next call to get_query_candidates
+        self.whitepage_node = whitepage_node
