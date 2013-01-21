@@ -66,8 +66,8 @@ class MDNSDiscoveryInstance(DiscoveryInstance, DiscoveryRecordObserver):
         self.mdns_node.write_record( SVRRecord(domain_name, "0.0.0.0", 9999) )
         self.mdns_node.write_record( DiscoveryRecordConverter.to_txt_record(self.my_record) )
         
-        
-    # stop() when node goes down!
+        self.detector = NewWPDetector(self, simulation) # maybe I should do a mechanism to stop it...
+        simulation.activate( self.detector, self.detector.check_new_wps() )
     
     def start(self):
         self.mdns_node.start()
