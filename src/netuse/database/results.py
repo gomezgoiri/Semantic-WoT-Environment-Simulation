@@ -4,7 +4,7 @@ Created on Nov 27, 2011
 @author: tulvur
 '''
 from netuse.database.execution import Execution
-from mongoengine import Document, StringField, FloatField, IntField, ReferenceField, ListField, NULLIFY
+from mongoengine import Document, StringField, FloatField, IntField, ReferenceField, DictField, ListField, NULLIFY
 
 class HTTPTrace(Document):
     meta = {'collection': 'http_trace',
@@ -25,6 +25,7 @@ class HTTPTrace(Document):
 
 class UDPTrace(Document):
     meta = {'collection': 'udp_trace',
+            'allow_inheritance': True,
             'indexes': ['execution',],
     }
     
@@ -39,7 +40,8 @@ class MDNSSubQuery(Document):
     record_type = StringField( required = True, default = "PTR", choices = ( "PTR", "SVR", "TXT" ) )
     
 class MDNSRecord(Document):
-    meta = {'collection': 'udp_trace'}
+    meta = {'collection': 'udp_trace',
+            'allow_inheritance': True}
     name = StringField( required = True ) # instance name or service name (e.g. query PTR)
     ttl = IntField( default=0 ) # remember that ttl is measured in seconds and simulation time in ms!
 
@@ -49,7 +51,7 @@ class PTRRecord(MDNSRecord):
 
 class TXTRecord(MDNSRecord):
     type = "TXT" # don't want to store this
-    keyvalues = StringField( required = True )
+    keyvalues = DictField( required = True )
 
 class SVRRecord(MDNSRecord):
     type = "SVR" # don't want to store this
