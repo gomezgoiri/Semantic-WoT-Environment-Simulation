@@ -13,6 +13,13 @@ from SimPy.Simulation import Process, SimEvent, waitevent
 class ContinuousQuerier(Process):
     """Check Section 5.2"""
     
+    # the interval between the first two queries MUST be at least one second
+    MINIMUM_FIRST_WAIT = 1000
+    MINIMUM_INCREMENT_RATE = 2
+    
+    FIRST_WAIT = MINIMUM_FIRST_WAIT + 4000
+    INCREMENT_RATE = MINIMUM_INCREMENT_RATE * 2
+    
     def __init__(self, subquery, sim, sender=None):
         super(ContinuousQuerier, self).__init__(sim=sim)
         self.sender = sender
@@ -34,7 +41,7 @@ class ContinuousQuerier(Process):
         self.sender.send_query(self.subquery, to_node=self.sender.node_id) # joining a network
         
         # the interval between the first two queries MUST be at least one second
-        twait = 1000
+        twait = ContinuousQuerier.FIRST_WAIT
         while not self.stopped:
             timer = Timer(waitUntil=twait, sim=self.sim)
             self.sim.activate(timer, timer.wait())
@@ -43,7 +50,7 @@ class ContinuousQuerier(Process):
             
             if twait!=3600000:
                 # the intervals between successive queries MUST increase by at least a factor of two
-                twait = twait * 2
+                twait = twait * ContinuousQuerier.INCREMENT_RATE
                 # When the interval between queries reaches or exceeds 60 minutes
                 # a querier MAY cap the interval to a maximum of 60 minutes
                 # and perform subsequent queries at a steady-state rate of one query per hour
