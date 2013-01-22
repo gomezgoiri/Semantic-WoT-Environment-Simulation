@@ -40,9 +40,9 @@ class AbstractConsumer(SelectionProcessObserver):
         self.ongoing_selection = False
     
     def get_query_candidates(self, template, previously_unresolved=False):
-        self.__update_connector_if_needed()
+        keep_waiting = self.__update_connector_if_needed()
         
-        if self.connector is None:
+        if keep_waiting or self.connector is None:
             raise Exception("Try again a little bit latter.")
         return self.connector.get_query_candidates(template, previously_unresolved)
     
@@ -54,8 +54,10 @@ class AbstractConsumer(SelectionProcessObserver):
                 wsm = WhitepageSelectionManager(self.simulation, self.discovery)
                 wsm.set_observer(self)
                 wsm.choose_whitepage(self.get_clue_store())
+            return True
         else:
             self._update_connector(wp)
+            return False
     
     @abstractmethod
     def _update_connector(self, wp):
