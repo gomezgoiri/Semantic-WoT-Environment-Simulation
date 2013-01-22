@@ -8,6 +8,7 @@ from netuse.nodes import NodeManager
 from commons.utils import SemanticFilesLoader
 from netuse.activity import ActivityGenerator
 from netuse.tracers.http import FileHTTPTracer
+from netuse.tracers.udp import FileUDPTracer
 from netuse.network_models import NetworkModelManager
 from netuse.evaluation.simulate import BasicModel
 from netuse.evaluation.utils import ParametrizationUtils, Parameters
@@ -21,7 +22,9 @@ from netuse.database.parametrization import Parametrization, ParametrizableNetwo
 class TraceAndLoadFilesModel(BasicModel):
         
     def initialize(self):
-        G.setNewExecution(None, tracer=FileHTTPTracer('/tmp/trace.txt'))
+        G.setNewExecution( None,
+                           tracer = FileHTTPTracer('/tmp/trace.txt'),
+                           udp_tracer = FileUDPTracer('/tmp/trace_udp.txt') )
         super(TraceAndLoadFilesModel, self).initialize()
     
     def runModel(self):
@@ -80,7 +83,7 @@ def main():
     p = ParametrizationUtils('memory_integration_test', '/home/tulvur/dev/dataset', None)
     params = Parameters (
             simulateUntil = 400000,
-            discovery = DiscoveryFactory.MDNS_DISCOVERY, #.SIMPLE_DISCOVERY,
+            discovery = DiscoveryFactory.MDNS_DISCOVERY, #SIMPLE_DISCOVERY MDNS_DISCOVERY
             strategy = Parametrization.our_solution,
             amountOfQueries = 1000,
             writeFrequency = 10000,
