@@ -5,11 +5,22 @@ Created on Jan 17, 2013
 '''
 from SimPy.Simulation import Process, hold
 from clueseval.clues.versions.management import Version
+from netuse.results import G
 from netuse.nodes import NodeManager
-from netuse.mdns.network import MDNSNode
+from netuse.mdns.network import UDPNetwork, MDNSNode
 from netuse.mdns.record import PTRRecord, SVRRecord, TXTRecord
-from netuse.triplespace.network.discovery.discovery import DiscoveryInstance
+from netuse.triplespace.network.discovery.discovery import AbstractDiscoveryFactory, DiscoveryInstance
 from netuse.triplespace.network.discovery.record import DiscoveryRecord, DiscoveryRecordObserver
+
+
+class MDNSDiscoveryFactory(AbstractDiscoveryFactory):
+    
+    def create(self, my_record):
+        if not hasattr(self, 'network'):
+            self.network = UDPNetwork(self.simulation, udp_tracer = G._udp_tracer)
+        
+        return MDNSDiscoveryInstance(my_record, self.network, self.simulation)
+
 
 class DiscoveryRecordConverter(object):
     
@@ -51,23 +62,25 @@ class MDNSDiscoveryInstance(DiscoveryInstance, DiscoveryRecordObserver):
         super(MDNSDiscoveryInstance, self).__init__()
         self.my_record = my_record
         self.my_record.add_change_observer(self)
-        self.start_mdns_node(udp_network)
+        
         # If you use weakref in "udp_network": the factory will be destroyed and this will be None.
         self.udp_network = udp_network # weakref.proxy(magic_network) 
-        self.udp_network.join_space(self)
+        self.simulation = simulation
+        
+        self.start_mdns_node(udp_network)
     
-    def start_mdns_node(self, udp_network, simulation):
+    def start_mdns_node(self, udp_network):
         self.mdns_node = MDNSNode( node_id = self.my_record.node_name,
                                    udp_network = udp_network,
-                                   simulation = simulation )
+                                   simulation = self.simulation )
         #write my registers
         domain_name = self.my_record.node_name+ "._http._tcp.local"
         self.mdns_node.write_record( PTRRecord("_http._tcp.local", domain_name) )
         self.mdns_node.write_record( SVRRecord(domain_name, "0.0.0.0", 9999) )
         self.mdns_node.write_record( DiscoveryRecordConverter.to_txt_record(self.my_record) )
         
-        self.detector = NewWPDetector(self, simulation) # maybe I should do a mechanism to stop it...
-        simulation.activate( self.detector, self.detector.check_new_wps() )
+        self.detector = NewWPDetector(self, self.simulation) # maybe I should do a mechanism to stop it...
+        self.simulation.activate( self.detector, self.detector.check_new_wps() )
     
     def start(self):
         self.mdns_node.start()

@@ -12,27 +12,28 @@ class DiscoveryFactory(object):
     SIMPLE_DISCOVERY = "simple"
     MDNS_DISCOVERY = "mdns"
     
+    @staticmethod
+    def create(ttype, simulation):
+        # Dirty. If it is imported at the beginning of the module, it throws a recursion error
+        if ttype == DiscoveryFactory.SIMPLE_DISCOVERY:
+            from netuse.triplespace.network.discovery.simple import SimpleDiscoveryFactory
+            return SimpleDiscoveryFactory( simulation )
+        elif ttype == DiscoveryFactory.MDNS_DISCOVERY:
+            from netuse.triplespace.network.discovery.mdns import MDNSDiscoveryFactory
+            return MDNSDiscoveryFactory( simulation )
+        else:
+            raise Exception( "Unacceptable discovery type: %s." % ttype )
+
+
+class AbstractDiscoveryFactory(object):
+    __metaclass__ = ABCMeta
+    
     def __init__(self, simulation):
         self.simulation = simulation
-        
-    def create_simple(self, my_record):
-        # Dirty. If it is imported at the beginning of the module, it throws a recursion error
-        if not hasattr(self, 'network'):
-            from netuse.triplespace.network.discovery.simple import MagicInstantNetwork
-            self.network = MagicInstantNetwork()
-        
-        from netuse.triplespace.network.discovery.simple import SimpleDiscoveryMechanism
-        return SimpleDiscoveryMechanism(my_record, self.network)
     
-    def create_mdns(self, my_record, simulation):
-        # Dirty. If it is imported at the beginning of the module, it throws a recursion error
-        if not hasattr(self, 'network'):
-            from netuse.mdns.network import UDPNetwork
-            self.network = UDPNetwork(self.simulation, udp_tracer = None)
-        
-        from netuse.triplespace.network.discovery.mdns import MDNSDiscoveryInstance
-        return MDNSDiscoveryInstance(my_record, self.network, self.simulation)
-
+    @abstractmethod
+    def create(self, my_record, tracer = None):
+        pass
 
 class DiscoveryEventObserver(object):
     __metaclass__ = ABCMeta

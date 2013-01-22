@@ -5,8 +5,17 @@ Created on Sep 16, 2012
 '''
 import weakref
 from netuse.nodes import NodeManager
-from netuse.triplespace.network.discovery.discovery import DiscoveryInstance
+from netuse.triplespace.network.discovery.discovery import AbstractDiscoveryFactory, DiscoveryInstance
 from netuse.triplespace.network.discovery.record import DiscoveryRecordObserver
+
+
+class SimpleDiscoveryFactory(AbstractDiscoveryFactory):
+    
+    def create(self, my_record):
+        if not hasattr(self, 'network'):
+            self.network = MagicInstantNetwork()
+        
+        return SimpleDiscoveryMechanism(my_record, self.network)
 
 
 class MagicInstantNetwork(DiscoveryRecordObserver):
