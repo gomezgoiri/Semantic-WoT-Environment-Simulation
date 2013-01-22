@@ -103,32 +103,34 @@ class OurSolution(TripleSpace):
     
     def be_whitepage(self, json_clues_sent_by_the_chooser):
         my_clue_store = None if self.consumer is None else self.consumer.get_clue_store()
+        
+        # In some cases, we could reuse the clue store used by the "Consumer" module.
+        # However, in order to simplify the synchronization between the 2 modules
+        # data from the consumer's clue store is loaded into a different
+        # clue store managed by the WP. 
+        self.whitepage = Whitepage( generation_time = self.simulation.now() )
+        
         if my_clue_store is None:
-                self.whitepage = Whitepage( clue_store = None,
-                                            generation_time = self.simulation.now() )
                 if json_clues_sent_by_the_chooser is not None:
-                    self.whitepage.clues.fromJson( json_clues_sent_by_the_chooser )
+                    self.whitepage.initial_data_loading( json_clues_sent_by_the_chooser )
         else: # if the sent clues are newer load them, otherwise don't
-            # no need to create a new store for this json yet
-            # just take the version
             if json_clues_sent_by_the_chooser is None:
-                self.whitepage = Whitepage( clue_store = my_clue_store )
+                consumers_data_json = my_clue_store.toJson()
+                self.whitepage.initial_data_loading( consumers_data_json )
             else:
                 dictio = json.loads(json_clues_sent_by_the_chooser)
                 sent_version = Version( dictio[AggregationClueUtils.GENERATION_FIELD],
                                         dictio[AggregationClueUtils.VERSION_FIELD] )
                 
                 if sent_version < my_clue_store.version:
-                    self.whitepage = Whitepage( clue_store = my_clue_store )
+                    consumers_data_json = my_clue_store.toJson()
+                    self.whitepage.initial_data_loading( consumers_data_json )
                 else:
-                    self.whitepage = Whitepage( clue_store = None, generation_time = 0 ) # gt will be ovewritten
-                    self.whitepage.clues.fromJson( json_clues_sent_by_the_chooser )
-        
+                    self.whitepage.initial_data_loading( json_clues_sent_by_the_chooser )
         
         # A WP shares through discovery record the first version it started providing
-        loaded_version = self.whitepage.clues.version
         self.discovery.get_my_record().change_transactionally( is_whitepage = True,
-                                                               version = loaded_version )
+                                                               version = self.whitepage.get_initially_loaded_version() )
         
         # TODO check if another whitepage already exist and resolve conflict (step 6)
     
@@ -187,19 +189,19 @@ class QueryFinisher(Process, RequestObserver):
         selected_nodes = None
         previously_unsolved = True
         attempts = 5 # to avoid too many process on memory when no clue has been checked
-        while selected_nodes==None and attempts>0:
+        while selected_nodes is None and attempts>0:
             try:
                 selected_nodes = self.consumer.get_query_candidates(template, previously_unsolved)
                 previously_unsolved = False
             except Exception as e:
                 #print "Waiting for a whitepage.", e.args[0]
                 attempts -= 1
-            if selected_nodes==None and attempts>0:
+            if selected_nodes is None and attempts>0:
                 yield hold, self, 100
             
         if attempts==0:
             # somehow record this failure
-            print "No clues have been initialized"
+            print "No clues have been initialized in %s (t=%d)." % ( self.discovery.get_my_record().node_name, self.sim.now() )
             #pass
         else:
             try:
