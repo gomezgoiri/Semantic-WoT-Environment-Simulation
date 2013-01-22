@@ -77,6 +77,10 @@ class SQLiteClueStore(AbstractStore):
         self.cur.close()
         self.conn.close()
     
+    def set_version(self, generation, version):
+        self.version = Version( generation = generation, version = version )
+        self.version_factory.previous_version = self.version
+    
     def increment_version(self):
         self.version = self.version_factory.create_version()
         
@@ -215,10 +219,8 @@ class SQLiteClueStore(AbstractStore):
         if dictio: # if the dictionary is empty, we don't do anything
             self.type = dictio[Clue.ID_P()]
             
-            # sets a concrete version
-            self.version = Version( generation = dictio[AggregationClueUtils.GENERATION_FIELD],
-                                    version = dictio[AggregationClueUtils.VERSION_FIELD] )
-            self.version_factory.previous_version = self.version
+            self.set_version( generation = dictio[AggregationClueUtils.GENERATION_FIELD],
+                              version = dictio[AggregationClueUtils.VERSION_FIELD] )
             
             if self.type==SchemaBasedClue.ID():
                 raise NotImplementedError()
