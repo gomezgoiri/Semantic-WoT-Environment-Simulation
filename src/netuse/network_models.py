@@ -39,7 +39,7 @@ class NetworkModelManager(object):
             dm.configure()
         elif model==NetworkModelManager.chaotic_netmodel:
             # parametrization is a ParametrizableNetworkModel
-            cm = ChaoticModel(simulation, network,
+            cm = ChaoticModel(simulation,
                               parametrization.network_model.state_change_mean,
                               parametrization.network_model.state_change_std_dev)
             cm.run(at=0)
@@ -99,10 +99,9 @@ class ChaoticModel(Process):
     A Model where the whitepage goes down and up periodically.
     """
     
-    def __init__(self, simulation, network, mean_wp_down, std_dev_wp_down):
+    def __init__(self, simulation, mean_wp_down, std_dev_wp_down):
         super(ChaoticModel, self).__init__(sim=simulation)
         self._change_state_each = (mean_wp_down, std_dev_wp_down)
-        self._network = network # type: MagicInstantNetwork
         self._random = Random()
     
     @activatable
@@ -117,8 +116,14 @@ class ChaoticModel(Process):
             if last_wp is not None:
                 last_wp.swap_state() # to revert the going down of the previous WP
                 #print "%s went up on %d."%(last_wp.name, self.sim.now())
-            last_wp = self._network.get_whitepage_record()
+            last_wp = self.find_whitepage()
             if last_wp is not None:
-                last_wp = self._network._get_node_for_record( last_wp )
                 last_wp.swap_state() # normal call, not scheduling it
                 #print "%s went down on %d."%(last_wp.name, self.sim.now())
+    
+    def find_whitepage(self):
+        for node in NodeManager.getNodes():
+            record = node._discovery_instance.get_my_record()
+            if not node.down and record.is_whitepage:
+                return node
+        return None
