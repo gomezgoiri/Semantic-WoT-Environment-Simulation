@@ -19,16 +19,16 @@ class TestResponder(unittest.TestCase):
         self.responder = Responder(self.simulation)
         
         self.sample_ptr = PTRRecord("_http._tcp.local", "name0._http._tcp.local")
-        self.responder.write_record(self.sample_ptr)
+        self.responder.write_record( self.sample_ptr )
         
         self.sample_svr = SVRRecord("name0._http._tcp.local", None, None)
-        self.responder.write_record(self.sample_svr)
+        self.responder.write_record( self.sample_svr )
         
         self.sample_txt = TXTRecord("name0._http._tcp.local", {})
-        self.responder.write_record(self.sample_txt)
+        self.responder.write_record( self.sample_txt )
         
         self.sample_ptr2 = PTRRecord("_app._udp.local", "instance1._app._udp.local")
-        self.responder.write_record(self.sample_ptr2)
+        self.responder.write_record( self.sample_ptr2 )
         
         # ignore fake-queries generated to announce new records
         self.responder.queued_queries = []
@@ -36,6 +36,25 @@ class TestResponder(unittest.TestCase):
         self.responder._random = Mock()
         self.responder._random.random.side_effect = lambda *args: 0.5 # 0.5 * 2% == 1% of variation
     
+    def assert_is(self, expected, condition):
+        for local_record in self.responder.local_records:
+            if local_record == expected:
+                self.assertTrue( condition(local_record, expected) )
+                break
+            
+    def assert_is_in_local_record(self, expected):
+        self.assert_is( expected, lambda got, expected: got is expected )
+    
+    def assert_is_not_in_local_record(self, expected):
+        self.assert_is( expected, lambda got, expected: got is not expected )
+    
+    def test_write_record(self):
+        self.assert_is_in_local_record( self.sample_txt )
+        
+        other_txt_with_same_name = TXTRecord("name0._http._tcp.local", {"hello": "world"}) # data has changed! (keyvalue)
+        self.responder.write_record( other_txt_with_same_name )
+        self.assert_is_in_local_record( other_txt_with_same_name )
+        self.assert_is_not_in_local_record( self.sample_txt )
 
     def test_queue_query(self):
         self.responder.sim = Mock()

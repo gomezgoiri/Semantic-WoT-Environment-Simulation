@@ -10,7 +10,8 @@ from netuse.triplespace.network.discovery.discovery import DiscoveryFactory
 
 
 class NetworkModel(Document):
-    meta = {'collection': 'parametrization'}
+    meta = {'collection': 'parametrization',
+            'allow_inheritance': True }
     
     type = StringField(
                 required = True,
@@ -29,7 +30,6 @@ class ParametrizableNetworkModel(NetworkModel):
 
 class Parametrization(Document):
     meta = { 'collection': 'parametrization',
-             'allow_inheritance': True,
              'cascade': True } # to save the 1:1 network model associated with the parametrization
     
     # valid strategies

@@ -32,7 +32,11 @@ class Responder(Process):
     def write_record(self, record):
         if record in self.local_records:
             if self.record_changes(record):
-                # "Whenever a host has a resource record with new data"
+                # "Whenever a host has a resource record with new data"                
+                # record is equal to a key (__eq__()==True), but has outdated data
+                del self.local_records[record] # remove old key with outdated data
+                # set new key
+                self.local_records[record] = -1 # -1 => next time should be sent using multicast (because is an announcement)
                 self.announce(record)
         else:
             # "Whenever a host has a resource record with new data"
