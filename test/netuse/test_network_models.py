@@ -125,15 +125,14 @@ class TestChaoticModel(unittest.TestCase):
     def _get_node_for_record(self, record):
         print record
     
-    def get_network(self):
-        network = Mock()
-        network.get_whitepage_record.return_value = self.nodes[0] # to force record!=None
-        network._get_node_for_record.return_value = self.nodes[0] # select the first as WP
-        return network
+    def patch_find_whitepage(self, model):
+        model.find_whitepage = Mock()
+        model.find_whitepage.return_value = self.nodes[0] # select the first as WP
     
-    def test_run(self):        
-        model = ChaoticModel(self.simulation, self.get_network(), 500, 200)
+    def test_run(self):
+        model = ChaoticModel(self.simulation, 500, 200)
         model._random = self.random
+        self.patch_find_whitepage(model)
         
         model.run(at=0) # test method
         self.simulation.simulate(until=2000)
