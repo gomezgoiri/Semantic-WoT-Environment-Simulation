@@ -76,7 +76,7 @@ class WhitepageSelectorTestCase(unittest.TestCase):
         self.candidates = []
         
         factory = Mock()
-        factory.create_simple.side_effect = self.log_candidates
+        factory.create.side_effect = self.log_candidates
         
         for _ in range(1): Node("server", discovery_factory = factory, device = DeviceType.create(Server.TYPE_ID))
         for i in range(30): Node("galaxy_%d"%(i), discovery_factory = factory, device = DeviceType.create(SamsungGalaxyTab.TYPE_ID))

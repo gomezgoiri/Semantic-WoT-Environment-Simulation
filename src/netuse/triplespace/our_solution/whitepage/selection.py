@@ -174,7 +174,7 @@ class WhitepageSelectionManager(RequestObserver):
         candidates = [item for item in self.discovery.get_discovered_records() if item.node_name not in self.refused]
         self.last_choosen = WhitepageSelector.select_whitepage(candidates)
         if self.last_choosen==None:
-            # somehow, transmit that no node could have been chosen
+            # somehow, transmit that no node could be chosen
             pass
         else:
             RequestManager.launchNormalRequest( self._get_choose_request( clue_store ) )
