@@ -107,7 +107,7 @@ class Node(Process):
                                                 storage = self.__device.storage_capacity,
                                                 joined_since = joined_since,
                                                 battery_lifetime = battery_lifetime if self.__device.hasBattery else DiscoveryRecord.INFINITE_BATTERY)
-        self._discovery_instance = discovery_factory.create_simple(discovery_record)
+        self._discovery_instance = discovery_factory.create(discovery_record)
         self._discovery_instance.start()
         
         self.__httpIn = []
