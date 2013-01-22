@@ -7,6 +7,7 @@ import shutil
 from tempfile import mkdtemp
 from SimPy.Simulation import random
 from netuse.tracers.http import MongoDBHTTPTracer #FileHTTPTracer
+from netuse.tracers.udp import MongoDBUDPTracer
 
 
 class G:  # global variables
@@ -16,15 +17,18 @@ class G:  # global variables
     dataset_path = "/home/tulvur/dev/dataset"
     temporary_path = None
     _tracer = None
-    
+    _udp_tracer = None
     
     @staticmethod
-    def setNewExecution(execution, tracer=None):
+    def setNewExecution(execution, tracer=None, udp_tracer=None):
         G.temporary_path = mkdtemp(prefix="/tmp/exec_")
         
         # G._tracer = FileHTTPTracer('/tmp/workfile')
         G._tracer = MongoDBHTTPTracer(execution) if tracer==None else tracer
         G._tracer.start()
+        
+        G._udp_tracer = MongoDBUDPTracer(execution) if tracer==None else udp_tracer
+        G._udp_tracer.start()
         
     @staticmethod
     def traceRequest(timestamp, client, server, path, status, response_time):

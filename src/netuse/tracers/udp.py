@@ -34,8 +34,9 @@ class AbstractUDPTracer(object):
 
 class FileUDPTracer(AbstractUDPTracer):
     
-    def __init__(self, filename='/tmp/workfile'):
+    def __init__(self, filename='/tmp/workfile', details=False):
         self.filename = filename
+        self.details = details
         self.flusher = Flusher()
     
     def start(self):
@@ -45,28 +46,34 @@ class FileUDPTracer(AbstractUDPTracer):
         self.f.close()
         
     def _trace_subqueries(self, queries):
-        self.f.write("\tSubqueries:\n")
+        self.f.write( "\tSubqueries:\n" )
         for subquery in queries:
             self.f.write("\t\t%s\t%s\n"%(subquery.record_type,subquery.name))
         
     def _trace_known_answers(self, known_answers):
-        self.f.write("\tKnown answers:\n")
+        self.f.write( "\tKnown answers:\n" )
         for known_answer in known_answers:
             self.f.write("\t\t%s\t%s\n"%(known_answer.type,known_answer.name))
     
+    def _trace_answers(self, answers):
+        self.f.write( "\tAnswers:\n" )
+        for answer in answers:
+            self.f.write( "\t\t%s\n"%(answer) )
+    
     def trace_query(self, timestamp, fromm, query):
         self.f.write("%0.2f\t%s\t%s\n"%(timestamp, fromm, query.question_type))
-        self._trace_subqueries(query.queries)
-        self._trace_known_answer(query.known_answers)
+        if self.details:
+            self._trace_subqueries(query.queries)
+            self._trace_known_answers(query.known_answers)
         
         if self.flusher.force_flush():
             self.f.flush()
     
     def _trace_response(self, timestamp, fromm, response_type, answers):
         self.f.write( "%0.2f\t%s\t%s\n" % (timestamp, fromm, response_type) )
-        self.f.write( "\tAnswers:\n" )
-        for answer in answers:
-            self.f.write( "\t\t%s\n"%(answer) )
+        
+        if self.details:
+            self._trace_answers(answers)
         
         if self.flusher.force_flush():
             self.f.flush()
@@ -102,7 +109,7 @@ class MongoDBUDPTracer(AbstractUDPTracer):
             from netuse.database.results import PTRRecord
             return PTRRecord( name = record.name,
                               ttl = record.ttl,
-                              hostname = record.domain_name )
+                              domain_name = record.domain_name )
         elif record.type == "SVR":
             from netuse.database.results import SVRRecord
             return SVRRecord( name = record.name,

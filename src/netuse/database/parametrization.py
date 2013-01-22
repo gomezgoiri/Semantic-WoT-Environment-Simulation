@@ -28,10 +28,9 @@ class ParametrizableNetworkModel(NetworkModel):
 
 
 class Parametrization(Document):
-    meta = {
-            'collection': 'parametrization',
-            'cascade': True # to save the 1:1 network model associated with the parametrization
-            } 
+    meta = { 'collection': 'parametrization',
+             'allow_inheritance': True,
+             'cascade': True } # to save the 1:1 network model associated with the parametrization
     
     # valid strategies
     negative_broadcasting = "negative broadcasting"
