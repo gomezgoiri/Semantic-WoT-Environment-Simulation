@@ -9,6 +9,7 @@ from netuse.evaluation.utils import ParametrizationUtils, Parameters
 from netuse.database.parametrization import Parametrization, ParametrizableNetworkModel
 from netuse.network_models import NetworkModelManager
 from netuse.devices import XBee, SamsungGalaxyTab, FoxG20, Server
+from netuse.triplespace.network.discovery.discovery import DiscoveryFactory
 
 
 def add_baseline_simulations(var_params):
@@ -105,6 +106,7 @@ def main():
     
     # Prepare constant independent parameters
     default_params = Parameters (
+                         discovery = DiscoveryFactory.SIMPLE_DISCOVERY, #SIMPLE_DISCOVERY MDNS_DISCOVERY
                          amountOfQueries = 1000,
                          writeFrequency = 10000,
                          simulateUntil = 3600000,  # 1h of simulation time
@@ -115,7 +117,7 @@ def main():
     # Prepare variable independent parameters
     var_params = []
     add_baseline_simulations(var_params)
-    add_simulations_with_dynamic_network_models(var_params, (600000, 60000, 10000))#, 5000, 1000)) # 10 mins, 1 min, 10 seconds, 5 seconds, 1 second
+    add_simulations_with_dynamic_network_models(var_params, (600000, 60000, 30000, 10000, 5000, 1000)) # 10 mins, 1 min, 30 secs, 10 secs, 5 secs, 1 sec
     
     # Prepare and save executions (possibly repeating them)
     p = ParametrizationUtils('dynamism', G.dataset_path, default_params, repetitions=1)
