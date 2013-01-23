@@ -4,6 +4,7 @@ Created on Jan 12, 2013
 @author: tulvur
 '''
 
+import weakref
 from netuse.mdns.cache import Cache
 from netuse.mdns.responder import Responder
 from netuse.mdns.querier import ContinuousQuerier
@@ -54,6 +55,11 @@ class MDNSNode(object):
         self.cache = Cache( sim = self.simulation, record_observer = self ) # observer with renew_record method
         browsing_subquery = SubQuery( name = "_services._dns-sd._udp.local", record_type = "PTR" )
         self.browser = ContinuousQuerier( browsing_subquery, sim = self.simulation , sender = self )
+        
+        self.txt_observers = weakref.WeakSet() # normally just one
+    
+    def add_observer(self, observer):
+        self.txt_observers.add( observer )
     
     # Redefine eq and hash to 
     def __eq__(self, node):
@@ -91,6 +97,9 @@ class MDNSNode(object):
             # dns_packet.data is a Query object
             for record in dns_packet.data:
                 self.cache.cache_record( record )
+                if record.type == "TXT":
+                    for observer in self.txt_observers:
+                        observer.notify_txt_record(record)
         elif dns_packet.type == DNSPacket.TYPE_QUERY:
             # dns_packet.data is a List of Record objects
             self.responder.queue_query( dns_packet.data )
@@ -102,7 +111,7 @@ class MDNSNode(object):
     
     # used by ContinuousQuerier and by self.renew_record
     def send_query(self, unique_subquery, to_node=None): # queries always through multicast
-        q = Query( queries = (unique_subquery,), known_answers= self.cache.get_known_answers(), to_node=to_node )
+        q = Query( queries = (unique_subquery,), known_answers = self.cache.get_known_answers(), to_node=to_node )
         self.send_multicast( DNSPacket(ttype=DNSPacket.TYPE_QUERY, data=q) )
     
     # used by send_query and Responder
