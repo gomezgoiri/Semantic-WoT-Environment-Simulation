@@ -3,7 +3,7 @@ Created on Jan 17, 2013
 
 @author: tulvur
 '''
-from SimPy.Simulation import Process, hold
+from SimPy.Simulation import Process, SimEvent, waitevent
 from clueseval.clues.versions.management import Version
 from netuse.results import G
 from netuse.nodes import NodeManager
@@ -81,6 +81,8 @@ class MDNSDiscoveryInstance(DiscoveryInstance, DiscoveryRecordObserver):
         
         self.detector = NewWPDetector(self, self.simulation) # maybe I should do a mechanism to stop it...
         self.simulation.activate( self.detector, self.detector.check_new_wps() )
+        
+        self.mdns_node.add_observer( self.detector )
     
     def start(self):
         self.mdns_node.start()
@@ -151,22 +153,22 @@ class MDNSDiscoveryInstance(DiscoveryInstance, DiscoveryRecordObserver):
 
 class NewWPDetector(Process):
     
-    FREQUENCY_WITH_NO_WP = 1000 # poll more frequently if no WP has been detected (some consumer will select it)
-    FREQUENCY_WITH_WP = 5000
-    
     def __init__(self, mdns_instance, sim):
         super(NewWPDetector, self).__init__( sim = sim )
         self.instance = mdns_instance
         self.last_wp_name = None
+        self.__new_record_update = SimEvent(name="new_record_updated", sim=sim)
     
     def check_new_wps(self):
         while True:
             wp_r = self.instance.get_whitepage_record()
-            if wp_r is None:
-                yield hold, self, NewWPDetector.FREQUENCY_WITH_NO_WP
-            else:
+            if wp_r is not None:
                 new_name = wp_r.node_name
                 if self.last_wp_name != new_name:
                     self.instance.notify_whitepage_changed()
                     self.last_wp_name = new_name
-                yield hold, self, NewWPDetector.FREQUENCY_WITH_WP
+            yield waitevent, self, (self.__new_record_update,)
+    
+    def notify_txt_record(self, record):
+        if "iw" in record.keyvalues:
+            self.__new_record_update.signal()
