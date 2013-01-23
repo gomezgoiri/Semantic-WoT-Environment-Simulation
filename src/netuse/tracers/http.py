@@ -58,8 +58,8 @@ class MongoDBHTTPTracer(AbstractHTTPTracer):
         # is appended to the list introduces a huge latency
     
     def trace(self, timestamp, client, server, path, status, response_time):
-        from netuse.database.results import NetworkTrace
-        n = NetworkTrace(
+        from netuse.database.results import HTTPTrace
+        n = HTTPTrace(
             execution=self.execution,
             timestamp=timestamp,
             client=client,

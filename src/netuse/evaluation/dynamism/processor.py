@@ -6,7 +6,7 @@ Created on Jan 08, 2013
 
 import json
 from netuse.database.execution import ExecutionSet
-from netuse.database.results import NetworkTrace
+from netuse.database.results import HTTPTrace
 from netuse.network_models import NetworkModelManager
 from netuse.database.parametrization import Parametrization
 from netuse.evaluation.dynamism.diagram import DiagramGenerator
@@ -30,7 +30,7 @@ class RawDataProcessor(object):
                 if interval not in requests_by_interval:
                     requests_by_interval[interval] = []
                 
-                num_requests = NetworkTrace.objects(execution=execution.id).count()
+                num_requests = HTTPTrace.objects(execution=execution.id).count()
                 requests_by_interval[interval].append(num_requests) 
         
         # sort by num_nodes
@@ -54,7 +54,7 @@ class RawDataProcessor(object):
                 if interval not in requests_by_interval:
                     requests_by_interval[interval] = []
                 
-                num_requests = NetworkTrace.objects(execution=execution.id, **trace_pattern).count()
+                num_requests = HTTPTrace.objects(execution=execution.id, **trace_pattern).count()
                 requests_by_interval[interval].append(num_requests) 
         
         # sort by num_nodes
