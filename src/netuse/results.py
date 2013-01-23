@@ -27,7 +27,7 @@ class G:  # global variables
         G._tracer = MongoDBHTTPTracer(execution) if tracer==None else tracer
         G._tracer.start()
         
-        G._udp_tracer = MongoDBUDPTracer(execution) if tracer==None else udp_tracer
+        G._udp_tracer = MongoDBUDPTracer(execution) if udp_tracer==None else udp_tracer
         G._udp_tracer.start()
         
     @staticmethod
