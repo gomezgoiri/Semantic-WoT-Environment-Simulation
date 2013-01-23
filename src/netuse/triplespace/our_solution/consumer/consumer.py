@@ -37,7 +37,7 @@ class AbstractConsumer(SelectionProcessObserver):
         self.simulation = simulation
         self.discovery = discovery
         self.connector = None
-        self.ongoing_selection = False
+        self.wsm = None
     
     def get_query_candidates(self, template, previously_unresolved=False):
         keep_waiting = self.__update_connector_if_needed()
@@ -50,10 +50,14 @@ class AbstractConsumer(SelectionProcessObserver):
         wp = self.discovery.get_whitepage()
         if wp is None:
             if not self.ongoing_selection:
-                self.ongoing_selection = True
-                wsm = WhitepageSelectionManager(self.simulation, self.discovery)
-                wsm.set_observer(self)
-                wsm.choose_whitepage(self.get_clue_store())
+                # Not setting the SelectionManager as an attribute ruins everything.
+                # The object disappears and the result of the sent request
+                # is never assigned to "wsm".
+                # Consequently, "wsm" never calls to the callback and ongoing_selection
+                # returns True for the rest of the simulation.
+                self.wsm = WhitepageSelectionManager(self.simulation, self.discovery)
+                self.wsm.set_observer(self)
+                self.wsm.choose_whitepage(self.get_clue_store())
             return True
         else:
             self._update_connector(wp)
@@ -64,9 +68,13 @@ class AbstractConsumer(SelectionProcessObserver):
         # TODO set directly after a selection without waiting discovery of new WP
         # (we know for sure that it is the new WP!)
         pass
-                    
+    
+    @property
+    def ongoing_selection(self):
+        return self.wsm is not None
+    
     def wp_selection_finished(self, wp_node):
-        self.ongoing_selection = False
+        self.wsm = None
         # TODO update the connector with the new selected white page
     
     def stop(self):
