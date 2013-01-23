@@ -5,8 +5,11 @@ class Whitepage(object):
     def __init__(self, generation_time = None):
         self.clues = SQLiteClueStore(generation_time, in_memory=True) # generation time == 0, this should change
         self.loaded_version = self.clues.version
-        self.clues.start() # TODO when should be stop it???
-        
+        self.clues.start()
+    
+    def stop(self):
+        self.clues.stop()
+    
     def get_query_candidates(self, template):
         return self.clues.get_query_candidates(template)
     
