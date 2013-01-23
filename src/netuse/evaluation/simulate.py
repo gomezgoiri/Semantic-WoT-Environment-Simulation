@@ -7,6 +7,7 @@ import datetime
 
 # "SimulationTrace" instead of "Simulation" to debug
 from SimPy.Simulation import Simulation
+from netuse.sim_utils import schedule
 from netuse.activity import ActivityGenerator
 from netuse.nodes import NodeManager
 from netuse.database.execution import ExecutionSet, Execution
@@ -41,9 +42,10 @@ class BasicModel(Simulation):
 
 class Model(BasicModel):
         
-    def __init__(self, execution, cool_down=500):
+    def __init__(self, execution, cool_down=500, informative=True):
         self.execution = execution # before calling to parent constructor since it calls to initialize()
         super(Model, self).__init__(execution.parameters, cool_down)
+        self.informative = informative
         
     def initialize(self):
         G.setNewExecution(self.execution)
@@ -51,6 +53,18 @@ class Model(BasicModel):
     
     def _mark_execution(self):
         ''' This method is used to warn another processes that this one is already processing it.'''
+        self.execution.execution_date = datetime.datetime.now()
+        self.execution.save()
+    
+    @schedule
+    def _show_message(self, msg):
+        print msg
+    
+    def schedule_messages(self):
+        '''To show messages during the simulation and check that everything goes ok.'''
+        interval = self.parameters.simulateUntil * 10.0
+        for i in range(1, 10): #[1..9]
+            self._show_message( at = interval * i, simulation = self, msg = "Execution %s at %d%% - "%(self.execution.id, i*10) )
         self.execution.execution_date = datetime.datetime.now()
         self.execution.save()
 
@@ -68,7 +82,14 @@ class Model(BasicModel):
         ActivityGenerator.create(self.parameters, loadedGraphs, simulation=self)
         self.stoppables.extend( NodeManager.getNodes() )
         
+        if self.informative:
+            self.schedule_messages()
+            print "Starting execution: %s" % (self.execution.id)
+        
         self.simulate( until = self.parameters.simulateUntil )
+        
+        if self.informative:
+            print "Execution finished: %s" % (self.execution.id)
 
 
 class SimulationPerformer(Process):
