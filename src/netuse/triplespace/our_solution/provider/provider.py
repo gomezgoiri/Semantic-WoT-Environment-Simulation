@@ -73,19 +73,22 @@ class Provider(Process, DiscoveryEventObserver):
         """Returns if it needs to be retry or not."""
         self.__update_connector_if_needed()
         if self.connector is not None:
-            self.connector.send_clue(self.clue_manager.get_clue())
+            ok = self.connector.send_clue(self.clue_manager.get_clue())
+            return ok # if the message could not be sent (e.g. because WP is not local anymore), retry
         return self.connector is None # if the connector could not be updated, retry
     
     def __update_connector_if_needed(self):
         wp = self.discovery.get_whitepage()
-        if wp!=None:
+        if wp is None:
+            self.connector = None
+        else:
             # TODO reuse connectors as done in "consumer" module
             if self.wp_node_name==None or self.wp_node_name!=wp.name:
                 self.wp_node_name = wp.name
                 if wp==self.discovery.me:
                     self.connector = LocalConnector(self.discovery, self)
                 else:
-                    self.connector = RemoteConnector(self.discovery.me, wp, self.sim, self)
+                    self.connector = RemoteConnector(self.discovery.me, wp, self.sim, self)            
                     
     def refresh_clue(self):
         refreshed = self.clue_manager.refresh()
@@ -121,14 +124,19 @@ class LocalConnector(AbstractConnector):
     
     def __init__(self, discovery, observer):
         super(LocalConnector, self).__init__(observer)
-        self.local_whitepage = discovery.me.ts.whitepage
-        self.me = discovery.me
+        self.discovery = discovery
         
     def send_clue(self, clue):
         # TODO a method to add local clues to the store without serializing/parsing
-        cwn = ClueWithNode(self.me.name, clue)
-        self.local_whitepage.add_clue(self.me.name, cwn.toJson()) # non-sense: serialize to parse
-        self.observer.set_last_version( self.local_whitepage.clues.version )
+        local_whitepage = self.discovery.me.ts.whitepage
+        if local_whitepage is None:
+            return False
+        else:
+            me = self.discovery.me
+            cwn = ClueWithNode(me.name, clue)
+            local_whitepage.add_clue(me.name, cwn.toJson()) # non-sense: serialize to parse
+            self.observer.set_last_version( local_whitepage.clues.version )
+            return True
 
 
 class RemoteConnector(AbstractConnector, RequestObserver):
@@ -141,6 +149,7 @@ class RemoteConnector(AbstractConnector, RequestObserver):
     
     def send_clue(self, clue):
         RequestManager.launchNormalRequest(self._get_update_request(clue))
+        return True
     
     def _get_update_request(self, clue):
         c = ClueWithNode(self.me_as_node.name, clue)

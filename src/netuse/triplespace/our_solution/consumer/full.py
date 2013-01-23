@@ -54,15 +54,18 @@ class Consumer(AbstractConsumer):
 class LocalConnector(AbstractConnector):
     
     def __init__(self, discovery):
-        self.local_whitepage = discovery.me.ts.whitepage
+        self.discovery = discovery
     
     def get_query_candidates(self, template, previously_unresolved):
-        return self.local_whitepage.get_query_candidates(template)
+        local_whitepage = self.discovery.me.ts.whitepage
+        if local_whitepage is None:
+            return None # I'm not the WP anymore!
+        return local_whitepage.get_query_candidates(template)
     
     # this SHOULD never be called!
     # Why would a WP become into a WP?
     def get_clue_store(self):
-        return self.local_whitepage.clues
+        return None
 
 
 class RemoteConnector(AbstractConnector, RequestObserver):
@@ -78,6 +81,7 @@ class RemoteConnector(AbstractConnector, RequestObserver):
         # generation id does not matter, will be ovewritten
         self.clues = SQLiteClueStore(in_memory=True)
         self.first_load_in_store = False
+        self.stopped = False
         
     def start(self):
         self.clues.start()
@@ -86,6 +90,7 @@ class RemoteConnector(AbstractConnector, RequestObserver):
         
     def stop(self):
         self.clues.stop()
+        self.stopped = True
     
     def change_whitepage(self, whitepage_node):
         self.whitepage_node = whitepage_node
@@ -160,4 +165,7 @@ class RemoteConnector(AbstractConnector, RequestObserver):
         return self.clues.get_query_candidates(template)
     
     def get_clue_store(self):
-        return self.clues
+        if self.first_load_in_store and not self.stopped:
+            return self.clues
+        else:
+            return None # just in case it has not been even opened/loaded or already closed!
