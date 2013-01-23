@@ -25,7 +25,7 @@ class BasicModel(Simulation):
     def __init__(self, parameters, cool_down=500):
         super(BasicModel, self).__init__()
         self.parameters = parameters
-        self.cool_down = 500
+        self.cool_down = cool_down
         self.stoppables = []
     
     def simulate(self, until=0):
