@@ -1,3 +1,4 @@
+import weakref
 from numpy import mean, std
 from abc import ABCMeta, abstractmethod
 from netuse.nodes import NodeManager
@@ -167,7 +168,7 @@ class WhitepageSelectionManager(RequestObserver):
         self.last_choosen = None # contains the name of the last choosen node
         
     def set_observer(self, observer):
-        self.observer = observer
+        self.observer = weakref.proxy(observer)
     
     def choose_whitepage(self, clue_store):
         # TODO consider that I can choose myself as a WP
@@ -191,7 +192,7 @@ class WhitepageSelectionManager(RequestObserver):
     def notifyRequestFinished(self, request_instance):
         for unique_response in request_instance.responses:
             if unique_response.getstatus()==200:
-                self.observer.wp_selection_finished( NodeManager.getNodeByName(self.last_choosen) )
+                self.observer.wp_selection_finished( NodeManager.getNodeByName(self.last_choosen.node_name) )
             else: # has refused being whitepage!
                 self.refused.append(self.last_choosen)
                 self.choose_whitepage()
