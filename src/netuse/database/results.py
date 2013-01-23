@@ -62,7 +62,7 @@ class MDNSQueryTrace(UDPTrace):
     # "execution" and "indexed" inherited
     question_type = StringField( required = True, default = "QM", choices = ( "QM", "QU" ) )
     queries = ListField(ReferenceField(MDNSSubQuery, reverse_delete_rule=NULLIFY), required=True)
-    known_answers = ListField(ReferenceField(MDNSRecord, reverse_delete_rule=NULLIFY), required=True)
+    known_answers = ListField(ReferenceField(MDNSRecord, reverse_delete_rule=NULLIFY), required=False) # it can be empty
 
 class MDNSAnswerTrace(UDPTrace):
     # "execution" and "indexed" inherited
