@@ -57,7 +57,7 @@ class ConcurrentThread(Process):
 class Connections(Resource):
     
     def __init__(self, device, sim, name="connections"):
-        super(Connections, self).__init__( device.get_maximum_concurrent_requests() ,
+        super(Connections, self).__init__( device.get_maximum_concurrent_requests(),
                                            name=name,
                                            sim=sim )
         self.canQueue = device.canQueue

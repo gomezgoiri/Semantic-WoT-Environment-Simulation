@@ -164,6 +164,9 @@ class OurSolution(TripleSpace):
 
     def recover_from_drop(self):
         # after a drop I won't be WP anymore
+        if self.whitepage is not None:
+            self.whitepage.stop()
+        
         # setting to None helps to answer correct 501 answer on the server-side
         self.whitepage = None
 
@@ -194,7 +197,7 @@ class QueryFinisher(Process, RequestObserver):
                 selected_nodes = self.consumer.get_query_candidates(template, previously_unsolved)
                 previously_unsolved = False
             except Exception as e:
-                #print "Waiting for a whitepage.", e.args[0]
+                #print "Waiting for a whitepage (t=%d)."%(self.sim.now()), e.args[0]
                 attempts -= 1
             if selected_nodes is None and attempts>0:
                 yield hold, self, 100
