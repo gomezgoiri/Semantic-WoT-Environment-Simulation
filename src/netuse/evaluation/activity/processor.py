@@ -106,9 +106,9 @@ class RawDataProcessor(object):
     
     def _calculate_activity_per_node(self, traces):
         '''
-        "traces" is a list of NetworkTrace instances.
+        "traces" is a list of HTTPTrace instances.
         
-        This method uses the following fields of NetworkTrace. Therefore they should contain a value:
+        This method uses the following fields of HTTPTrace. Therefore they should contain a value:
             - timestamp = FloatField(default=0.0)
             - client = StringField()
             - server = StringField()
@@ -137,14 +137,14 @@ class RawDataProcessor(object):
     
     def _load_strat(self, executionSet, strategy, key):
         # Imported here to enable testing other methods without connecting to mongodb
-        from netuse.database.results import NetworkTrace
+        from netuse.database.results import HTTPTrace
         
         self.data[key] = []
         for execution in executionSet.executions:
             if execution.parameters.strategy==strategy:
                 repetition_data = {}
                 
-                total_activity_per_node = self._calculate_total_activity_per_node(NetworkTrace.objects(execution=execution.id))
+                total_activity_per_node = self._calculate_total_activity_per_node(HTTPTrace.objects(execution=execution.id))
                 repetition_data[DiagramGenerator.TOTAL] = numpy.mean(total_activity_per_node.values())
                 
                 # for each type of device

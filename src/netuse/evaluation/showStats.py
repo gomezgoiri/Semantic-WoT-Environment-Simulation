@@ -1,6 +1,6 @@
-from netuse.database.results import NetworkTrace
+from netuse.database.results import HTTPTrace
 
 
 if __name__ == '__main__':
-    for trace in NetworkTrace.objects.order_by('-timestamp'): #(status=200):
+    for trace in HTTPTrace.objects.order_by('-timestamp'): #(status=200):
         print trace.client, trace.server

@@ -5,10 +5,10 @@ Created on Jan 7, 2012
 '''
 from bson.objectid import ObjectId
 from netuse.database.execution import Execution
-from netuse.database.results import NetworkTrace
+from netuse.database.results import HTTPTrace
 
 def reset_execution(execution_id):    
-    for req in NetworkTrace.objects(execution=execution_id):
+    for req in HTTPTrace.objects(execution=execution_id):
         req.delete()
     
     ex = Execution.objects(id=execution_id).first()

@@ -6,7 +6,7 @@ Created on Sep 22, 2012
 
 import json
 from netuse.database.execution import ExecutionSet
-from netuse.database.results import NetworkTrace
+from netuse.database.results import HTTPTrace
 from netuse.database.parametrization import Parametrization
 from netuse.evaluation.number_requests.strategies.diagram import DiagramGenerator
 
@@ -21,7 +21,7 @@ class RawDataProcessor(object):
             if execution.parameters.strategy==strategy:
                 if additionalFilter==None or additionalFilter(execution.parameters):
                     num_nodes = len(execution.parameters.nodes) # in the reference of mongoengine, they defend this method
-                    num_requests = NetworkTrace.objects(execution=execution.id).count()
+                    num_requests = HTTPTrace.objects(execution=execution.id).count()
                     if num_nodes not in requests_by_node:
                         requests_by_node[num_nodes] = []
                     requests_by_node[num_nodes].append(num_requests)

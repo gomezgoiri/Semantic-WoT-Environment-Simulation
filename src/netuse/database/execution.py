@@ -14,7 +14,7 @@ class Execution(Document):
     # executions are repeated if they have exactly the same "parameters" attribute
     parameters = ReferenceField(Parametrization) 
     execution_date = DateTimeField(default=None) # when this was started being simulated?
-    #requests = ListField(ReferenceField(NetworkTrace))
+    #requests = ListField(ReferenceField(HTTPTrace))
 # db.eval(function(){return db.executions.find().map(function (obj) { return obj.requests.length });})
 
 class AwesomerQuerySet(QuerySet):
