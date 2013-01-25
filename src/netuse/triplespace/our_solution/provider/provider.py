@@ -114,7 +114,7 @@ class Provider(Process, DiscoveryEventObserver):
         """Returns if it needs to be retried or not."""
         self.__update_connector_if_needed()
         if self.connector is not None:
-            ok = self.connector.send_clue(self.clue_manager.get_clue())
+            ok = self.connector.send_clue( self.clue_manager.get_clue() )
             return not ok # if the message could not be sent (e.g. because WP is not local anymore), retry
         return self.connector is None # if the connector could not be updated, retry
     
