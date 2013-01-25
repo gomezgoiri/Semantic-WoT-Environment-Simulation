@@ -6,7 +6,7 @@ Created on Nov 28, 2011
 
 import copy
 import unittest
-from mock import Mock, patch
+from mock import Mock
 from SimPy.Simulation import Simulation
 from netuse.mdns.network import UDPNetwork, MDNSNode
 from netuse.mdns.responder import Responder
