@@ -35,12 +35,13 @@ class Provider(Process, DiscoveryEventObserver):
     RETRY_ON_FAILURE = 2000 # Time the providers sleeps if no WP was found
     UPDATE_TIME = 3600000 # 1h
     
-    def __init__(self, dataaccess, discovery, sim=None):
+    def __init__(self, dataaccess, discovery, sim):
         super(Provider, self).__init__(sim = sim)
         
         self.discovery = discovery
         self.discovery.add_changes_observer(self)
-        self.clue_manager = ClueManager(dataaccess)
+        if dataaccess is not None: # it should be None just for testing purposes!
+            self.clue_manager = ClueManager(dataaccess)
         
         self.__stop = False
         self.wp_node_name = None
@@ -76,7 +77,7 @@ class Provider(Process, DiscoveryEventObserver):
                         # but I received a negative response yet, so I retry.
                         # no need to update self.last_wp_notification
                         retry = self.sent_through_connector()
-                        return Provider.UPDATE_TIME if not retry else Provider.RETRY_ON_FAILURE
+                        return Provider.RETRY_ON_FAILURE if retry else Provider.UPDATE_TIME
                 else:
                     # still waiting for the previous request's response
                     return Provider.RETRY_ON_FAILURE
