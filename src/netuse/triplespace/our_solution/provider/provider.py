@@ -32,7 +32,7 @@ class WPRequestNotifier(object):
 
 class Provider(Process, DiscoveryEventObserver):
     
-    RETRY_ON_FAILURE = 2000 # Time the providers sleeps if no WP was found
+    RETRY_ON_FAILURE = 2000 # Time the providers sleep if no WP was found
     UPDATE_TIME = 3600000 # 1h
     
     def __init__(self, dataaccess, discovery, sim):
@@ -55,6 +55,16 @@ class Provider(Process, DiscoveryEventObserver):
         
         self.last_contribution_to_aggregated_clue = Version(-1, -1)
         self.last_wp_notification = WPRequestNotifier("super_fake_node", self.sim)
+        # When we have to detect the need of updating our clues in the WP:
+        #     have we received a new version confirming that the WP received it correctly?
+        # Once we decide to send our clue a WP needs to acknowledge that has received it.
+        # Even if it is not the same WP.
+        # Otherwise it may happen that a new WP is initialized from a version higher than
+        # the one this node has contributed without having its information.
+        # BIG TODO here!
+        # si el provider detecta un WP que ha partido de una pista menor, se debe asegurar de actualizar su version:
+        # le envia su pista si o si, a este o al siguiente!
+        self.pending_update = False
         
     def _new_wp_in_the_neighborhood(self, new_wp_r, remaining):
         """Returns the time the node should sleep"""
@@ -65,7 +75,7 @@ class Provider(Process, DiscoveryEventObserver):
                 # I didn't send my information, so the WP cannot have it
                 self.last_wp_notification = WPRequestNotifier(new_wp_r.node_name, self.sim)
                 retry = self.sent_through_connector()
-                return Provider.UPDATE_TIME if not retry else Provider.RETRY_ON_FAILURE
+                return Provider.RETRY_ON_FAILURE if retry else Provider.UPDATE_TIME
             else:
                 if self.last_wp_notification.got_response():
                     if self.last_wp_notification.successfully_sent():
@@ -80,7 +90,9 @@ class Provider(Process, DiscoveryEventObserver):
                         return Provider.RETRY_ON_FAILURE if retry else Provider.UPDATE_TIME
                 else:
                     # still waiting for the previous request's response
-                    return Provider.RETRY_ON_FAILURE
+                    # CAUTION: if you set to RETRY time, then next time will not enter in this method.
+                    # That means that will try to send the clue again in RETRY_TIME :-S
+                    return Provider.UPDATE_TIME
         else: # nothing to send
             return remaining if remaining > 0 else Provider.UPDATE_TIME
     
@@ -98,7 +110,7 @@ class Provider(Process, DiscoveryEventObserver):
             else:
                 # last clue has expired or it has changed => send it to the WP
                 retry = self.sent_through_connector()
-                sleep_for = Provider.UPDATE_TIME if not retry else Provider.RETRY_ON_FAILURE
+                sleep_for = Provider.RETRY_ON_FAILURE if retry else Provider.UPDATE_TIME
             
             self.timer = Timer(sleep_for, sim=self.sim)
             self.sim.activate(self.timer, self.timer.wait())

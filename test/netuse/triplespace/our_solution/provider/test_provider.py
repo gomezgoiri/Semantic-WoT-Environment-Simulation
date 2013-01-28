@@ -68,12 +68,12 @@ class ProviderTestCase(unittest.TestCase):
         self.provider.last_contribution_to_aggregated_clue = Version(2, 1)
         new_wp_r = DiscoveryRecord("super_fake_node") # the provider had already sent him a message
         new_wp_r.version = Version(1, 1)
-                
-        self.last_wp_notification = Mock()
-        self.last_wp_notification.got_response.return_value = False
+        
+        self.provider.last_wp_notification.got_response = Mock()
+        self.provider.last_wp_notification.got_response.return_value = False
         self.provider.sent_through_connector = Mock()
         
-        self.assertEquals( Provider.RETRY_ON_FAILURE, self.provider._new_wp_in_the_neighborhood( new_wp_r, 0) )
+        self.assertEquals( Provider.UPDATE_TIME, self.provider._new_wp_in_the_neighborhood( new_wp_r, 0) )
 
 if __name__ == '__main__':
     unittest.main()
