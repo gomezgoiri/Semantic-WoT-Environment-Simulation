@@ -60,11 +60,11 @@ class Model(BasicModel):
     def _show_message(self, msg):
         print msg
     
-    def schedule_messages(self):
+    def schedule_messages(self, number_of_messages):
         '''To show messages during the simulation and check that everything goes ok.'''
-        interval = self.parameters.simulateUntil * 10.0
-        for i in range(1, 10): #[1..9]
-            self._show_message( at = interval * i, simulation = self, msg = "Execution %s at %d%% - "%(self.execution.id, i*10) )
+        interval = self.parameters.simulateUntil / float(number_of_messages)
+        for i in range(1, number_of_messages): #[1..9]
+            self._show_message( at = interval * i, simulation = self, msg = "Execution %s at %d%%"%(self.execution.id, i*10) )
         self.execution.execution_date = datetime.datetime.now()
         self.execution.save()
 
@@ -83,7 +83,7 @@ class Model(BasicModel):
         self.stoppables.extend( NodeManager.getNodes() )
         
         if self.informative:
-            self.schedule_messages()
+            self.schedule_messages(10)
             print "Starting execution: %s" % (self.execution.id)
         
         self.simulate( until = self.parameters.simulateUntil )
