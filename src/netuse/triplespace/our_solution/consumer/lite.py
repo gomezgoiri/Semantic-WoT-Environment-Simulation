@@ -13,7 +13,7 @@ from netuse.triplespace.network.client import RequestInstance, RequestManager, R
 class ConsumerLite(AbstractConsumer):
     def _update_connector(self, wp):
         if wp==self.discovery.me:
-            raise Exception("A lite consumer cannot be whitepage, check the selection algorithm.")
+            raise Exception("A lite consumer cannot act as a whitepage, check the selection algorithm.")
         else:
             if self.connector is None:
                 self.connector = RemoteLiteConnector(self.discovery.me, wp, simulation=self.simulation)
@@ -46,7 +46,7 @@ class RemoteLiteConnector(AbstractConnector, RequestObserver):
                 # get the template URL requested
                 pattern = "/whitepage/clues/query/"
                 path = unique_response.geturl()
-                pos = path.find(pattern) + len(pattern) # it could be len(pattern) since pattern will be always at the begining
+                pos = path.find(pattern) + len(pattern) # it could be len(pattern) since pattern will be always at the beginning
                 templateURL = path[pos:]
                 
                 # parse a list of names (nodes)
@@ -63,7 +63,7 @@ class RemoteLiteConnector(AbstractConnector, RequestObserver):
         templateURL = URLUtils.serialize_wildcard_to_URL(template)
         
         if templateURL in self.responses.keys():
-            if self.responses[templateURL]==None:
+            if self.responses[templateURL] is None:
                 raise Exception("Wait for the answer.")
             else:
                 # take the response
