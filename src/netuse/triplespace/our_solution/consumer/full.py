@@ -135,6 +135,7 @@ class RemoteConnector(AbstractConnector, RequestObserver):
                 # If it was TIMEOUT, we could retry it
                 # To simplify RETRY==0!
                 # TODO flush record from this whitepage
+                self._check_if_next_update_changes() # schedule next clue update!
                 pass
     
     def _check_if_next_update_changes(self):
