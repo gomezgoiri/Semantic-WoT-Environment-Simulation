@@ -58,7 +58,10 @@ class DeviceType(object):
                     dev = round( (curr[2] - prev[2]) * factor + prev[2], 2) # for testing purposes
                     responseTime = G.Rnd.normalvariate(avg,dev)
                     break
-        return responseTime if responseTime>0 else 0.1
+        # if time is negative, we return the waiting time for one request
+        # Almost sure that this just happens with 1 request in Android measurements
+        # because it has a huge std deviation (the measures should be repeated or find the outliner)
+        return responseTime if responseTime>0 else self.__wait[0][1] 
     
     def get_maximum_concurrent_requests(self):
         last = len(self.__wait)-1
