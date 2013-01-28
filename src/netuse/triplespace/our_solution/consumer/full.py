@@ -128,15 +128,14 @@ class RemoteConnector(AbstractConnector, RequestObserver):
                 # NOT NECESSARY IN CURRENT ALGORITHM, WE CAN AVOID TRAFFIC IN MDNS
                 #self.me_as_node._discovery_instance.get_my_record().version = self.clues.version
                 self.first_load_in_store = True
-                self._check_if_next_update_changes() # schedule next clue update!
-                break
             elif unique_response.getstatus()==408 or unique_response.getstatus()==501:
                 # if timeout or the node is not a whitepage anymore
                 # If it was TIMEOUT, we could retry it
                 # To simplify RETRY==0!
                 # TODO flush record from this whitepage
-                self._check_if_next_update_changes() # schedule next clue update!
                 pass
+            break
+        self._check_if_next_update_changes() # schedule next clue update!
     
     def _check_if_next_update_changes(self):
         if self.next_scheduled_at <= self.simulation.now(): # if last update already done...
