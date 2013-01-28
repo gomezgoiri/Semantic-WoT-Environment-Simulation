@@ -117,7 +117,7 @@ def main():
     # Prepare variable independent parameters
     var_params = []
     add_baseline_simulations(var_params)
-    add_simulations_with_dynamic_network_models(var_params, (600000, 60000, 30000, 10000, 5000, 1000)) # 10 mins, 1 min, 30 secs, 10 secs, 5 secs, 1 sec
+    add_simulations_with_dynamic_network_models(var_params, (45*60000, 30*60000, 20*60000, 10*60000, 5*60000, 60000, 30000)) # 45 mins, 30 mins, 20 mins, 10 mins, 5 mins, 1min, 30 secs
     
     # Prepare and save executions (possibly repeating them)
     p = ParametrizationUtils('dynamism', G.dataset_path, default_params, repetitions=1)
