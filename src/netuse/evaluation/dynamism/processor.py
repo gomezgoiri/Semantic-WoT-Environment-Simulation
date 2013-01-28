@@ -75,8 +75,10 @@ class RawDataProcessor(object):
                                         data_serie1[DiagramGenerator.REQUESTS],
                                         data_serie2[DiagramGenerator.REQUESTS] ):
             ret[DiagramGenerator.DROP_INTERVAL].append( drop )
+            execution = []
             for da1, da2 in zip(data1, data2):
-                ret[DiagramGenerator.REQUESTS].append( da1 + da2 )
+                execution.append( da1 + da2 )
+            ret[DiagramGenerator.REQUESTS].append( execution )
         return ret
         
     
