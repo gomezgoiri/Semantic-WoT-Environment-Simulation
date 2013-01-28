@@ -1,10 +1,14 @@
 from clueseval.clues.storage.sqlite import SQLiteClueStore
+from clueseval.clues.versions.management import Version
 
 class Whitepage(object):
     
     def __init__(self, generation_time = None):
         self.clues = SQLiteClueStore(generation_time, in_memory=True) # generation time == 0, this should change
-        self.loaded_version = self.clues.version
+        # Initially, if no version is loaded, the version will be the lowest possible
+        # This way we force all the providers to send their clues
+        # if no version was loaded!
+        self.loaded_version = Version(-1, -1)
         self.clues.start()
     
     def stop(self):
