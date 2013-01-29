@@ -4,6 +4,8 @@ Created on Sep 16, 2012
 @author: tulvur
 '''
 import weakref
+from random import Random
+from netuse.sim_utils import schedule
 from netuse.nodes import NodeManager
 from netuse.triplespace.network.discovery.discovery import AbstractDiscoveryFactory, DiscoveryInstance
 from netuse.triplespace.network.discovery.record import DiscoveryRecordObserver
@@ -13,16 +15,23 @@ class SimpleDiscoveryFactory(AbstractDiscoveryFactory):
     
     def create(self, my_record):
         if not hasattr(self, 'network'):
-            self.network = MagicInstantNetwork()
+            self.network = MagicInstantNetwork(self.simulation)
         
         return SimpleDiscoveryMechanism(my_record, self.network)
 
 
 class MagicInstantNetwork(DiscoveryRecordObserver):
     
-    def __init__(self):        
+    # set up taking into account how long it takes to an Android device
+    # to process 300 requests without becoming overloaded and start rejecting them (i.e. causing a TIMEOUT)
+    # Can attend 30 requests in 1 second => in 10 seconds processes 300 requests
+    NOTIFICATION_LIMIT = 10 * 1000
+    
+    def __init__(self, simulation):        
         self.whitepage_exist = False
         self.instances = weakref.WeakSet() # they are also the observers
+        self.simulation = simulation
+        self._random = Random()
     
     def join_space(self, discovery_instance):
         # magic instant observer! without network delays :-P
@@ -60,7 +69,16 @@ class MagicInstantNetwork(DiscoveryRecordObserver):
                 for observer in self.instances:
                     # SimpleDiscoveryMechanism
                     if not observer.me.down:
+                        # notify at different moments to avoid the Providers from sending all their clues at the same time
+                        delay = 10 + self._random.random() * MagicInstantNetwork.NOTIFICATION_LIMIT
+                        self.notify_observer( delay = delay, observer = observer )
                         observer.on_whitepage_selected_after_none()
+    
+    @schedule
+    def notify_observer(self, observer):
+        # The notification is delayed a little bit to avoid server overload.
+        # This can happen if all the observers start sending their clues at the same time.
+        observer.on_whitepage_selected_after_none()
 
 
 class SimpleDiscoveryMechanism(DiscoveryInstance):
