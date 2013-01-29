@@ -61,18 +61,15 @@ class Provider(Process, DiscoveryEventObserver):
         # Even if it is not the same WP.
         # Otherwise it may happen that a new WP is initialized from a version higher than
         # the one this node has contributed without having its information.
-        # BIG TODO here!
-        # si el provider detecta un WP que ha partido de una pista menor, se debe asegurar de actualizar su version:
-        # le envia su pista si o si, a este o al siguiente!
         self.pending_update = False
         
     def _new_wp_in_the_neighborhood(self, new_wp_r, remaining):
         """Returns the time the node should sleep"""
         # only if I have a Version the new WP does not have
-        if self.last_contribution_to_aggregated_clue > new_wp_r.version:
+        if self.last_contribution_to_aggregated_clue > new_wp_r.version or \
+            self.pending_update: # or if the last update could not be sent to the former WP
             # the WP may not have my information
-            if self.last_wp_notification.wp_name != new_wp_r.node_name: # the first time this will never be true
-                # I didn't send my information, so the WP cannot have it
+            if self.last_wp_notification.wp_name != new_wp_r.node_name: # in the first loop this will always be true
                 self.last_wp_notification = WPRequestNotifier(new_wp_r.node_name, self.sim)
                 retry = self.sent_through_connector()
                 return Provider.RETRY_ON_FAILURE if retry else Provider.UPDATE_TIME
@@ -127,6 +124,8 @@ class Provider(Process, DiscoveryEventObserver):
         self.__update_connector_if_needed()
         if self.connector is not None:
             ok = self.connector.send_clue( self.clue_manager.get_clue() )
+            if not self.connector.send_confirmed:
+                self.pending_update = True
             return not ok # if the message could not be sent (e.g. because WP is not local anymore), retry
         return self.connector is None # if the connector could not be updated, retry
     
@@ -162,6 +161,7 @@ class Provider(Process, DiscoveryEventObserver):
         self.last_contribution_to_aggregated_clue = version
         self.last_wp_notification.response_received( successful = True )
         self.on_external_condition = True
+        self.pending_update = False
         self.externalCondition.signal()
     
     def set_error_on_last_request(self):
@@ -175,6 +175,7 @@ class AbstractConnector(object):
     
     def __init__(self, observer):
         self.observer = weakref.proxy(observer)
+        self.send_confirmed = None
     
     @abstractmethod
     def send_clue(self, clue):
@@ -186,6 +187,7 @@ class LocalConnector(AbstractConnector):
     def __init__(self, discovery, observer):
         super(LocalConnector, self).__init__(observer)
         self.discovery = discovery
+        self.send_confirmed = True # since it is local, we need no confirmation, so it can be set to True
         
     def send_clue(self, clue):
         # TODO a method to add local clues to the store without serializing/parsing
@@ -209,6 +211,7 @@ class RemoteConnector(AbstractConnector, RequestObserver):
         self.me_as_node = me_as_node
         self.whitepage_node = whitepage_node
         self.simulation = simulation
+        self.send_confirmed = False # until we get a response, we cannot confirm it
     
     def send_clue(self, clue):
         RequestManager.launchNormalRequest(self._get_update_request(clue))
