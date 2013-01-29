@@ -99,7 +99,9 @@ def main():
     numNodes = 300
     
     # 1 server, 10% of galaxys, 25% of FoxG20
-    nodeTypes = (Server.TYPE_ID,)*1 + (SamsungGalaxyTab.TYPE_ID,)*((int)(numNodes*0.1)) + (FoxG20.TYPE_ID,)*((int)(numNodes*0.25))
+    nodeTypes = (Server.TYPE_ID,)*1
+    nodeTypes += (SamsungGalaxyTab.TYPE_ID,)*((int)(numNodes*1.0))
+    nodeTypes += (FoxG20.TYPE_ID,)*((int)(numNodes*0.25))
     # Remaining devices, are XBees
     nodeTypes += (XBee.TYPE_ID,)*(numNodes-len(nodeTypes))
     
@@ -109,7 +111,7 @@ def main():
                          discovery = DiscoveryFactory.SIMPLE_DISCOVERY, #SIMPLE_DISCOVERY MDNS_DISCOVERY
                          amountOfQueries = 1000,
                          writeFrequency = 10000,
-                         simulateUntil = 3600000,  # 1h of simulation time
+                         simulateUntil = 60*60000,  # 1h of simulation time
                          queries = templates,
                          nodeTypes = nodeTypes
                      )
