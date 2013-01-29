@@ -100,6 +100,13 @@ class RawDataProcessor(object):
             del self.data["tmp"]
             del self.data["tmp2"]
             break # just one execution set
+        
+    
+    def load_just_changes_on_mdns_txt_record(self):
+        for executionSet in ExecutionSet.objects(experiment_id='dynamism').get_simulated():
+            self._load_by_communication_pattern(executionSet, "wp_changes", Parametrization.our_solution,
+                                                path__exact="/whitepage/choose")
+            break # just one execution set
 
     def toJson(self):
         return json.dumps(self.data)
@@ -113,6 +120,15 @@ def main():
     #print json_txt
     
     f = open('/tmp/dynamism.json', 'w')
+    f.write(json_txt)
+    f.close()
+    
+    # exports metrics to know how our solution affects to mDNS
+    rdp = RawDataProcessor()
+    rdp.load_just_changes_on_mdns_txt_record()
+    json_txt = rdp.toJson()
+    
+    f = open('/tmp/changes_mdns.json', 'w')
     f.write(json_txt)
     f.close()
 
