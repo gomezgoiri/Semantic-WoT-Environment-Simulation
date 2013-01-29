@@ -45,7 +45,7 @@ class DiagramGenerator:
     '''
     def __init__(self, title, data):
         self.title = title
-        self.xlabel = 'Drop interval (mins)'
+        self.xlabel = 'Drop-interval (mins)'
         self.ylabel = 'Requests'
         self.linesShapes = cycle(('xk-','+k-.','Dk--'))
         self.linesColors = cycle(('r','g', 'b','y'))
