@@ -9,8 +9,13 @@ from itertools import cycle
 from matplotlib.pyplot import FuncFormatter#, LogLocator
 import matplotlib.pyplot as plt
 
+
+def format_time_in_minutes(x, pos):
+    """Formatter for Y axis, values are in miliseconds"""
+    return '%1.f' % (x/(1000*60))
+
 def format_time(x, pos):
-    """Formatter for Y axis, values are in megabytes"""
+    """Formatter for Y axis, values are in time units"""
     if x<1000:
         return '%1.f ms' % (x)
     elif x<(1000*60):
@@ -40,19 +45,14 @@ class DiagramGenerator:
     '''
     def __init__(self, title, data):
         self.title = title
-        self.xlabel = 'Drop interval'
+        self.xlabel = 'Drop interval (mins)'
         self.ylabel = 'Requests'
-        self.linesShapes = ('xk-','+k-.','Dk--')
-        self.linesColors = ('r','y','g', 'b')
-        self.show_on_diagram = ( DiagramGenerator.NB,
-                                 DiagramGenerator.OURS,
-                                 DiagramGenerator.PROV_WP,
-                                 DiagramGenerator.CONS_WP,
-                                 DiagramGenerator.CONS_PROV )
+        self.linesShapes = cycle(('xk-','+k-.','Dk--'))
+        self.linesColors = cycle(('r','g', 'b','y'))
         self.generate(data)
 
     def generate(self, data):
-        fig = plt.figure()
+        fig = plt.figure(figsize=(10,5))
         
         plt.subplots_adjust(
             left=None,   # the left side of the subplots of the figure
@@ -62,9 +62,18 @@ class DiagramGenerator:
             wspace=0.3,  # the amount of width reserved for blank space between subplots
             hspace=0.4   # the amount of height reserved for white space between subplots
         )
-                
-        ax = fig.add_subplot(1,1,1)
-        self.generate_subplot(ax, data, self.title)
+        
+        show_on_diagram = ( DiagramGenerator.NB,
+                            DiagramGenerator.OURS )
+        ax1 = fig.add_subplot(1,2,1)
+        self.generate_subplot(ax1, data, show_on_diagram)
+        
+        
+        show_on_diagram = ( DiagramGenerator.PROV_WP,
+                            DiagramGenerator.CONS_WP)
+        ax2 = fig.add_subplot(1,2,2)
+        self.generate_subplot(ax2, data, show_on_diagram)    
+    
     
     def get_mean_and_std_dev(self, values):
         means = []
@@ -74,27 +83,24 @@ class DiagramGenerator:
             std_devs.append( np.std(repetitions) )
         return means, std_devs
     
-    def generate_subplot(self, ax, data, title=None):
+    def generate_subplot(self, ax, data, show_on_diagram, title=None):
         plt.xlabel(self.xlabel)
         plt.ylabel(self.ylabel)
         if title is not None:
             plt.title(title)
         
-        shapes = cycle(self.linesShapes)
-        colors = cycle(self.linesColors)
-        
-        for label in self.show_on_diagram:
-            color = colors.next()
+        for label in show_on_diagram:
+            color = self.linesColors.next()
             means, std_devs = self.get_mean_and_std_dev(data[label][DiagramGenerator.REQUESTS])
             ax.errorbar( data[label][DiagramGenerator.DROP_INTERVAL],
-                         means, fmt=shapes.next(), color = color,
+                         means, fmt = self.linesShapes.next(), color = color,
                          yerr = std_devs, ecolor = color,
                          label = label)
         
         ax.set_xlim(0)
         ax.set_ylim(0)
                  
-        ax.xaxis.set_major_formatter(FuncFormatter(format_time))
+        ax.xaxis.set_major_formatter(FuncFormatter(format_time_in_minutes))
         #ax.xaxis.set_major_locator(LogLocator())
         
         handles, labels = ax.get_legend_handles_labels()
