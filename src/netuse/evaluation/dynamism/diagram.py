@@ -105,7 +105,7 @@ class DiagramGenerator:
         
         handles, labels = ax.get_legend_handles_labels()
         #ax.legend(handles[::-1], labels[::-1]) # reverse the order
-        ax.legend(handles, labels, loc="upper left")
+        ax.legend(handles, labels, loc="upper right")
     
     def show(self):
         plt.show()
