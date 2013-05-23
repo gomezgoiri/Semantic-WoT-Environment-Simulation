@@ -49,7 +49,7 @@ def calculatePrecisionAndRecall(retrieved_nodes, relevant_nodes):
 
 def createGossips(graphs):
     gossips = {}
-    gossips['schema'] = {}
+    gossips['prefix'] = {}
     gossips['predicate'] = {}
     gossips['class'] = {}
     
@@ -60,7 +60,7 @@ def createGossips(graphs):
         if node_name not in ('ontology','ontology_expanded'):
             print "\rCreating gossips... (%%%.2f)"%(count*100.0/total)
             
-            gossips['schema'][node_name] = SchemaBasedClue()
+            gossips['prefix'][node_name] = SchemaBasedClue()
             gossips['predicate'][node_name] = PredicateBasedClue()
             gossips['class'][node_name] = ClassBasedClue(graphs['ontology'])
             

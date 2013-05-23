@@ -14,13 +14,13 @@ from clueseval.clues.class_based import ClassBasedClue
 
 def createClues(graphs):
     gossips = {}
-    gossips['schema'] = {}
+    gossips['prefix'] = {}
     gossips['predicate'] = {}
     gossips['class'] = {}
     
     for node_name in graphs:
         if node_name not in ('ontology','ontology_expanded'):
-            gossips['schema'][node_name] = SchemaBasedClue()
+            gossips['prefix'][node_name] = SchemaBasedClue()
             gossips['predicate'][node_name] = PredicateBasedClue()
             gossips['class'][node_name] = ClassBasedClue(graphs['ontology'])
             
@@ -36,7 +36,7 @@ def createClues(graphs):
 
 def calculateLenghts(clues):
     results = {}
-    results['schema'] = {}
+    results['prefix'] = {}
     results['predicate'] = {}
     results['class'] = {}
            
