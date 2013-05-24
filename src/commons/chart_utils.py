@@ -9,11 +9,18 @@ import matplotlib
 
 class ChartImprover(object):
     
-    def __init__( self, title=None, xlabel=None, ylabel={'label': None, 'x':0, 'y': 0 }, line_width=5 ):
+    def __init__( self,
+                  title = None,
+                  xlabel = None,
+                  ylabel = {'label': None, 'x':0, 'y': 0 },
+                  line_width = 5,
+                  legend_from_to = (0.12, 0.78) ):
         self.title = title
         self.xlabel = xlabel
         self.ylabel = ylabel
         self._configure_matplotlib(line_width)
+        self.legend_from = legend_from_to[0]
+        self.legend_to = legend_from_to[1]
     
     # should be called before making the chart
     def _configure_matplotlib(self, line_width):
@@ -30,7 +37,8 @@ class ChartImprover(object):
     def improve_following_guidelines(self, ax): # from the Wall Street Journal "Guide to Information Graphics"
         #ax.legend(handles, labels, loc="upper right")
         # using strings with loc (e.g. loc = "upper left") is also valid
-        leg = ax.legend(bbox_to_anchor=(0.12, 1.1, .78, .102), loc=3, ncol=3, mode="expand", borderaxespad=0)
+        _, labels = ax.get_legend_handles_labels()
+        leg = ax.legend( bbox_to_anchor = (self.legend_from, 1.1, self.legend_to, .102), loc=3, ncol=len(labels), mode="expand", borderaxespad=0)
         if leg is not None: # we got labels to create a legend
             leg.get_frame().set_alpha(0)
         
