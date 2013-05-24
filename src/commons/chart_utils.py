@@ -13,19 +13,35 @@ class ChartImprover(object):
                   title = None,
                   xlabel = None,
                   ylabel = {'label': None, 'x':0, 'y': 0 },
-                  line_width = 5,
-                  legend_from_to = (0.12, 0.78) ):
+                  line_width = 3,
+                  legend_from_to = (0.12, 0.78),
+                  font_size = 18.0 ):
         self.title = title
         self.xlabel = xlabel
         self.ylabel = ylabel
-        self._configure_matplotlib(line_width)
+        self._configure_matplotlib(line_width, font_size)
         self.legend_from = legend_from_to[0]
         self.legend_to = legend_from_to[1]
     
     # should be called before making the chart
-    def _configure_matplotlib(self, line_width):
-        # change font
-        matplotlib.rcParams.update({'font.size': 24})
+    def _configure_matplotlib(self, line_width, font_size):
+        # http://matplotlib.org/users/customizing.html
+        
+        # It is important that in order this fonts to be suitable, the height should be 6
+        # the default figure.figsize: 8, 6
+        
+        # change font sizes
+        matplotlib.rcParams.update({'font.size': font_size})
+        # Relative to the font size:
+        # 'xx-small', 'x-small', 'small', 'medium', 'large', 'x-large', 'xx-large', 'larger', or 'smaller'        
+        matplotlib.rcParams.update({'axes.titlesize': 'large'})   # fontsize of the axes title
+        matplotlib.rcParams.update({'axes.labelsize': 'large'})  # fontsize of the x any y labels
+        
+        matplotlib.rcParams.update({'xtick.labelsize': 'medium'})
+        matplotlib.rcParams.update({'ytick.labelsize': 'medium'})
+        
+        matplotlib.rcParams.update({'legend.fontsize': 'medium'})
+        matplotlib.rcParams.update({'legend.handletextpad': 0.25})        
         
         # change paddings for ticks
         matplotlib.rcParams['xtick.major.pad']='12'

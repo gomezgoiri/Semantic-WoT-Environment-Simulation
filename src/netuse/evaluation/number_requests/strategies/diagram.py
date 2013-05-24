@@ -34,13 +34,13 @@ class DiagramGenerator:
         # self.linesShapes = ('xk-','+k-.','Dk--') # avoiding spaghetti lines
         self.ci = ChartImprover( title = None, # title,
                                  xlabel = 'Number of nodes',
-                                 ylabel = {"label": 'Requests', "x": -0.02, "y": 1.08},
-                                 legend_from_to = (0.04, 0.90)  )
+                                 ylabel = {"label": 'Requests', "x": -0.02, "y": 1.1},
+                                 legend_from_to = (0.04, 1.0) )
         
         self.generate(data)
 
     def generate(self, data):
-        fig = plt.figure(figsize=(15,10))
+        fig = plt.figure(figsize=(10, 6))
         
         #plt.subplots_adjust(
         #    left=None,   # the left side of the subplots of the figure
