@@ -9,14 +9,14 @@ import matplotlib
 
 class ChartImprover(object):
     
-    def __init__(self, title=None, xlabel=None, ylabel={'label': None, 'x':0, 'y': 0 }):
+    def __init__( self, title=None, xlabel=None, ylabel={'label': None, 'x':0, 'y': 0 }, line_width=5 ):
         self.title = title
         self.xlabel = xlabel
         self.ylabel = ylabel
-        self._configure_matplotlib()
+        self._configure_matplotlib(line_width)
     
     # should be called before making the chart
-    def _configure_matplotlib(self):
+    def _configure_matplotlib(self, line_width):
         # change font
         matplotlib.rcParams.update({'font.size': 24})
         
@@ -25,10 +25,11 @@ class ChartImprover(object):
         matplotlib.rcParams['ytick.major.pad']='12'
         
         # Line thickness
-        matplotlib.rcParams['lines.linewidth'] = 5
+        matplotlib.rcParams['lines.linewidth'] = line_width
 
     def improve_following_guidelines(self, ax): # from the Wall Street Journal "Guide to Information Graphics"
         #ax.legend(handles, labels, loc="upper right")
+        # using strings with loc (e.g. loc = "upper left") is also valid
         leg = ax.legend(bbox_to_anchor=(0.12, 1.1, .78, .102), loc=3, ncol=3, mode="expand", borderaxespad=0)
         if leg is not None: # we got labels to create a legend
             leg.get_frame().set_alpha(0)
