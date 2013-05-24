@@ -12,7 +12,7 @@ from abc import abstractmethod, ABCMeta
 from devices import DeviceType
 from netuse.nodes import NodeManager, Node
 from netuse.network_models import NetworkModelManager
-from netuse.triplespace.kernel import NegativeBroadcasting, Centralized, OurSolution
+from netuse.triplespace.kernel import NegativeBroadcasting, NegativeBroadcastingCaching, Centralized, OurSolution
 from netuse.triplespace.network.discovery.discovery import DiscoveryFactory
 from netuse.database.parametrization import Parametrization
 from netuse.results import G
@@ -26,6 +26,8 @@ class ActivityGenerator(object):
         
         if params.strategy==Parametrization.negative_broadcasting :
             activity = NegativeBroadcastingActivity(params, baseGraphs, simulation)
+        elif params.strategy==Parametrization.negative_broadcasting_caching :
+            activity = NegativeBroadcastingCachingActivity(params, baseGraphs, simulation)
         elif params.strategy==Parametrization.our_solution :
             activity = OurSolutionActivity(params, baseGraphs, simulation)
         elif params.strategy==Parametrization.centralized :
@@ -58,10 +60,14 @@ class AbstractActivity(object):
         pass
     
     def _generate_nodes(self):
+        if len(self._params.nodes) != len(self._params.nodeTypes):
+            Exception("Nodes and device types don't match!!!")
+        
+        NodeManager.nodes = {} # avoid this by not using static attribute!!!
         for nodeName, nodeType in zip(self._params.nodes, self._params.nodeTypes):
-            node = Node(nodeName, self._discovery_factory, DeviceType.create(nodeType), sim=self._simulation)
+            node = Node( nodeName, self._discovery_factory, DeviceType.create(nodeType), sim=self._simulation )
             NodeManager.nodes[nodeName] = node
-            self._simulation.activate(node,node.processRequests())
+            self._simulation.activate( node, node.processRequests() )
     
     def generate_activity(self):
         self._generate_nodes()
@@ -108,6 +114,12 @@ class NegativeBroadcastingActivity(AbstractActivity):
     def _configure_nodes(self):
         for n in NodeManager.getNodes():
             n.ts = NegativeBroadcasting(self._simulation)
+
+class NegativeBroadcastingCachingActivity(AbstractActivity):
+    
+    def _configure_nodes(self):
+        for n in NodeManager.getNodes():
+            n.ts = NegativeBroadcastingCaching(self._simulation)
 
 class OurSolutionActivity(AbstractActivity):       
     def _configure_nodes(self):

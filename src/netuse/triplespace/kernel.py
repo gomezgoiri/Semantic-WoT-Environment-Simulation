@@ -10,6 +10,7 @@ from SimPy.Simulation import Process, hold
 from clueseval.clues.storage.abstract_store import AggregationClueUtils # to manually parse the json
 from clueseval.clues.versions.management import Version
 from netuse.nodes import NodeManager
+from netuse.triplespace.caching.queries import QueryCacher 
 from netuse.triplespace.our_solution.whitepage.whitepage import Whitepage
 from netuse.triplespace.our_solution.provider.provider import Provider
 from netuse.triplespace.our_solution.consumer.consumer import ConsumerFactory
@@ -67,7 +68,37 @@ class NegativeBroadcasting(TripleSpace):
                               name = "queryAt"+str(self.simulation.now()),
                               sim = self.simulation )
         RequestManager.launchNormalRequest(req)
+
+
+class NegativeBroadcastingCaching(NegativeBroadcasting, RequestObserver):
+    def __init__(self, simulation):
+        super(NegativeBroadcastingCaching, self).__init__(simulation)
+        self.cache = QueryCacher()
+        self.url_beginning = '/' + URLUtils.serialize_space_to_URL() + "query/"
+    
+    @schedule
+    def write(self, triples):
+        self.dataaccess.write(triples)
+    
+    @schedule
+    def query(self, template):
+        # local query
         
+        # remote queries
+        relevants = self.cache.get_relevant_nodes( template, self.discovery.get_nodes() )
+        req = RequestInstance(self.discovery.me,
+                              relevants,
+                              self.url_beginning + URLUtils.serialize_wildcard_to_URL(template),
+                              name = "queryAt"+str(self.simulation.now()),
+                              sim = self.simulation )
+        req.addObserver(self)
+        RequestManager.launchNormalRequest(req)
+    
+    def notifyRequestFinished(self, request_instance):
+        template = URLUtils.parse_wildcard_url( request_instance.url[ len(self.url_beginning): ] )
+        for response in request_instance.responses:
+            self.cache.cache(template, request_instance.get_destination_node_name(response.getid()), response) # do I really need the results?
+
 
 class Centralized(TripleSpace):
     def __init__(self, me, server, simulation):
