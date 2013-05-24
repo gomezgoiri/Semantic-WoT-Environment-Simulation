@@ -61,16 +61,17 @@ class RequestInstance(Process): # TODO rename to something more meaningful such 
         self.name += " (from=%s, url=%s)"%(actionNode.name, url)
         self.__actionNode = weakref.proxy(actionNode) #weakref.ref(actionNode)
         self.__destinationNodes = weakref.WeakSet(destinationNodes) # tuple with all the nodes to be requested
-        self.__url = url
+        self.url = url # accessible
         self.__data = data
         
         self.requestInit = {} # requestInit[reqId1] = now(), requestInit[reqId2] = now()
-        self.responses = []
+        self.responses = [] # accessible
         self.__maxWaitingTime = waitUntil
         self.nodeNamesByReqId = {} # used in the gossiping mechanism with the gossiping requests
         
         self.__newResponseReceived = SimEvent(name="request_response_for_%s"%(self.name), sim=sim)
         self.__observers = weakref.WeakSet()
+    
         
     def startup(self):
         t_init = self.sim.now()
@@ -81,7 +82,7 @@ class RequestInstance(Process): # TODO rename to something more meaningful such 
                 reqId = RequestInstance.ReqIdGenerator
                 RequestInstance.ReqIdGenerator += 1
                 
-                request = HttpRequest(reqId, self.__url, data=self.__data)
+                request = HttpRequest(reqId, self.url, data=self.__data)
                 self.nodeNamesByReqId[reqId] = node.name
                 
                 self.requestInit[reqId] = self.sim.now()
@@ -106,7 +107,7 @@ class RequestInstance(Process): # TODO rename to something more meaningful such 
                 G.traceRequest(t_init,
                            self.__actionNode.name,
                            node_name,
-                           self.__url,
+                           self.url,
                            408, # TIMEOUT. See http://www.restlet.org/documentation/2.0/jse/api/org/restlet/data/Status.html#CLIENT_ERROR_REQUEST_TIMEOUT
                            response_time )
             
