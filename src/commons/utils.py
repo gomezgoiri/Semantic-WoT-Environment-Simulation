@@ -64,11 +64,12 @@ class SemanticFilesLoader(object):
         ontologiesPath = self.path +"/base_ontologies"
         
         if 'ontology' not in loadedGraph:
-            loadedGraph['ontology'] = Graph()
+            #loadedGraph['ontology'] = Graph()
             dirList=os.listdir(ontologiesPath)
             for fname in dirList:
                 if not os.path.isdir(ontologiesPath+'/'+fname):
-                    loadedGraph['ontology'] += Graph().parse(ontologiesPath+"/"+fname)
+                    pass
+                    #loadedGraph['ontology'] += Graph().parse(ontologiesPath+"/"+fname)
             #loadedGraph['ontology_expanded'] = self._expand_ontology(loadedGraph['ontology'])
         
         for node_name in nodeNames:
