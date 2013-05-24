@@ -23,6 +23,9 @@ class ChartImprover(object):
         # change paddings for ticks
         matplotlib.rcParams['xtick.major.pad']='12'
         matplotlib.rcParams['ytick.major.pad']='12'
+        
+        # Line thickness
+        matplotlib.rcParams['lines.linewidth'] = 5
 
     def improve_following_guidelines(self, ax): # from the Wall Street Journal "Guide to Information Graphics"
         #ax.legend(handles, labels, loc="upper right")

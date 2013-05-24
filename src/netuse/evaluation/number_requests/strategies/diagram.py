@@ -28,8 +28,10 @@ class DiagramGenerator:
       }
     '''
     def __init__(self, title, data):
-        self.linesShapes = ('xk-','+k-.','Dk--')
-        self.linesColors = ('r','y','g', 'b')
+        
+        # http://colorschemedesigner.com/previous/colorscheme2/index-es.html?tetrad;100;0;225;0.3;-0.8;0.3;0.5;0.1;0.9;0.5;0.75;0.3;-0.8;0.3;0.5;0.1;0.9;0.5;0.75;0.3;-0.8;0.3;0.5;0.1;0.9;0.5;0.75;0.3;-0.8;0.3;0.5;0.1;0.9;0.5;0.75;0
+        self.linesColors = ("#E6AC73", "#CFE673", "#507EA1", "#8A458A")#'r','y','g', 'b')
+        # self.linesShapes = ('xk-','+k-.','Dk--') # avoiding spaghetti lines
         self.ci = ChartImprover( title = None, # title,
                                  xlabel = 'Number of nodes',
                                  ylabel = {"label": 'Requests', "x": -0.02, "y": 1.08} )
@@ -63,14 +65,15 @@ class DiagramGenerator:
         if title is not None:
             plt.title(title)
         
-        shapes = cycle(self.linesShapes)
+        #shapes = cycle(self.linesShapes)
         colors = cycle(self.linesColors)
         
         for strategy_name, strat_data in data.iteritems():
             color = colors.next()
             means, std_devs = self.get_mean_and_std_dev(strat_data[DiagramGenerator.REQUESTS])
             ax.errorbar( strat_data[DiagramGenerator.NUM_NODES],
-                         means, fmt = shapes.next(), color = color,
+                         means, #fmt = shapes.next(),
+                         color = color,
                          yerr = std_devs, ecolor = color,
                          label = strategy_name )
         
