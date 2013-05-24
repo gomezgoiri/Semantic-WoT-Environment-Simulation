@@ -85,6 +85,12 @@ class SpacesHandler(object):
         if quoted_graph_uri == 'wildcards':
             wildcard = URLUtils.parse_wildcard_url( graph_operation )
             graph = store.query_wildcard(*wildcard)
+            # Except 'caching' strategy the rest don't use the results
+            # If we know for sure that we won't simulate 'caching',
+            # we can comment the previous sentence and uncomment the following one.
+            # Doing so, we may save time by not processing queries.
+            #   ( WARNING: not tested how much time or even if it is relevant )
+            # graph = None
             return self.process_graph(graph)
         
         return (404, """Method not found""", CustomSimulationHandler.CONTENT_TYPES['html'])
