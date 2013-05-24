@@ -7,6 +7,7 @@ Created on Aug 18, 2012
 import numpy as np
 from itertools import cycle
 import matplotlib.pyplot as plt
+from commons.chart_utils import ChartImprover
 
 
 class DiagramGenerator:
@@ -27,27 +28,28 @@ class DiagramGenerator:
       }
     '''
     def __init__(self, title, data):
-        self.title = title
-        self.xlabel = 'Number of nodes'
-        self.ylabel = 'Requests'
         self.linesShapes = ('xk-','+k-.','Dk--')
         self.linesColors = ('r','y','g', 'b')
+        self.ci = ChartImprover( title = None, # title,
+                                 xlabel = 'Number of nodes',
+                                 ylabel = {"label": 'Requests', "x": -0.02, "y": 1.08} )
+        
         self.generate(data)
 
     def generate(self, data):
-        fig = plt.figure()
+        fig = plt.figure(figsize=(15,10))
         
-        plt.subplots_adjust(
-            left=None,   # the left side of the subplots of the figure
-            bottom=None, # the right side of the subplots of the figure
-            right=None,  # the bottom of the subplots of the figure
-            top=None,    # the top of the subplots of the figure
-            wspace=0.3,  # the amount of width reserved for blank space between subplots
-            hspace=0.4   # the amount of height reserved for white space between subplots
-        )
+        #plt.subplots_adjust(
+        #    left=None,   # the left side of the subplots of the figure
+        #    bottom=None, # the right side of the subplots of the figure
+        #    right=None,  # the bottom of the subplots of the figure
+        #    top=None,    # the top of the subplots of the figure
+        #    wspace=0.3,  # the amount of width reserved for blank space between subplots
+        #    hspace=0.4   # the amount of height reserved for white space between subplots
+        #)
                 
         ax = fig.add_subplot(1,1,1)
-        self.generate_subplot(ax, data, self.title)
+        self.generate_subplot(ax, data)
     
     def get_mean_and_std_dev(self, values):
         means = []
@@ -57,42 +59,20 @@ class DiagramGenerator:
             std_devs.append( np.std(repetitions) )
         return means, std_devs
     
-    def generate_subplot(self, ax, data, title=None):        
-        plt.xlabel(self.xlabel)
-        plt.ylabel(self.ylabel)
+    def generate_subplot(self, ax, data, title=None):
         if title is not None:
             plt.title(title)
         
         shapes = cycle(self.linesShapes)
         colors = cycle(self.linesColors)
         
-        color = colors.next()
-        means, std_devs = self.get_mean_and_std_dev(data[DiagramGenerator.OURS_1C][DiagramGenerator.REQUESTS])
-        ax.errorbar( data[DiagramGenerator.OURS_1C][DiagramGenerator.NUM_NODES],
-                     means, fmt=shapes.next(), color=color,
-                     yerr=std_devs, ecolor=color,
-                     label='ours_1c')
-        
-        color = colors.next()
-        means, std_devs = self.get_mean_and_std_dev(data[DiagramGenerator.OURS_10C][DiagramGenerator.REQUESTS])
-        ax.errorbar( data[DiagramGenerator.OURS_10C][DiagramGenerator.NUM_NODES],
-                     means, fmt=shapes.next(), color=color,
-                     yerr=std_devs, ecolor=color,
-                     label='ours_10c')
-        
-        color = colors.next()
-        means, std_devs = self.get_mean_and_std_dev(data[DiagramGenerator.OURS_100C][DiagramGenerator.REQUESTS])
-        ax.errorbar( data[DiagramGenerator.OURS_100C][DiagramGenerator.NUM_NODES],
-                     means, fmt=shapes.next(), color=color,
-                     yerr=std_devs, ecolor=color,
-                     label='ours_100c')
-        
-        color = colors.next()
-        means, std_devs = self.get_mean_and_std_dev(data[DiagramGenerator.NB][DiagramGenerator.REQUESTS])
-        ax.errorbar( data[DiagramGenerator.NB][DiagramGenerator.NUM_NODES],
-                     means, fmt=shapes.next(), color=color,
-                     yerr=std_devs, ecolor=color,
-                     label='nb')
+        for strategy_name, strat_data in data.iteritems():
+            color = colors.next()
+            means, std_devs = self.get_mean_and_std_dev(strat_data[DiagramGenerator.REQUESTS])
+            ax.errorbar( strat_data[DiagramGenerator.NUM_NODES],
+                         means, fmt = shapes.next(), color = color,
+                         yerr = std_devs, ecolor = color,
+                         label = strategy_name )
         
         ax.set_xlim(0)
         ax.set_ylim(0)
@@ -100,12 +80,14 @@ class DiagramGenerator:
         handles, labels = ax.get_legend_handles_labels()
         #ax.legend(handles[::-1], labels[::-1]) # reverse the order
         ax.legend(handles, labels, loc="upper left")
+        
+        self.ci.improve_following_guidelines(ax)
     
     def show(self):
         plt.show()
         
     def save(self, filename):
-        plt.savefig(filename, bbox_inches=0)
+        plt.savefig(filename, bbox_inches='tight')
 
 
 def mainTest():

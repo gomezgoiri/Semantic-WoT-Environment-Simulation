@@ -37,15 +37,6 @@ class DiagramGenerator:
         self.fig = plt.figure(figsize=(15,4)) #(figsize=(15,3))
         ax = self.fig.add_subplot(111)
         
-        plt.subplots_adjust(
-            left=None,   # the left side of the subplots of the figure
-            bottom=None, # the right side of the subplots of the figure
-            right=None,  # the bottom of the subplots of the figure
-            top=None,    # the top of the subplots of the figure
-            wspace=0.3,  # the amount of width reserved for blank space between subplots
-            hspace=0.4   # the amount of height reserved for white space between subplots
-        )
-        
         width = 0.25       # the width of the bars
         left_margin = 0.5
         
