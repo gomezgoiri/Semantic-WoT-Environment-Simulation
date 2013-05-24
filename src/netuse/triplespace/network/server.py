@@ -64,8 +64,7 @@ class SpacesHandler(object):
 
         # Retrieve the graph
         if quoted_graph_uri == 'wildcards':
-            wildcard_str = graph_operation[len('wildcards/'):]
-            wildcard = URLUtils.parse_wildcard_url(wildcard_str)
+            wildcard = URLUtils.parse_wildcard_url( graph_operation )
             graph = store.read_wildcard(*wildcard)
         else: # We have an URI
             graph_uri = urllib.unquote(quoted_graph_uri)
@@ -84,8 +83,7 @@ class SpacesHandler(object):
         
         # Retrieve the graph
         if quoted_graph_uri == 'wildcards':
-            wildcard_str = graph_operation[len('wildcards/'):]
-            wildcard = URLUtils.parse_wildcard_url(wildcard_str)
+            wildcard = URLUtils.parse_wildcard_url( graph_operation )
             graph = store.query_wildcard(*wildcard)
             return self.process_graph(graph)
         
@@ -136,7 +134,7 @@ class WhitepageHandler(object):
                     return (200, json_data, CustomSimulationHandler.CONTENT_TYPES['html'])
                 else:
                     if clues_path.startswith('query/wildcards/'):
-                        wildcard_str = clues_path[len('query/wildcards/'):]
+                        wildcard_str = clues_path[len('query/'):]
                         wildcard = URLUtils.parse_wildcard_url(wildcard_str)
                         candidates = list(self.tskernel.whitepage.get_query_candidates(wildcard)) # to convert from set to list
                         return (200, json.dumps(candidates), CustomSimulationHandler.CONTENT_TYPES['json'])

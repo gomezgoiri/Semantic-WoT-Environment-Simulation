@@ -44,7 +44,8 @@ class URLUtils:
     
     @staticmethod
     def parse_wildcard_url(wildcard_url):
-        wildcard_tokens = wildcard_url.split('/')
+        # always starts with "wildcard/{template}"
+        wildcard_tokens = wildcard_url[len('wildcards/'):].split('/')
         if len(wildcard_tokens)==4 and wildcard_tokens[3]!='': # With type
             xsd_type  = wildcard_tokens[2]
             str_value = wildcard_tokens[3]
