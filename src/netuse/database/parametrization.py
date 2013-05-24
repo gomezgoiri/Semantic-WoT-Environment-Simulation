@@ -34,6 +34,7 @@ class Parametrization(Document):
     
     # valid strategies
     negative_broadcasting = "negative broadcasting"
+    negative_broadcasting_caching = "negative broadcasting caching"
     centralized = "centralized"
     our_solution = "our"
     
