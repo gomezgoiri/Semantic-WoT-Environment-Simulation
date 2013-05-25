@@ -4,9 +4,17 @@ Created on Aug 18, 2012
 
 @author: tulvur
 '''
+
 import numpy as np
 from itertools import cycle
 import matplotlib.pyplot as plt
+from commons.chart_utils import ChartImprover
+from matplotlib.ticker import FuncFormatter
+
+
+def seconds(x, pos):
+    'The two args are the value and tick position'
+    return '%d' % (x/1000.0)
 
 
 class DiagramGenerator:
@@ -54,27 +62,23 @@ class DiagramGenerator:
       }
     '''
     def __init__(self, data):
-        self.xlabel = 'Number of nodes'
-        self.ylabel = 'active time / node'
-        self.colors =  cycle(('r','y','g'))
+        # http://colorschemedesigner.com/previous/colorscheme2/index-es.html?tetrad;100;0;225;0.3;-0.8;0.3;0.5;0.1;0.9;0.5;0.75;0.3;-0.8;0.3;0.5;0.1;0.9;0.5;0.75;0.3;-0.8;0.3;0.5;0.1;0.9;0.5;0.75;0.3;-0.8;0.3;0.5;0.1;0.9;0.5;0.75;0
+        self.colors =  cycle(('#CF6795','#E6DA73', "#507EA1"))
+        self.ci = ChartImprover( # There should be two distinct x labels: ('Strategy', 'device type'),
+                                 legend_from_to = (0.25, 0.55) )
         self.generate(data)
 
     def generate(self, data):
-        fig = plt.figure(figsize=(10,5))
+        formatter = FuncFormatter(seconds)
         
-        plt.subplots_adjust(
-            left=None,   # the left side of the subplots of the figure
-            bottom=None, # the right side of the subplots of the figure
-            right=None,  # the bottom of the subplots of the figure
-            top=None,    # the top of the subplots of the figure
-            wspace=0.3,  # the amount of width reserved for blank space between subplots
-            hspace=0.4   # the amount of height reserved for white space between subplots
-        )
+        fig = plt.figure(figsize=(18,6))
                 
         ax1 = fig.add_subplot(1,2,1)
+        ax1.yaxis.set_major_formatter(formatter)
         self.generate_subplot_strategy_comparison(ax1, data)
         
         ax2 = fig.add_subplot(1,2,2)
+        ax2.yaxis.set_major_formatter(formatter)
         self.generate_subplot_device_comparison(ax2, data)
         
         if ax1.get_ylim()>ax2.get_ylim():
@@ -83,14 +87,12 @@ class DiagramGenerator:
             ax1.set_ylim(ax2.get_ylim())
     
     def generate_subplot_strategy_comparison(self, ax, data):        
-        plt.xlabel("Strategy")
-        plt.ylabel(self.ylabel)
+        #total_nb = [rep[DiagramGenerator.TOTAL] for rep in data[DiagramGenerator.NB] ]
+        #total_ours = [rep[DiagramGenerator.TOTAL] for rep in data[DiagramGenerator.OURS] ]
         
-        total_nb = [rep[DiagramGenerator.TOTAL] for rep in data[DiagramGenerator.NB] ]
-        total_ours = [rep[DiagramGenerator.TOTAL] for rep in data[DiagramGenerator.OURS] ]
-        
-        values = (np.average(total_nb), np.average(total_ours))
-        yerr = (np.std(total_nb), np.std(total_ours))
+        values = ( data[DiagramGenerator.NB][DiagramGenerator.TOTAL], data[DiagramGenerator.OURS][DiagramGenerator.TOTAL] )
+        #values = (np.average(total_nb), np.average(total_ours))
+        #yerr = data[DiagramGenerator.NB][DiagramGenerator.TOTAL] #(np.std(total_nb), np.std(total_ours))
         
         ind = (1,2)  # the x locations for the groups
         width = 0.5       # the width of the bars
@@ -98,13 +100,16 @@ class DiagramGenerator:
         ax.bar( ind,
                 values,
                 width,
-                yerr=yerr,
+                #yerr=yerr,
                 color=self.colors.next(),
-                ecolor='black')
+                #ecolor='black'
+                edgecolor = 'none' )
         plt.xticks([i+width/2 for i in ind ], ('nb', 'ours') )
         
         ax.set_xlim(0.5,3)
         ax.set_ylim(0)
+        
+        self.ci.improve_following_guidelines(ax)
         
     def _generate_dictionary_by_device(self, strategy_list):       
         devices = {}
@@ -123,53 +128,55 @@ class DiagramGenerator:
             
     
     def generate_subplot_device_comparison(self, ax, data):        
-        plt.xlabel("Types of devices")
-        plt.ylabel(self.ylabel)
+        #devices_nb = self._generate_dictionary_by_device(data[DiagramGenerator.NB])
+        #devices_ours = self._generate_dictionary_by_device(data[DiagramGenerator.OURS])
+        #self._check_order(devices_nb, devices_ours)
         
-        devices_nb = self._generate_dictionary_by_device(data[DiagramGenerator.NB])
-        devices_ours = self._generate_dictionary_by_device(data[DiagramGenerator.OURS])
-        self._check_order(devices_nb, devices_ours)
-        
-        ind = range(1, len(devices_ours)+1) # the x locations for the groups
+        self._check_order(data[DiagramGenerator.NB], data[DiagramGenerator.OURS])
+        devices_names = data[DiagramGenerator.NB].keys()
+        devices_names.remove( DiagramGenerator.TOTAL )
+        ind = range(1, len(devices_names)+1) # the x locations for the groups
         width = 0.3       # the width of the bars
         
         
-        values = [np.average(measures) for measures in devices_nb.itervalues()]
-        yerr = [np.std(measures) for measures in devices_nb.itervalues()]
+        values = [ v for k, v in data[DiagramGenerator.NB].iteritems() if k != DiagramGenerator.TOTAL ]
+        #values = [np.average(measures) for measures in devices_nb.itervalues()]
+        #yerr = [np.std(measures) for measures in devices_nb.itervalues()]
         
         ax.bar( ind, values, width,
-                yerr=yerr,
+                #yerr=yerr,
                 color=self.colors.next(),
-                ecolor='black',
+                #ecolor='black',
+                edgecolor = 'none',
                 label=DiagramGenerator.NB
         )
         
         
-        values = [np.average(measures) for measures in devices_ours.itervalues()]
-        yerr = [np.std(measures) for measures in devices_ours.itervalues()]
+        values = [ v for k, v in data[DiagramGenerator.OURS].iteritems() if k != DiagramGenerator.TOTAL ]
+        #values = [np.average(measures) for measures in devices_ours.itervalues()]
+        #yerr = [np.std(measures) for measures in devices_ours.itervalues()]
         
         ax.bar( [i+width for i in ind], values, width,
-                yerr=yerr,
+                #yerr=yerr,
                 color=self.colors.next(),
-                ecolor='black',
+                #ecolor='black',
+                edgecolor = 'none',
                 label=DiagramGenerator.OURS
         )
         
         
-        plt.xticks( [i+width for i in ind], devices_ours.keys())
+        plt.xticks( [i+width for i in ind], devices_names)
         
-        handles, labels = ax.get_legend_handles_labels()
-        #ax.legend(handles[::-1], labels[::-1]) # reverse the order
-        ax.legend(handles, labels, loc="upper left")
-        
-        ax.set_xlim(0.5, len(devices_ours)+1)
+        ax.set_xlim(0.5, len(devices_names)+1)
         ax.set_ylim(0)
+        
+        self.ci.improve_following_guidelines(ax)
     
     def show(self):
         plt.show()
         
     def save(self, filename):
-        plt.savefig(filename, bbox_inches=0)
+        plt.savefig(filename, bbox_inches='tight')
         
 
 def mainTest():
@@ -223,7 +230,7 @@ def main():
     f.close()
     
     d = DiagramGenerator(eval(json_txt))
-    d.save('/tmp/activity_measures.pdf')
+    d.save('/tmp/activity_measures.svg')
 
 
 if __name__ == '__main__':   
