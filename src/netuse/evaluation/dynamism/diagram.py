@@ -8,6 +8,7 @@ import numpy as np
 from itertools import cycle
 from matplotlib.pyplot import FuncFormatter#, LogLocator
 import matplotlib.pyplot as plt
+from commons.chart_utils import ChartImprover
 
 
 def format_time_in_minutes(x, pos):
@@ -44,24 +45,17 @@ class DiagramGenerator:
       }
     '''
     def __init__(self, title, data):
-        self.title = title
-        self.xlabel = 'Drop-interval (mins)'
-        self.ylabel = 'Requests'
-        self.linesShapes = cycle(('xk-','+k-.','Dk--'))
-        self.linesColors = cycle(('r','g', 'b','y'))
+        # http://colorschemedesigner.com/previous/colorscheme2/index-es.html?tetrad;100;0;225;0.3;-0.8;0.3;0.5;0.1;0.9;0.5;0.75;0.3;-0.8;0.3;0.5;0.1;0.9;0.5;0.75;0.3;-0.8;0.3;0.5;0.1;0.9;0.5;0.75;0.3;-0.8;0.3;0.5;0.1;0.9;0.5;0.75;0
+        self.linesColors = cycle(("#BF60BF", "#ACBF60", "#BF9060", "#6096BF"))
+        self.ci = ChartImprover( title = None, # title,
+                                 xlabel = 'Drop-interval (mins)',
+                                 ylabel = {"label": 'Requests', "x": -0.02, "y": 1.1},
+                                 legend_from_to = (0.2, 0.8) )
+        #self.linesShapes = cycle(('xk-','+k-.','Dk--'))
         self.generate(data)
 
     def generate(self, data):
-        fig = plt.figure(figsize=(10,5))
-        
-        plt.subplots_adjust(
-            left=None,   # the left side of the subplots of the figure
-            bottom=None, # the right side of the subplots of the figure
-            right=None,  # the bottom of the subplots of the figure
-            top=None,    # the top of the subplots of the figure
-            wspace=0.3,  # the amount of width reserved for blank space between subplots
-            hspace=0.4   # the amount of height reserved for white space between subplots
-        )
+        fig = plt.figure(figsize=(16,6))
         
         show_on_diagram = ( DiagramGenerator.NB,
                             DiagramGenerator.OURS )
@@ -83,18 +77,15 @@ class DiagramGenerator:
             std_devs.append( np.std(repetitions) )
         return means, std_devs
     
-    def generate_subplot(self, ax, data, show_on_diagram, title=None):
-        plt.xlabel(self.xlabel)
-        plt.ylabel(self.ylabel)
-        if title is not None:
-            plt.title(title)
-        
+    def generate_subplot(self, ax, data, show_on_diagram, title=None):        
         for label in show_on_diagram:
             color = self.linesColors.next()
             means, std_devs = self.get_mean_and_std_dev(data[label][DiagramGenerator.REQUESTS])
             ax.errorbar( data[label][DiagramGenerator.DROP_INTERVAL],
-                         means, fmt = self.linesShapes.next(), color = color,
-                         yerr = std_devs, ecolor = color,
+                         means,
+                         #fmt = self.linesShapes.next(),
+                         color = color,
+                         #yerr = std_devs, ecolor = color, # in this print N=1, so avoiding errorbars it looks better
                          label = label)
         
         ax.set_xlim(0)
@@ -103,15 +94,13 @@ class DiagramGenerator:
         ax.xaxis.set_major_formatter(FuncFormatter(format_time_in_minutes))
         #ax.xaxis.set_major_locator(LogLocator())
         
-        handles, labels = ax.get_legend_handles_labels()
-        #ax.legend(handles[::-1], labels[::-1]) # reverse the order
-        ax.legend(handles, labels, loc="upper right")
+        self.ci.improve_following_guidelines(ax)
     
     def show(self):
         plt.show()
         
     def save(self, filename):
-        plt.savefig(filename, bbox_inches=0)
+        plt.savefig(filename, bbox_inches='tight')
 
 
 def mainTest():
@@ -134,7 +123,7 @@ def main():
     f.close()
     
     d = DiagramGenerator("Solutions behavior on dynamic environments", eval(json_txt))
-    d.save('/tmp/dynamism.pdf')
+    d.save('/tmp/dynamism.svg')
 
 
 if __name__ == '__main__':   
