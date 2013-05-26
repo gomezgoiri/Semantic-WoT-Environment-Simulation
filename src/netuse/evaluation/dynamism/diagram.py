@@ -6,7 +6,7 @@ Created on Jan 08, 2013
 '''
 import numpy as np
 from itertools import cycle
-from matplotlib.pyplot import FuncFormatter#, LogLocator
+from matplotlib.pyplot import FuncFormatter, MultipleLocator
 import matplotlib.pyplot as plt
 from commons.chart_utils import ChartImprover
 
@@ -92,7 +92,7 @@ class DiagramGenerator:
         ax.set_ylim(0)
                  
         ax.xaxis.set_major_formatter(FuncFormatter(format_time_in_minutes))
-        #ax.xaxis.set_major_locator(LogLocator())
+        ax.xaxis.set_major_locator(MultipleLocator( 1000*60*10 )) # each 10 minutes a tick
         
         self.ci.improve_following_guidelines(ax)
     

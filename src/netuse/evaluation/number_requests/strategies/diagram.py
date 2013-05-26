@@ -12,6 +12,8 @@ from commons.chart_utils import ChartImprover
 
 class DiagramGenerator:
     
+    NB_CACHING_1C = 'caching_1'
+    NB_CACHING_100C = 'caching_100'
     OURS_1C = 'ours_1'
     OURS_10C = 'ours_10'
     OURS_100C = 'ours_100'
@@ -30,29 +32,20 @@ class DiagramGenerator:
     def __init__(self, title, data):
         
         # http://colorschemedesigner.com/previous/colorscheme2/index-es.html?tetrad;100;0;225;0.3;-0.8;0.3;0.5;0.1;0.9;0.5;0.75;0.3;-0.8;0.3;0.5;0.1;0.9;0.5;0.75;0.3;-0.8;0.3;0.5;0.1;0.9;0.5;0.75;0.3;-0.8;0.3;0.5;0.1;0.9;0.5;0.75;0
-        self.linesColors = ("#E6AC73", "#CFE673", "#507EA1", "#8A458A")#'r','y','g', 'b')
+        self.linesColors = ("#E6AC73", "#CFE673", "#507EA1", "#E67373", "#8A458A")
         # self.linesShapes = ('xk-','+k-.','Dk--') # avoiding spaghetti lines
         self.ci = ChartImprover( title = None, # title,
                                  xlabel = 'Number of nodes',
                                  ylabel = {"label": 'Requests', "x": -0.02, "y": 1.1},
                                  legend_from_to = (0.04, 1.0) )
-        
-        self.generate(data)
-
-    def generate(self, data):
-        fig = plt.figure(figsize=(10, 6))
-        
-        #plt.subplots_adjust(
-        #    left=None,   # the left side of the subplots of the figure
-        #    bottom=None, # the right side of the subplots of the figure
-        #    right=None,  # the bottom of the subplots of the figure
-        #    top=None,    # the top of the subplots of the figure
-        #    wspace=0.3,  # the amount of width reserved for blank space between subplots
-        #    hspace=0.4   # the amount of height reserved for white space between subplots
-        #)
-                
-        ax = fig.add_subplot(1,1,1)
-        self.generate_subplot(ax, data)
+        # from worst to best
+        desired_order = ( DiagramGenerator.NB,
+                          DiagramGenerator.NB_CACHING_100C,
+                          DiagramGenerator.OURS_100C,
+                          DiagramGenerator.OURS_10C,
+                          DiagramGenerator.OURS_1C,
+                          DiagramGenerator.NB_CACHING_1C )
+        self.generate(data, desired_order)
     
     def get_mean_and_std_dev(self, values):
         means = []
@@ -62,26 +55,33 @@ class DiagramGenerator:
             std_devs.append( np.std(repetitions) )
         return means, std_devs
     
-    def generate_subplot(self, ax, data, title=None):
-        if title is not None:
-            plt.title(title)
+    def generate(self, data, desired_order):
+        fig = plt.figure(figsize=(10, 6))
+        ax = fig.add_subplot(1,1,1)
         
         #shapes = cycle(self.linesShapes)
         colors = cycle(self.linesColors)
         
-        for strategy_name, strat_data in data.iteritems():
-            color = colors.next()
-            means, std_devs = self.get_mean_and_std_dev(strat_data[DiagramGenerator.REQUESTS])
-            ax.errorbar( strat_data[DiagramGenerator.NUM_NODES],
-                         means, #fmt = shapes.next(),
-                         color = color,
-                         yerr = std_devs, ecolor = color,
-                         label = strategy_name )
+        #for strategy_name, strat_data in data.iteritems():
+        # I want they to appear in an order: for the legends and for the colors
+        for strategy_name in desired_order:
+            if strategy_name in data:
+                strat_data = data[strategy_name]
+                color = colors.next()
+                means, std_devs = self.get_mean_and_std_dev(strat_data[DiagramGenerator.REQUESTS])
+                ax.errorbar( strat_data[DiagramGenerator.NUM_NODES],
+                             means, #fmt = shapes.next(),
+                             color = color,
+                             yerr = std_devs, ecolor = color,
+                             label = strategy_name )
         
         ax.set_xlim(0)
         ax.set_ylim(0)
         
         self.ci.improve_following_guidelines(ax)
+        handles, labels = ax.get_legend_handles_labels()
+        #ax.legend(handles[::-1], labels[::-1]) # reverse the order
+        ax.legend(handles, labels, loc="upper right")
     
     def show(self):
         plt.show()
@@ -112,7 +112,7 @@ def main():
     f.close()
     
     d = DiagramGenerator("Network usage by strategies", eval(json_txt))
-    d.save('/tmp/requests_by_strategies.pdf')
+    d.save('/tmp/requests_by_strategies.svg')
 
 
 if __name__ == '__main__':   
