@@ -59,16 +59,17 @@ def main():
         )
     )
     
-    for numConsumers in (1, 10, 100):
+    for numConsumers in (1, 100, 300):
         var_params.append (
            Parameters(
-              strategy = Parametrization.our_solution,
+              #strategy = Parametrization.our_solution,
+              strategy = Parametrization.negative_broadcasting_caching,
               numConsumers = numConsumers
             )
         )
     
     # Prepare and save executions (possibly repeating them)
-    p.save_repeating_for_network_sizes( network_sizes=range(5,301,10), rest_variable_parameters=var_params)
+    p.save_repeating_for_network_sizes( network_sizes=range(5,305,10), rest_variable_parameters=var_params)
 
 
 if __name__ == '__main__':
