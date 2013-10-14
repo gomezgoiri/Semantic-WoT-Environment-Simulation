@@ -39,6 +39,8 @@ class RawDataProcessor(object):
             self._load(executionSet, DiagramGenerator.OURS_1C, Parametrization.our_solution, additionalFilter=lambda p: p.numConsumers==1)
             self._load(executionSet, DiagramGenerator.OURS_10C, Parametrization.our_solution, additionalFilter=lambda p: p.numConsumers==10)
             self._load(executionSet, DiagramGenerator.OURS_100C, Parametrization.our_solution, additionalFilter=lambda p: p.numConsumers==100)
+            self._load(executionSet, DiagramGenerator.NB_CACHING_1C, Parametrization.negative_broadcasting_caching, additionalFilter=lambda p: p.numConsumers==1)
+            self._load(executionSet, DiagramGenerator.NB_CACHING_100C, Parametrization.negative_broadcasting_caching, additionalFilter=lambda p: p.numConsumers==100)
             break # just one execution set
 
     def toJson(self):
