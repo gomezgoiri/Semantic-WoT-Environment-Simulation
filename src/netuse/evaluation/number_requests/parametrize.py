@@ -60,9 +60,16 @@ def main():
     )
     
     for numConsumers in (1, 100, 300):
+        
         var_params.append (
            Parameters(
-              #strategy = Parametrization.our_solution,
+              strategy = Parametrization.our_solution,
+              numConsumers = numConsumers
+            )
+        )
+        
+        var_params.append (
+           Parameters(
               strategy = Parametrization.negative_broadcasting_caching,
               numConsumers = numConsumers
             )
