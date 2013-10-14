@@ -13,7 +13,7 @@ from netuse.network_models import NetworkModelManager
 from netuse.evaluation.simulate import BasicModel
 from netuse.evaluation.utils import ParametrizationUtils, Parameters
 from netuse.triplespace.network.discovery.discovery import DiscoveryFactory
-from netuse.database.parametrization import Parametrization, ParametrizableNetworkModel
+from netuse.database.parametrization import Parametrization, ParametrizableNetworkModel, NetworkModel
 
 # This script generates a simulation and records its trace in a file.
 # Used to check the functionalities under really simple simulation conditions.
@@ -83,14 +83,14 @@ def main():
     p = ParametrizationUtils('memory_integration_test', '/home/tulvur/dev/dataset', None)
     params = Parameters (
             simulateUntil = 400000,
-            discovery = DiscoveryFactory.MDNS_DISCOVERY, #SIMPLE_DISCOVERY MDNS_DISCOVERY
+            discovery = DiscoveryFactory.SIMPLE_DISCOVERY, #SIMPLE_DISCOVERY MDNS_DISCOVERY
             strategy = Parametrization.our_solution,
             amountOfQueries = 1000,
             writeFrequency = 10000,
             queries = templates,
             nodes = p.get_random_nodes(100),
             numConsumers = 100,
-            network_model = ParametrizableNetworkModel( type = NetworkModelManager.chaotic_netmodel )
+            network_model = ParametrizableNetworkModel( type = NetworkModelManager.chaotic_netmodel ) # NetworkModel()
          )
     
     model = TraceAndLoadFilesModel( p.create_parametrization(params) )

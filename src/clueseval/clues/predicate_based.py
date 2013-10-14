@@ -115,7 +115,7 @@ class PredicateBasedClue(Clue):
 
 if __name__ == '__main__':
     c1 = PredicateBasedClue()
-    c1.parseFile("../../../files/7CAMPA_measures.n3")
+    c1.parseFile("/home/tulvur/dev/dataset/data/bizkaisense/7CAMPA_station.n3")
     
     json_str = c1.toJson()
     print json_str
