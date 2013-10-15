@@ -149,7 +149,7 @@ Afterwards, you can...
 Tests
 -----
 
-To run any tests, just execute the desired one using:
+To run any test, just execute the desired one using:
 
      python test/[subfolder/]name.py
 
@@ -157,4 +157,4 @@ To run any tests, just execute the desired one using:
 License
 -------
 
-Check _COPYING.txt_.
+Check [COPYING.txt](https://bitbucket.org/gomezgoiri/networkusage/src/0c075bcd7841cade197e15a9b78df5737e8825f1/COPYING.txt).
