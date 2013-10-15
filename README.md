@@ -12,18 +12,18 @@ Directory structure
 -------------------
 
  * _src_ contains the source code of the different modules which compose this project.
-  + _clueseval_ has the code and the evaluation for the _clues_
-   - _clues_ has the code about this core data structure (i.e. utility methods, parsing and serializations)
-   - _evaluation_ has the evaluation for the Section 6.1
-  + _netuse_
-   - _database_ contains the simulation results are persisted using [mongoDB](http://www.mongodb.org/). This module contains the data models stored through [mongoengine](http://mongoengine.org/).
-   - _debugging_ (ignore it)
-   - _evaluation_ has the parametrization and processing for the evaluations of sections 6.2 ( _number&#95;requests_ ), 6.3 ( _activity_ ) and 6.4 ( _dynamism_ )
-   - _mdns_ has the code to simulate the [mDNS](http://tools.ietf.org/html/rfc6762) and [DNS-SD](http://www.ietf.org/rfc/rfc6763.txt) protocols
-   - _tracers_ contains the code to write the simulated [HTTP](http://www.ietf.org/rfc/rfc2616.txt) and [UDP](http://www.ietf.org/rfc/rfc768.txt) traces in a file or in mongoDB
-   - _triplespace_ contains the semantic management classes. It is called like that, because this project originally evolved from another used to assess different _Triple Space_ implementations. For more information, see [this paper](http://gomezgoiri.net/publications/gomezgoiri-assesing.html).
-  + _commons_ has the code which is used by both _clueseval_ and _netuse_ modules
-  + _testing_ has code used by the unit tests
+   + _clueseval_ has the code and the evaluation for the _clues_
+     - _clues_ has the code about this core data structure (i.e. utility methods, parsing and serializations)
+     - _evaluation_ has the evaluation for the Section 6.1
+   + _netuse_
+     - _database_ contains the simulation results are persisted using [mongoDB](http://www.mongodb.org/). This module contains the data models stored through [mongoengine](http://mongoengine.org/).
+     - _debugging_ (ignore it)
+     - _evaluation_ has the parametrization and processing for the evaluations of sections 6.2 ( _number&#95;requests_ ), 6.3 ( _activity_ ) and 6.4 ( _dynamism_ )
+     - _mdns_ has the code to simulate the [mDNS](http://tools.ietf.org/html/rfc6762) and [DNS-SD](http://www.ietf.org/rfc/rfc6763.txt) protocols
+     - _tracers_ contains the code to write the simulated [HTTP](http://www.ietf.org/rfc/rfc2616.txt) and [UDP](http://www.ietf.org/rfc/rfc768.txt) traces in a file or in mongoDB
+     - _triplespace_ contains the semantic management classes. It is called like that, because this project originally evolved from another used to assess different _Triple Space_ implementations. For more information, see [this paper](http://gomezgoiri.net/publications/gomezgoiri-assesing.html).
+   + _commons_ has the code which is used by both _clueseval_ and _netuse_ modules
+   + _testing_ has code used by the unit tests
  * _test_ contains the unit tests for the different modules of the project.
 
 
@@ -105,10 +105,10 @@ Configuration
 -------------
 
  * Dataset:
-  - By default, the dataset is supposed to be located in ~/dev/dataset.
-  - However, all the entry points which need it, can receive a different path as a parameter (e.g. '-ds','--data-set).
+   - By default, the dataset is supposed to be located in ~/dev/dataset.
+   - However, all the entry points which need it, can receive a different path as a parameter (e.g. '-ds','--data-set).
  * Mongodb:
-  - The database connection details can be changed in src/netuse/database/__init__.py
+   - The database connection details can be changed in src/netuse/database/__init__.py
 
 
 Usage
