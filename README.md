@@ -2,10 +2,12 @@ Evaluation of _Energy-aware Architecture for Information Search..._
 ===================================================================
 
 Evaluation of the paper entiled [Energy-aware Architecture for Information Search in the Semantic Web of Things](http://gomezgoiri.net/publications/gomezgoiri-energy.html).
-This project has evolved during more than a year.
+
+This project was developed during more than a year.
+Indeed, since it is based on a previous project, there is two years old code.
 Consequently, it may be difficult to understand.
-I did my best to make a neat design and now I'm really trying to clearly document it.
-However, if after carefully reading the documentation and the source code, you don't understand something or you cannot run something, just mail me and I'll do my best to help you ;-)
+I did my best to make a neat design and now I've really tried to clearly document it.
+However, providing that, after carefully reading the documentation and the source code, you don't understand something or you cannot run something, just mail me and I'll do my best to help you ;-)
 
 
 Directory structure
@@ -122,19 +124,20 @@ To run a concrete simulation, you should follow the following steps:
 1. Choose the simulation to run under _/netuse/evaluation_.
 1. Parametrize the simulation. Using _parametrize.py_ (see _Directory structure_ section).
 1. Run the simulations.
-   Note that (a) by default the simulation script runs in parallel as much simulations as processors the host machine has and
-   (b) you can run all the simulations of a simulation set using different machines as long as they have access to the same _MongoDB database_.
+   Note that (a) by default the following script runs in parallel as much simulations as processors the host machine has; and
+   (b) you can run all the simulations of a simulation set using different machines as long as they all have access to the same _MongoDB database_ where the parametrization is stored.
    
-        * If you have installed this project using the _setup.py_ file, an entry point to the simulation class has already been installed. Simply run:
+    * If you have installed this project using the _setup.py_ file, an entry point to the simulation class has already been installed in your system.
+      To use it, simply run:
 
-                simulate
+        simulate
     
-                # Or if you prefer to run it in the background:
-                nohup simulate &> output_file.out
+        # Or if you prefer to run it in the background:
+        nohup simulate &> output_file.out
     
-        * Otherwise, run:
+    * Otherwise, run:
   
-                python src/netuse/evaluation/simulate.py
+        python src/netuse/evaluation/simulate.py
 
 
 Afterwards, you can...
