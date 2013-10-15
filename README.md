@@ -126,17 +126,12 @@ To run a concrete simulation, you should follow the following steps:
 1. Run the simulations.
    Note that (a) by default the following script runs in parallel as much simulations as processors the host machine has; and
    (b) you can run all the simulations of a simulation set using different machines as long as they all have access to the same _MongoDB database_ where the parametrization is stored.
-   
-    * If you have installed this project using the _setup.py_ file, an entry point to the simulation class has already been installed in your system.
-      To use it, simply run:
-
+    * If you have installed this project using the _setup.py_ file, an entry point to the simulation class has already been installed in your system. To use it, simply run:
             simulate
     
             # Or if you prefer to run it in the background:
             nohup simulate &> output_file.out
-    
     * Otherwise, run:
-  
             python src/netuse/evaluation/simulate.py
 
 
