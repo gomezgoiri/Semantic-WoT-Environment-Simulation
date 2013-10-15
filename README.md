@@ -122,14 +122,14 @@ To run a concrete simulation, you should follow the following steps:
  
   * If you have installed this project using the _setup.py_ file, an entry point to the simulation class has already been installed. Simply run:
 
-     simulate
+        simulate
     
-     # Or if you prefer to run it in the background:
-     nohup simulate &> output_file.out
+        # Or if you prefer to run it in the background:
+        nohup simulate &> output_file.out
     
   * Otherwise, run:
   
-     python src/netuse/evaluation/simulate.py
+        python src/netuse/evaluation/simulate.py
 
 
 Afterwards, you can...
