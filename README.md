@@ -119,25 +119,34 @@ Configuration
 Usage
 -----
 
+### Simulation
+
 To run a concrete simulation, you should follow the following steps:
 
 1. Choose the simulation to run under _/netuse/evaluation_.
 1. Parametrize the simulation. Using _parametrize.py_ (see _Directory structure_ section).
 1. Run the simulations.
-   Note that (a) by default the following script runs in parallel as much simulations as processors the host machine has; and
-   (b) you can run all the simulations of a simulation set using different machines as long as they all have access to the same _MongoDB database_ where the parametrization is stored.
-    * If you have installed this project using the _setup.py_ file, an entry point to the simulation class has already been installed in your system. To use it, simply run:
-            simulate
-    
-            # Or if you prefer to run it in the background:
-            nohup simulate &> output_file.out
-    * Otherwise, run:
-            python src/netuse/evaluation/simulate.py
+
+        # If you have installed this project using the _setup.py_ file, an entry point to the simulation class has already been installed in your system:
+        simulate
+        
+        # Or if you prefer to run it in the background:
+        nohup simulate &> output_file.out
+        
+        # Or if the previous two don't work, simply
+        python src/netuse/evaluation/simulate.py
+
+Note that:
+
+ - By default the simulation script runs in parallel as much simulations as processors the host machine has.
+ - You can run all the simulations of a simulation set using different machines as long as they all have access to the same _MongoDB database_ where the parametrization is stored.
 
 
-Afterwards, you can...
+### Analysis of the results
 
-1. Process the results of the simulations with the proper _processor.py_
+To analyze the results of the last simulation runs, you can...
+
+1. Summarize the results of the simulations with the proper _processor.py_
 1. Generate a chart which summarizes the results using _diagram.py_
 
 
