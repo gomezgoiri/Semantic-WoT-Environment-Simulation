@@ -1,0 +1,13 @@
+FuXi==1.4.production
+SimPy==2.3.1
+argparse==1.2.1
+distribute==0.6.34
+ez-setup==0.9
+isodate==0.4.9
+matplotlib==1.1.1
+mock==1.0.0
+mongoengine==0.7.5
+numpy==1.6.2
+pymongo==2.3
+rdflib==2.4.2
+wsgiref==0.1.2
