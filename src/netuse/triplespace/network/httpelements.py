@@ -1,8 +1,18 @@
+# -*- coding: utf-8 -*-
 '''
-Created on Nov 20, 2011
+ Copyright (C) 2012 onwards University of Deusto
+  
+ All rights reserved.
+ 
+ This software is licensed as described in the file COPYING, which
+ you should have received as part of this distribution.
+ 
+ This software consists of contributions made by many individuals, 
+ listed below:
+ 
+ @author: Aitor Gómez Goiri <aitor.gomez@deusto.es>
+'''
 
-@author: tulvur
-'''
 from urllib2 import Request
 
 # http://www.w3.org/Protocols/rfc2616/rfc2616-sec6.html

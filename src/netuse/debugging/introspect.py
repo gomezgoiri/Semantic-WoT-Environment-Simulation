@@ -1,16 +1,25 @@
+# -*- coding: utf-8 -*-
 '''
-Created on Sep 26, 2012
+ Copyright (C) 2012 onwards University of Deusto
+  
+ All rights reserved.
+ 
+ This software is licensed as described in the file COPYING, which
+ you should have received as part of this distribution.
+ 
+ This software consists of contributions made by many individuals, 
+ listed below:
 
-@author: nctrun
+ @author: Pablo Orduña <pablo.orduna@deusto.es>
 
 http://code.google.com/p/weblabdeusto/source/browse/server/src/voodoo/MemoryIntrospector.py?r=1b1608dfc72a55d4e4d228673e72b35e911b16e2
 
 
-Uso:
+Usage:
     introspect()
     raw_input("Before (press enter)")
 
-Y mientras esta parado, miras el dump:
+And while it is stopped, check the dump:
     cat introspection.dump
     Ahi tendras pistas del uso de objetos: ordenados de mayor a menor frecuencia, cuantos son, y con porcentaje.
     

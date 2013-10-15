@@ -1,10 +1,20 @@
+# -*- coding: utf-8 -*-
 '''
-Created on Sep 26, 2012
+ Copyright (C) 2012 onwards University of Deusto
+  
+ All rights reserved.
+ 
+ This software is licensed as described in the file COPYING, which
+ you should have received as part of this distribution.
+ 
+ This software consists of contributions made by many individuals, 
+ listed below:
 
-@author: nctrun
-
-Hack para python para sobreescribir una clase hecha por terceros (o por mi) y saber cual es su origen (donde se creo).
+ @author: Pablo Orduña <pablo.orduna@deusto.es>
 '''
+
+# Hack para python para sobreescribir una clase hecha por terceros (o por mi) y saber cual es su origen (donde se creo).
+
 import urllib2
 import traceback
 import StringIO

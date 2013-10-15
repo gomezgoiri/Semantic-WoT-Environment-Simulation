@@ -1,8 +1,18 @@
+# -*- coding: utf-8 -*-
 '''
-Created on Jan 17, 2013
+ Copyright (C) 2012 onwards University of Deusto
+  
+ All rights reserved.
+ 
+ This software is licensed as described in the file COPYING, which
+ you should have received as part of this distribution.
+ 
+ This software consists of contributions made by many individuals, 
+ listed below:
+ 
+ @author: Aitor Gómez Goiri <aitor.gomez@deusto.es>
+'''
 
-@author: tulvur
-'''
 from SimPy.Simulation import Process, SimEvent, waitevent
 from clueseval.clues.versions.management import Version
 from netuse.results import G
