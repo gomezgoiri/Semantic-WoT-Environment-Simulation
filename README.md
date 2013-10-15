@@ -34,6 +34,7 @@ Installation
 ### Short procedure
 
 Use the bash script on the project's top directory:
+
     bash install.bash
 
 ### Manual procedure
@@ -41,33 +42,43 @@ Use the bash script on the project's top directory:
 First of all, install the project and its dependencies using pip:
 
  * Recommended option for development: checkout the code and edit it whenever you need
+ 
      pip install -e git+https://gomezgoiri@bitbucket.org/gomezgoiri/networkusage.git#egg=netuse
+     
  * If you have already downloaded the code and you don't need to edit it, you can simply do...
+ 
      pip install ./
+     
  * If a previous version was already installed use this:
+ 
      sudo pip install ./ --upgrade
      
 And to uninstall it:
+
      sudo pip uninstall netuse
 
 
 During the installation process, some dependencies won't be installed correctly.
 While the setup.py is broken, install them manually:
+
      sudo pip install numpy
      sudo pip install simpy
 
 After installing them, you should patch "n3meta.py" (issue related with n3 parsing) and "InfixOWL.py":
+
      patch [installation-path]/rdflib/syntax/parsers/n3p/n3meta.py ./patches/n3meta.py.diff
      patch [installation-path]/FuXi/Syntax/InfixOWL.py ./patches/InfixOWL.py.patch
 
 Then, download the semantic files needed for the simulation.
 Note that there is a subfolder with too much unnecessary base-data.
 To avoid downloading it, mark the checkout as as not recursive (-N) and then just download the needed folders.
+
      svn co https://dev.morelab.deusto.es/svn/aigomez/trunk/dataset/ -N [localfolder]/
      svn co https://dev.morelab.deusto.es/svn/aigomez/trunk/dataset/base_ontologies/ [localfolder]/base_ontologies
      svn co https://dev.morelab.deusto.es/svn/aigomez/trunk/dataset/data/ [localfolder]/data
 
 Then, create a symbolic link to point from ~/dev/dataset to the actual location of the dataset:
+
      ln -s  path/[localfolder] ~/dev/dataset
 
 
