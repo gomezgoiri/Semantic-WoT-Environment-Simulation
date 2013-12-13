@@ -18,6 +18,7 @@ import numpy as np
 from itertools import cycle
 import matplotlib.pyplot as plt
 from commons.chart_utils import ChartImprover
+from netuse.evaluation.utils import millions_formatter
 
 
 class DiagramGenerator:
@@ -49,6 +50,7 @@ class DiagramGenerator:
     def generate(self, data):
         fig = plt.figure(figsize=(10, 6))                
         ax = fig.add_subplot(1,1,1)
+        ax.yaxis.set_major_formatter( millions_formatter )
         self.generate_subplot(ax, data)
         
     def get_mean_and_std_dev(self, values):
@@ -107,5 +109,5 @@ def main():
     d.save('/tmp/requests_by_roles.pdf')
 
 
-if __name__ == '__main__':   
+if __name__ == '__main__':
     main()

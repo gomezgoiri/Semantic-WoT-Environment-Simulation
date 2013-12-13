@@ -13,6 +13,7 @@
  @author: Aitor Gómez Goiri <aitor.gomez@deusto.es>
 '''
 import random
+from matplotlib.ticker import FuncFormatter
 from netuse.devices import RegularComputer
 from netuse.database.execution import ExecutionSet, Execution
 from netuse.database.parametrization import Parametrization
@@ -124,3 +125,16 @@ class ParametrizationUtils():
                     except Exception as e:
                         print e
         self.es.save() # save just once with all the executions
+
+
+def millions_format(x, pos):
+    '100000000 => 100.000.000'
+    if x==0: return "0" # without commas!
+    if x<1000:
+        return x
+    thousand_units, remaining_units = x/1000, x%1000
+    if x<1000000:
+        return "%d.%03d" % (thousand_units, remaining_units)
+    return "%d.%03d.%03d" % (thousand_units/1000, thousand_units%1000, remaining_units)
+
+millions_formatter = FuncFormatter(millions_format)
