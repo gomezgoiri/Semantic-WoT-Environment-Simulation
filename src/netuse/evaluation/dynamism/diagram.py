@@ -18,6 +18,7 @@ from itertools import cycle
 from matplotlib.pyplot import FuncFormatter, MultipleLocator
 import matplotlib.pyplot as plt
 from commons.chart_utils import ChartImprover
+from netuse.evaluation.utils import millions_formatter
 
 
 def format_time_in_minutes(x, pos):
@@ -69,12 +70,14 @@ class DiagramGenerator:
         show_on_diagram = ( DiagramGenerator.NB,
                             DiagramGenerator.OURS )
         ax1 = fig.add_subplot(1,2,1)
+        ax1.yaxis.set_major_formatter( millions_formatter )
         self.generate_subplot(ax1, data, show_on_diagram)
         
         
         show_on_diagram = ( DiagramGenerator.PROV_WP,
                             DiagramGenerator.CONS_WP)
         ax2 = fig.add_subplot(1,2,2)
+        ax2.yaxis.set_major_formatter( millions_formatter )
         self.generate_subplot(ax2, data, show_on_diagram)    
     
     

@@ -100,7 +100,7 @@ def mainTest():
     d = DiagramGenerator("Roles on the network use", eval(json_txt))
     d.save('/tmp/test_diagram.pdf')
 
-def main():    
+def main():
     f = open('/tmp/requests_by_roles.json', 'r')
     json_txt = f.read()
     f.close()
